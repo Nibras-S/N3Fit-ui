@@ -1,426 +1,215 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import './Active.css';
 import PhoneInput from 'react-phone-input-2';
-import { FaUsers, FaMale, FaFemale } from 'react-icons/fa';
+import 'react-phone-input-2/lib/style.css';
+import { FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaTimes, FaSync } from 'react-icons/fa';
+import toast, { Toaster } from 'react-hot-toast';
+import DataTable from '../ui/DataTable';
+import PageHeader from '../ui/PageHeader';
+import EditMemberModal from './EditMemberModal';
 
 const AllMembers = () => {
-  
     const navigate = useNavigate();
     const [members, setMembers] = useState([]);
-    const [searchTerm, setSearchTerm] = useState(''); 
-    const [loading, setloading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [genderFilter, setGenderFilter] = useState('all');
+    const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState(null);
-
-
-    // const backendUrl = process.env.BACKEND_URL;// State to store the search input
-
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-    useEffect(() => {
-        let isMounted = true;
-      
-        const loadMembers = async () => {
-          await fetchMembers();
-        };
-      
-        if (isMounted) {
-          loadMembers();
-        }
-      
-        return () => {
-          isMounted = false;
-        };
-      }, []);
-      
-      const fetchMembers = async () => {
-        setloading(true);
+    const fetchMembers = async () => {
+        setLoading(true);
         try {
-          const response = await axios.get(`${backendUrl}/api/contacts/`);
-          setMembers(response.data);
+            const response = await axios.get(`${backendUrl}/api/contacts/`);
+            setMembers(response.data);
         } catch (error) {
-          console.error("Error fetching contacts:", error);
+            toast.error('Failed to load members');
         } finally {
-          setloading(false);
+            setLoading(false);
         }
-      };
-      
+    };
 
-    
-    const menCount = members.filter(user => user.gender === "Male").length;
-    const womenCount = members.filter(user => user.gender === "Female").length;
-    const totalCount = members.length;
+    useEffect(() => { fetchMembers(); }, []);
+
+    const stats = useMemo(() => ({
+        total: members.length,
+        male: members.filter(u => u.gender === "Male").length,
+        female: members.filter(u => u.gender === "Female").length,
+        active: members.filter(u => u.dews >= 0).length
+    }), [members]);
+
+    const filteredMembers = useMemo(() => {
+        let filtered = members;
+        if (genderFilter !== 'all') filtered = filtered.filter(u => u.gender === genderFilter);
+        return filtered
+            .filter(u => u.phone?.includes(searchTerm) || u.name?.toLowerCase().includes(searchTerm.toLowerCase()))
+            .sort((a, b) => a.dews - b.dews);
+    }, [members, searchTerm, genderFilter]);
 
     const handleDeleteClick = async (userId, userName) => {
-    const confirmDelete = window.confirm(`Are you sure you want to delete ${userName}?`);
-        
-    if (!confirmDelete) return;
-      
-    if (!userId) {
-        console.warn("User ID not available.");
-        return;
-    }
-      
-    try {
-        const res = await axios.delete(`${backendUrl}/api/contacts/${userId}`);
-      
-        if (res.status === 200) {
-        console.log(`Successfully deleted user: ${userId}`);
-        setMembers(prev => prev.filter(u => u._id !== userId));
-        } else {
-        console.warn("Unexpected response:", res);
-        }
-        } catch (err) {
-          console.error("Failed to delete user:", err);
-        }
-      };
-    // Function to handle the search input change
-    const handleSearchChange = (e) => {
-        setSearchTerm(e.target.value);
+        if (!window.confirm(`Delete ${userName}?`)) return;
+        try {
+            await axios.delete(`${backendUrl}/api/contacts/${userId}`);
+            setMembers(prev => prev.filter(u => u._id !== userId));
+            toast.success('Member deleted');
+        } catch { toast.error('Failed to delete'); }
     };
 
-    const handleEditClick = async (userId) => {
-        try {
-            const response = await axios.get(`${backendUrl}/api/contacts/${userId}`);
-            setEditData(response.data);
-            setIsEditing(true);
-        } catch (err) {
-            console.error("Error fetching user data:", err.response ? err.response.data : err.message);
-        }
+    const handleEditClick = (userId) => {
+        setEditData(userId); // Store ID instead of full object
+        setIsEditing(true);
     };
-    const handleUpdate = async (e) => {
-        e.preventDefault();
-      
-        try {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); // Normalize to local midnight
-        
-            let daysToAdd = 0;
-            switch (editData.plan) {
-              case "1-Month":
-                daysToAdd = 30;
-                break;
-              case "2-Month":
-                daysToAdd = 60;
-                break;
-              case "3-Month":
-                daysToAdd = 90;
-                break;
-              default:
-                daysToAdd = 0;
-            }
-        
-            const startDate = new Date(editData.date);
-            startDate.setHours(0, 0, 0, 0); // Normalize to midnight
-        
-            const endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + daysToAdd);
-            endDate.setHours(0, 0, 0, 0); // Normalize to midnight
-        
-            const timeDiff = endDate.getTime() - today.getTime();
-            const dews = Math.floor(timeDiff / (1000 * 60 * 60 * 24)) ;
-        
-            const status = dews >= 0 ? "Active" : "InActive";
-        
-            const updatedData = {
-              ...editData,
-              endDate: endDate.toISOString(),
-              status,
-              dews,
-            };
-        
-            console.log("Updating with data:", updatedData);
-      
-          await axios.put(`${backendUrl}/api/contacts/${editData._id}`, updatedData);
-      
-          setIsEditing(false);
-          fetchMembers();
-        } catch (err) {
-          console.error("Error updating member:", err.response ? err.response.data : err.message);
-        }
-      };
-      
-    
+
+    const handleUpdateSuccess = () => {
+        setIsEditing(false);
+        fetchMembers();
+    };
+
+    const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+
+    // Column definitions
+    const columns = [
+        {
+            key: 'name', label: 'Name',
+            render: (row) => (
+                <div
+                    className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-1 -m-1 rounded-lg transition-colors group"
+                    onClick={() => navigate(`/members/${row._id}`)}
+                >
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                        {row.name?.charAt(0)}
+                    </div>
+                    <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{row.name}</span>
+                </div>
+            )
+        },
+        { key: 'phone', label: 'Phone', render: (row) => <span className="text-gray-500">{row.phone}</span> },
+        {
+            key: 'status', label: 'Status',
+            render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
+        },
+        {
+            key: 'dews', label: 'Days Left',
+            render: (row) => <span className={row.dews < 0 ? 'text-red-500 font-medium' : 'text-gray-700'}>{row.dews}</span>
+        },
+        { key: 'date', label: 'Start Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.date)}</span> },
+        { key: 'endDate', label: 'End Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.endDate)}</span> }
+    ];
+
+    const renderActions = (row) => (
+        <div className="flex gap-2">
+            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"><FaEdit /></button>
+            <button onClick={() => handleDeleteClick(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
+        </div>
+    );
+
+    const renderMobileCard = (row) => (
+        <>
+            <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-3">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                        {row.name?.charAt(0)}
+                    </div>
+                    <div>
+                        <div className="font-semibold text-gray-900">{row.name}</div>
+                        <div className="text-sm text-gray-500">{row.phone}</div>
+                    </div>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    {row.dews >= 0 ? 'Active' : 'Expired'}
+                </span>
+            </div>
+            <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                <span className={row.dews < 0 ? 'text-red-500 font-medium' : ''}>{row.dews} days</span>
+                <span>{formatDate(row.date)}</span>
+            </div>
+            <div className="flex gap-2 pt-3 border-t border-gray-100">
+                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaEdit /> Edit</button>
+                <button onClick={() => handleDeleteClick(row._id, row.name)} className="flex-1 py-2 bg-red-50 text-red-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaTrash /> Delete</button>
+            </div>
+        </>
+    );
 
     return (
+        <div>
+            <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
 
-    <div>
-        {loading && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center pointer-events-auto">
-            <div className="flex flex-col items-center space-y-4 animate-fadeIn">
-            <div className="relative w-16 h-16">
-                <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-white animate-spin" />
-            </div>
-            <p className="text-white text-lg font-semibold">loading ...</p>
-            </div>
-        </div>
-        )}
-            <div className="search-bar-container ">
-                <input
-                    type="text"
-                    className="search-bar-input"
-                    placeholder="Search by phone number or name"
-                    value={searchTerm}
-                    onChange={handleSearchChange} // Update the search input state
-                />
-            </div>
-            <div className="flex flex-wrap gap-4 mb-4 ml-8 text-sm">
-                <span className="flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full shadow-sm">
-                    <FaUsers /> Total: {totalCount}
-                </span>
-                <span className="flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full shadow-sm">
-                    <FaMale /> Men: {menCount}
-                </span>
-                <span className="flex items-center gap-2 bg-pink-100 text-pink-700 px-4 py-2 rounded-full shadow-sm">
-                    <FaFemale /> Women: {womenCount}
-                    </span>
-                </div>
-            <div className="container mt-5 ">
-                {/* Search Bar */}
-                {/* Mobile View Cards */}
+            {/* Page Header */}
+            <PageHeader
+                title="All Members"
+                gender={genderFilter} // Pass gender for dynamic theming
+                stats={[
+                    { label: 'Total', value: stats.total, icon: FaUsers },
+                    { label: 'Male', value: stats.male, icon: FaMale },
+                    { label: 'Female', value: stats.female, icon: FaFemale },
+                    { label: 'Active', value: stats.active, icon: undefined } // No specific icon for active in stats chips usually, maybe allow text only? Or reuse FaUsers?
+                ]}
+            />
 
-                <div className="mobile-card-view">
-                {members
-                    .filter(user =>
-                    
-                    (
-                        user.phone.includes(searchTerm) ||
-                        user.name.toLowerCase().includes(searchTerm.toLowerCase())
-                      )
-                    )
-                    .sort((a, b) => a.dews - b.dews)
-                    .map(user => {
-                    const formatDate = (dateString) => {
-                        const date = new Date(dateString);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        return `${day}-${month}-${year}`;
-                    };
-                    let rowBgClass = '';
-                                if (user.dews >= 0) {
-                                    rowBgClass = 'bg-green-600';
-                                } else if (user.dews < 0 ) {
-                                    // rowBgClass = 'bg-red-600 ';
-                                    rowBgClass = 'bg-red-600';
-                                } 
+            {/* Toolbar */}
+            <div className="bg-white p-4 rounded-xl border border-gray-200 mb-6 shadow-sm">
+                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <div className="relative w-full sm:w-72">
+                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search by name or phone..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                        />
+                        {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>}
+                    </div>
 
-                    return (
-                        <div className="mobile-card" key={user._id}>
-                            <div className="flex justify-between">
-                                <div className="info-row">
-                                
-                                    <i className="fas fa-user icon"></i>
-                                    <span>{user.name}</span>
-                                </div>
-                                <div className={`${rowBgClass} px-2 py-1  rounded-2xl flex items-center justify-center`}>
-                                        {user.dews < 0 ? 'Expired' : 'Active'}
-                                </div>
-                            </div>
-
-                            <div className="info-row">
-                                <i className="fas fa-phone icon"></i>
-                                <span>{user.phone}</span>
-                            </div>
-
-                            <div className="info-row">
-                                <i className="fas fa-coins icon"></i>
-                                <span>{user.dews}</span>
-                            </div>
-
-                            <div className="date-row">
-                                <div className="info-row">
-                                <i className="fas fa-play icon"></i>
-                                <span>{formatDate(user.date)}</span>
-                                </div>
-                                <div className="info-row">
-                                <i className="fas fa-flag icon"></i>
-                                <span>{formatDate(user.endDate)}</span>
-                                </div>
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <div className="inline-flex bg-gray-100 rounded-lg p-1">
+                            {['all', 'Male', 'Female'].map(tab => (
                                 <button
-                                    onClick={() => handleEditClick(user._id, user.name)}
-                                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition duration-300 "
+                                    key={tab}
+                                    onClick={() => setGenderFilter(tab)}
+                                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${genderFilter === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
                                 >
-                                    <i className="fas fa-edit"></i>
+                                    {tab === 'all' ? 'All' : tab}
                                 </button>
-                                <button
-                                    onClick={() => handleDeleteClick(user._id, user.name)}
-                                    style={{background:'#ef2c2c'}}
-                                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition duration-300 "
-                                    >
-                                <i className="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                            </div>
-
-
-
-                    );
-                    })}
-                </div>
-
-                {/* Table */}
-                <div >
-                <div className='px-3  block overflow-y-auto'>
-                <table className="table table-dark table-striped">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th scope="col">Name</th>
-                            <th scope="col">Phone</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Rem</th>
-                            <th scope="col">Start Date</th>
-                            <th scope="col">End Date</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members
-                            .filter(user => 
-                                 
-                                (
-                                    user.phone.includes(searchTerm) ||
-                                    user.name.toLowerCase().includes(searchTerm.toLowerCase())
-                                  ) // Filter by phone number based on search term
-                            )
-                            .sort((a, b) => a.dews - b.dews) // Sorting by date in descending order
-                            .map((user) => {
-                                const formatDate = (dateString) => {
-                                    const date = new Date(dateString);
-                                    const day = String(date.getDate()).padStart(2, '0');
-                                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                                    const year = date.getFullYear();
-                                    return `${day}-${month}-${year}`;
-                                };
-                            
-                                const formattedStartDate = formatDate(user.date);
-                                const formattedEndDate = formatDate(user.endDate);
-                            
-                                
-                                let rowBgClass = '';
-                                if (user.dews >= 0) {
-                                    rowBgClass = 'bg-green-600';
-                                } else if (user.dews < 0 ) {
-                                    // rowBgClass = 'bg-red-600 ';
-                                    rowBgClass = 'bg-red-600';
-                                } 
-                            
-                                return (
-                                    <tr key={user._id} className={` text-white`}>
-                                        <td>{user.name}</td>
-                                        <td>{user.phone}</td>
-                                        <td>
-                                        <div className={`${rowBgClass} px-2 py-1  rounded-2xl flex items-center justify-center`}>
-                                        {user.dews < 0 ? 'Expired' : 'Active'}
-                                        </div>
-
-                                        </td>
-                                        <td>{user.dews}</td>
-                                        <td>{formattedStartDate}</td>
-                                        <td>{formattedEndDate}</td>
-                                        <td>
-                                            <button
-                                                onClick={() => handleEditClick(user._id, user.name)}
-                                                className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded transition duration-300 ml-2"
-                                            >
-                                                 <i className="fas fa-edit"></i>
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteClick(user._id, user.name)}
-                                                className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition duration-300 ml-2"
-                                            >
-                                                <i className="fas fa-trash-alt"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                            
-                        }
-                    </tbody>
-                </table>
-                </div>
+                            ))}
+                        </div>
+                        <button
+                            onClick={fetchMembers}
+                            disabled={loading}
+                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
+                            title="Refresh"
+                        >
+                            <FaSync className={loading ? 'animate-spin' : ''} />
+                        </button>
+                    </div>
                 </div>
             </div>
-            {isEditing && (
-            <div className="fixed inset-0 lg:px-0 px-3 bg-black bg-opacity-60 flex items-center justify-center z-50">
-                <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
-                <h2 className="text-xl font-semibold mb-4">Edit Member</h2>
-                <form onSubmit={handleUpdate}>
-                    <input
-                    type="text"
-                    value={editData.name}
-                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
-                    placeholder="Name"
-                    className="w-full p-2 border rounded mb-4"
-                    />
-                    <PhoneInput
-                    country="IN"
-                    value={editData.phone}
-                    onlyCountries={['in']}
-                    onChange={(value) => setEditData({ ...editData, phone: value })}
-                    containerClass="w-full mb-4"
-                    inputClass="w-full p-2 border rounded"
-                    />
-                    <select
-                    value={editData.plan}
-                    onChange={(e) => setEditData({ ...editData, plan: e.target.value })}
-                    className="w-full p-2 border rounded mb-4"
-                    >
-                    <option value="">Select a plan</option>
-                    <option value="1-Month">1 month</option>
-                    <option value="2-Month">2 months</option>
-                    <option value="3-Month">3 months</option>
-                    </select>
-                    <div className="flex space-x-4 mb-4">
-                    <label>
-                        <input
-                        type="radio"
-                        value="Male"
-                        checked={editData.gender === "Male"}
-                        onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
-                        /> Male
-                    </label>
-                    <label>
-                        <input
-                        type="radio"
-                        value="Female"
-                        checked={editData.gender === "Female"}
-                        onChange={(e) => setEditData({ ...editData, gender: e.target.value })}
-                        /> Female
-                    </label>
-                    </div>
-                    <input
-                    type="date"
-                    value={editData.date}
-                    onChange={(e) => setEditData({ ...editData, date: e.target.value })}
-                    className="w-full p-2 border rounded mb-4"
-                    />
 
-                    <div className="flex justify-between">
-                    <button
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                        Update
-                    </button>
-                    </div>
-                </form>
-                </div>
-            </div>
+            {/* DataTable */}
+            <DataTable
+                data={filteredMembers}
+                columns={columns}
+                loading={loading}
+                emptyMessage="No members found"
+                emptyDescription={searchTerm ? 'Try a different search' : 'Add new members to get started'}
+                renderActions={renderActions}
+                renderMobileCard={renderMobileCard}
+                hoverColor="hover:bg-blue-50"
+                gender={genderFilter} // Pass gender for dynamic theming
+            />
+
+            {/* Edit Modal */}
+            {isEditing && editData && (
+                <EditMemberModal
+                    memberId={editData}
+                    onClose={() => setIsEditing(false)}
+                    onUpdate={handleUpdateSuccess}
+                />
             )}
-
         </div>
-  )
-}
+    );
+};
 
-export default AllMembers
+export default AllMembers;

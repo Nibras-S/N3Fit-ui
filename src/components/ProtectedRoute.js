@@ -1,10 +1,33 @@
-// components/ProtectedRoute.jsx
 import { Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-const ProtectedRoute = () => {
-  const isAuthenticated = localStorage.getItem('adminToken'); // or use context or cookie
+/**
+ * Role-based protected route.
+ * @param {string[]} allowedRoles - Roles that can access this route. If empty, any authenticated user can access.
+ */
+const ProtectedRoute = ({ allowedRoles = [] }) => {
+  const { isAuthenticated, loading, user } = useAuth();
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/admin" />;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+    // Redirect to appropriate dashboard based on role
+    if (user?.role === 'superadmin') return <Navigate to="/superadmin" replace />;
+    if (user?.role === 'staff') return <Navigate to="/active" replace />;
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;

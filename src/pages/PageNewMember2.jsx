@@ -1,16 +1,12 @@
-import React from 'react';
-import InactiveSoon from './InactiveSoon';
-import Sidebar from './Sidebar';
+import React from "react";
+import AppLayout from "../layout/AppLayout";
+import InactiveSoon from "./InactiveSoon";
 
 function PageNewMember2() {
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar  showButton={false} showBackToList={true} />
-      
-      <div className="flex-grow px-4 py-6 mt-16 lg:mt-0 w-full">
-        <InactiveSoon />
-      </div>
-    </div>
+    <AppLayout showBackToList={true} showGenderSwitch={false}>
+      <InactiveSoon />
+    </AppLayout>
   );
 }
 

@@ -1,56 +1,93 @@
-.btn {
-    padding: 1rem 2rem;
-    outline: none;
-    border: none;
-    font-size: 1rem;
-    color: var(--white);
-    background-color: var(--secondary-color);
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  
-  .btn:hover {
-    background-color: var(--secondary-color-dark);
-  }
-  .nav {
-    max-width: var(--max-width);
-    margin: auto;
-    padding: 2rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2rem;
-  }
-  
-  .nav__logo {
-    max-width: 150px;
-  }
-  
-  .nav__links {
-    list-style: none;
-    display: flex;
-    align-items: center;
-    gap: 3rem;
-  }
-  
-  .link a {
-    position: relative;
-    padding-bottom: 0.75rem;
-    color: var(--white);
-  }
-  
-  .link a::after {
-    content: "";
-    position: absolute;
-    height: 2px;
-    width: 0;
-    left: 0;
-    bottom: 0;
-    background-color: var(--secondary-color);
-    transition: 0.3s;
-  }
-  
-  .link a:hover::after {
-    width: 50%;
-  }
+/* Minimalist Scoped Navbar */
+
+.landing-page-wrapper .nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  padding: 2rem 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.landing-page-wrapper .nav--scrolled {
+  padding: 1.25rem 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.landing-page-wrapper .nav__container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.landing-page-wrapper .logo-text--minimal {
+  font-weight: 900;
+  font-size: 1.25rem;
+  letter-spacing: -0.05em;
+  color: var(--text-main);
+}
+
+.landing-page-wrapper .logo-icon--minimal {
+  background: var(--text-main);
+  color: white;
+  padding: 0.2rem 0.5rem;
+  font-weight: 900;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+}
+
+.landing-page-wrapper .nav__links--minimal {
+  display: flex;
+  gap: 3rem;
+  list-style: none;
+}
+
+.landing-page-wrapper .link--minimal {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.landing-page-wrapper .link--minimal:hover {
+  color: var(--text-main);
+}
+
+.landing-page-wrapper .nav__actions--minimal {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.landing-page-wrapper .btn-text--minimal {
+  background: none;
+  border: none;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.landing-page-wrapper .btn-landing--sm {
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+  background: var(--text-main);
+  color: white;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.landing-page-wrapper .btn-landing--sm:hover {
+  background: #333;
+  transform: translateY(-1px);
+}

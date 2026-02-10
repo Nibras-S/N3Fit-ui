@@ -1,25 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './navbar.css';
-import logo from '../../assets/logo.png';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
-function Navbar() {
+export default function Navbar() {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <div className='nav'>
-      <div className="nav__logo">
-        <a><img src={logo} alt="logo" /></a>
+    <nav className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
+      <div className="nav__container">
+        <div className="nav__logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <span className="logo-icon--minimal">N3</span>
+          <span className="logo-text--minimal">GYM</span>
+        </div>
+
+        <ul className="nav__links--minimal desktop-only">
+          <li className="link--minimal" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>Solutions</li>
+          <li className="link--minimal" onClick={() => document.getElementById('benefits').scrollIntoView({ behavior: 'smooth' })}>Impact</li>
+          <li className="link--minimal" onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}>Pricing</li>
+        </ul>
+
+        <div className="nav__actions--minimal">
+          <button onClick={() => navigate("/login")} className="btn-text--minimal">Log in</button>
+          <button onClick={() => navigate("/register")} className="btn-landing--sm">Start Free Trial</button>
+        </div>
       </div>
-      <ul className="nav__links">
-        <li className="link"><a>Home</a></li>
-        <li className="link"><a>Program</a></li>
-        <li className="link"><a>Service</a></li>
-        <li className="link"><a>About</a></li>
-        <li className="link"><a>Community</a></li>
-      </ul>
-      <button onClick={()=> navigate("/admin")} className="btn">Admin</button>
-    </div>
+    </nav>
   )
 }
-
-export default Navbar;

@@ -1,24 +1,14 @@
-// PageNewMember.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar'; // 👈 Reusing Sidebar
-import NewMember from '../components/admin/newMember';
+import React from "react";
+import AppLayout from "../layout/AppLayout";
+import NewMember from "../components/admin/newMember";
 
 function PageNewMember() {
-  const navigate = useNavigate();
-  
-
   return (
-    <div className="main min-h-screen bg-gray-100">
-      {/* Sidebar (shared) */}
-      <Sidebar  showBackToList={true}/>
-
-      {/* Main Content */}
-      <div className="rightbar px-4 py-auto  w-full">
-        
-        <NewMember/>
+    <AppLayout showBackToList={true} showGenderSwitch={false}>
+      <div className="w-full max-w-2xl mx-auto">
+        <NewMember />
       </div>
-    </div>
+    </AppLayout>
   );
 }
 
