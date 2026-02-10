@@ -1,76 +1,45 @@
 # AZEEFIT – Frontend
 
-React app for the AZEEFIT gym management UI. **Separate repository** from the backend. Set `REACT_APP_BACKEND_URL` in `.env` (see `.env.example`).
+React.js application for the N3 Gym Management platform. Built with Tailwind CSS and Context API.
 
----
+## Setup
 
-# Getting Started with Create React App
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+2. **Configuration**
+   Create `.env` based on `.env.example`:
+   - `REACT_APP_BACKEND_URL`: URL of the backend API (e.g., `http://localhost:5000`)
 
-## Available Scripts
+3. **Start Development Server**
+   ```bash
+   npm start
+   ```
 
-In the project directory, you can run:
+## Project Structure
 
-### `npm start`
+- **Context (`src/context`)**:
+  - `AuthContext`: Handles JWT storage, user roles, and login/logout.
+- **Layout (`src/layout`)**:
+  - `AppLayout`: Main layout with dynamic sidebar based on user role.
+- **Pages (`src/pages`)**:
+  - `SuperAdminDashboard`: Platform analytics.
+  - `GymDashboard`: Gym-specific stats.
+  - `SaaSPlanManagement`: Super Admin plan editor.
+  - `GymProfile`: Gym branding settings.
+  - `Invoice`: Printable invoice view.
+  - `MemberProfile`, `AllMembers`, `Register`: Member management.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Role-Based Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- **Super Admin**: Access to `/superadmin/*` routes.
+- **Gym Admin**: Access to `/dashboard`, `/gym-profile`, `/staff`.
+- **Staff**: Restricted to `/active`, `/register`, `/attendance`. Redirected from dashboard.
 
-### `npm test`
+## Invoicing
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Invoices are generated at `/invoice/:id`.
+- Requires `gymadmin` or `staff` role.
+- Automatically includes Gym Logo and Contact Info.

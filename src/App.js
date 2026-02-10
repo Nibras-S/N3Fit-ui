@@ -13,6 +13,7 @@ import StaffManagement from './pages/StaffManagement';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
 import SaaSPlanManagement from './pages/SaaSPlanManagement';
 import GymProfile from './pages/GymProfile';
+import Invoice from './pages/Invoice';
 import AdminAuth from './components/admin/adminauth';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -58,6 +59,7 @@ function App() {
             <Route path="/register" element={<PageNewMember />} />
             <Route path="/inactivesoon" element={<PageNewMember2 />} />
             <Route path="/manageUsers" element={<ManageUsers />} />
+            <Route path="/invoice/:id" element={<Invoice />} />
           </Route>
 
           {/* Gym Admin-only routes */}
