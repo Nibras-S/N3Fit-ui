@@ -8,14 +8,20 @@ import toast, { Toaster } from 'react-hot-toast';
 import DataTable from '../ui/DataTable';
 import PageHeader from '../ui/PageHeader';
 import EditMemberModal from './EditMemberModal';
+import ConfirmModal from '../ui/ConfirmModal';
+import CSVImportModal from './CSVImportModal';
+import { FaFileImport } from 'react-icons/fa';
 
 const AllMembers = () => {
     const navigate = useNavigate();
     const [members, setMembers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
+    const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [editData, setEditData] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -43,16 +49,37 @@ const AllMembers = () => {
     const filteredMembers = useMemo(() => {
         let filtered = members;
         if (genderFilter !== 'all') filtered = filtered.filter(u => u.gender === genderFilter);
-        return filtered
-            .filter(u => u.phone?.includes(searchTerm) || u.name?.toLowerCase().includes(searchTerm.toLowerCase()))
-            .sort((a, b) => a.dews - b.dews);
-    }, [members, searchTerm, genderFilter]);
+        filtered = filtered.filter(u => u.phone?.includes(searchTerm) || u.name?.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const handleDeleteClick = async (userId, userName) => {
-        if (!window.confirm(`Delete ${userName}?`)) return;
+        filtered.sort((a, b) => {
+            let valA = a[sortConfig.key];
+            let valB = b[sortConfig.key];
+
+            if (sortConfig.key === 'name') {
+                valA = valA?.toLowerCase() || "";
+                valB = valB?.toLowerCase() || "";
+            } else if (['date', 'endDate', 'createdAt'].includes(sortConfig.key)) {
+                valA = new Date(valA || 0);
+                valB = new Date(valB || 0);
+            } else if (sortConfig.key === 'dews') {
+                valA = parseInt(valA) || 0;
+                valB = parseInt(valB) || 0;
+            }
+
+            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+        return filtered;
+    }, [members, searchTerm, genderFilter, sortConfig]);
+
+    const handleSort = (key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc' }));
+
+    const handleDeleteClick = async () => {
+        const { id, name } = deleteModal;
         try {
-            await axios.delete(`${backendUrl}/api/contacts/${userId}`);
-            setMembers(prev => prev.filter(u => u._id !== userId));
+            await axios.delete(`${backendUrl}/api/contacts/${id}`);
+            setMembers(prev => prev.filter(u => u._id !== id));
             toast.success('Member deleted');
         } catch { toast.error('Failed to delete'); }
     };
@@ -72,36 +99,47 @@ const AllMembers = () => {
     // Column definitions
     const columns = [
         {
-            key: 'name', label: 'Name',
+            key: 'name', label: 'Name', sortable: true,
             render: (row) => (
                 <div
                     className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-1 -m-1 rounded-lg transition-colors group"
                     onClick={() => navigate(`/members/${row._id}`)}
                 >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                        {row.name?.charAt(0)}
-                    </div>
+                    {row.profileImage ? (
+                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+                            <img
+                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                alt={row.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        </div>
+                    ) : (
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                            {row.name?.charAt(0)}
+                        </div>
+                    )}
                     <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{row.name}</span>
                 </div>
             )
         },
-        { key: 'phone', label: 'Phone', render: (row) => <span className="text-gray-500">{row.phone}</span> },
+        { key: 'phone', label: 'Phone', sortable: true, render: (row) => <span className="text-gray-500">{row.phone}</span> },
         {
             key: 'status', label: 'Status',
             render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
         },
         {
-            key: 'dews', label: 'Days Left',
+            key: 'dews', label: 'Days Left', sortable: true,
             render: (row) => <span className={row.dews < 0 ? 'text-red-500 font-medium' : 'text-gray-700'}>{row.dews}</span>
         },
-        { key: 'date', label: 'Start Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.date)}</span> },
-        { key: 'endDate', label: 'End Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.endDate)}</span> }
+        { key: 'date', label: 'Start Date', sortable: true, render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.date)}</span> },
+        { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.endDate)}</span> }
     ];
 
     const renderActions = (row) => (
         <div className="flex gap-2">
             <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-blue-500 hover:bg-blue-50 rounded-lg"><FaEdit /></button>
-            <button onClick={() => handleDeleteClick(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
+            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
         </div>
     );
 
@@ -109,9 +147,20 @@ const AllMembers = () => {
         <>
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-                        {row.name?.charAt(0)}
-                    </div>
+                    {row.profileImage ? (
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+                            <img
+                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                alt={row.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        </div>
+                    ) : (
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                            {row.name?.charAt(0)}
+                        </div>
+                    )}
                     <div>
                         <div className="font-semibold text-gray-900">{row.name}</div>
                         <div className="text-sm text-gray-500">{row.phone}</div>
@@ -127,7 +176,7 @@ const AllMembers = () => {
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100">
                 <button onClick={() => handleEditClick(row._id)} className="flex-1 py-2 bg-blue-50 text-blue-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaEdit /> Edit</button>
-                <button onClick={() => handleDeleteClick(row._id, row.name)} className="flex-1 py-2 bg-red-50 text-red-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaTrash /> Delete</button>
+                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-2 bg-red-50 text-red-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaTrash /> Delete</button>
             </div>
         </>
     );
@@ -163,27 +212,32 @@ const AllMembers = () => {
                         {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>}
                     </div>
 
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                        <div className="inline-flex bg-gray-100 rounded-lg p-1">
-                            {['all', 'Male', 'Female'].map(tab => (
-                                <button
-                                    key={tab}
-                                    onClick={() => setGenderFilter(tab)}
-                                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${genderFilter === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
-                                >
-                                    {tab === 'all' ? 'All' : tab}
-                                </button>
-                            ))}
-                        </div>
-                        <button
-                            onClick={fetchMembers}
-                            disabled={loading}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
-                            title="Refresh"
-                        >
-                            <FaSync className={loading ? 'animate-spin' : ''} />
-                        </button>
+                    <button
+                        onClick={() => setIsImportModalOpen(true)}
+                        className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm font-bold border border-green-100 dark:border-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/40 transition-all"
+                    >
+                        <FaFileImport size={14} />
+                        <span>Import CSV</span>
+                    </button>
+                    <div className="inline-flex bg-gray-100 rounded-lg p-1">
+                        {['all', 'Male', 'Female'].map(tab => (
+                            <button
+                                key={tab}
+                                onClick={() => setGenderFilter(tab)}
+                                className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${genderFilter === tab ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                {tab === 'all' ? 'All' : tab}
+                            </button>
+                        ))}
                     </div>
+                    <button
+                        onClick={fetchMembers}
+                        disabled={loading}
+                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
+                        title="Refresh"
+                    >
+                        <FaSync className={loading ? 'animate-spin' : ''} />
+                    </button>
                 </div>
             </div>
 
@@ -194,21 +248,40 @@ const AllMembers = () => {
                 loading={loading}
                 emptyMessage="No members found"
                 emptyDescription={searchTerm ? 'Try a different search' : 'Add new members to get started'}
+                sortConfig={sortConfig}
+                onSort={handleSort}
                 renderActions={renderActions}
                 renderMobileCard={renderMobileCard}
                 hoverColor="hover:bg-blue-50"
                 gender={genderFilter} // Pass gender for dynamic theming
             />
 
-            {/* Edit Modal */}
-            {isEditing && editData && (
-                <EditMemberModal
-                    memberId={editData}
-                    onClose={() => setIsEditing(false)}
-                    onUpdate={handleUpdateSuccess}
-                />
-            )}
-        </div>
+            <ConfirmModal
+                isOpen={deleteModal.isOpen}
+                onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+                onConfirm={handleDeleteClick}
+                title="Delete Member"
+                message={`Are you sure you want to delete ${deleteModal.name}? This action cannot be undone.`}
+                type="danger"
+            />
+
+            {
+                isEditing && editData && (
+                    <EditMemberModal
+                        memberId={editData}
+                        onClose={() => setIsEditing(false)}
+                        onUpdate={handleUpdateSuccess}
+                    />
+                )
+            }
+
+            {/* Import Modal */}
+            <CSVImportModal
+                isOpen={isImportModalOpen}
+                onClose={() => setIsImportModalOpen(false)}
+                onRefresh={fetchMembers}
+            />
+        </div >
     );
 };
 

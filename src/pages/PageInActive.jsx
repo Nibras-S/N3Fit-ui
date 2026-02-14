@@ -5,11 +5,13 @@ import Lottie from "lottie-react";
 import AppLayout from "../layout/AppLayout";
 import DataTable from "../components/ui/DataTable";
 import PageHeader from "../components/ui/PageHeader";
+import { useAuth } from "../context/AuthContext";
 import bellAnimation from "./bellAnimation.json";
 import {
   FaSearch, FaSync, FaTrash, FaMale, FaFemale, FaUserTimes, FaWhatsapp
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 function PageInactive() {
   const navigate = useNavigate();
@@ -17,13 +19,17 @@ function PageInactive() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
-  const [sortConfig, setSortConfig] = useState({ key: 'dews', direction: 'desc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
   const [expandedRow, setExpandedRow] = useState(null);
   const [selectedOption, setSelectedOption] = useState('1-Month');
   const [customDate, setCustomDate] = useState('');
   const [renewing, setRenewing] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [settings, setSettings] = useState(null);
+  const [archivedMembers, setArchivedMembers] = useState([]);
+  const [showArchived, setShowArchived] = useState(false);
+  const { hasFeature } = useAuth();
 
   const [amount, setAmount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("Cash");
@@ -55,6 +61,14 @@ function PageInactive() {
       setMembers(merged);
       const pending = remindersRes.data.filter(u => u.dews <= 4 && u.dews >= 0 && u.reminderStatus === "Pending");
       setPendingCount(pending.length);
+
+      // Fetch archived members if feature is enabled
+      if (hasFeature('archiveExpired')) {
+        const archivedRes = await axios.get(`${backendUrl}/api/contacts/expired`);
+        setArchivedMembers(archivedRes.data);
+      } else {
+        setArchivedMembers([]);
+      }
     } catch (error) {
       toast.error('Failed to load members');
     } finally {
@@ -81,8 +95,22 @@ function PageInactive() {
       filtered = filtered.filter(u => u.name?.toLowerCase().includes(term) || u.phone?.includes(searchTerm));
     }
     filtered.sort((a, b) => {
-      if (sortConfig.key === 'dews') return sortConfig.direction === 'asc' ? a.dews - b.dews : b.dews - a.dews;
-      if (sortConfig.key === 'name') return sortConfig.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (sortConfig.key === 'name') {
+        valA = valA?.toLowerCase() || "";
+        valB = valB?.toLowerCase() || "";
+      } else if (['date', 'endDate', 'createdAt'].includes(sortConfig.key)) {
+        valA = new Date(valA || 0);
+        valB = new Date(valB || 0);
+      } else if (sortConfig.key === 'dews') {
+        valA = parseInt(valA) || 0;
+        valB = parseInt(valB) || 0;
+      }
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
     return filtered;
@@ -118,8 +146,8 @@ function PageInactive() {
     finally { setRenewing(false); }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete ${name}?`)) return;
+  const handleDelete = async () => {
+    const { id, name } = deleteModal;
     try {
       await axios.delete(`${backendUrl}/api/contacts/${id}`);
       setMembers(prev => prev.filter(u => u._id !== id));
@@ -151,9 +179,20 @@ function PageInactive() {
           className="flex items-center gap-3 cursor-pointer hover:bg-gray-50/80 p-1 -m-1 rounded-lg transition-colors group"
           onClick={() => navigate(`/members/${row._id}`)}
         >
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-            {row.name?.charAt(0)}
-          </div>
+          {row.profileImage ? (
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                alt={row.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          ) : (
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+              {row.name?.charAt(0)}
+            </div>
+          )}
           <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{row.name}</span>
         </div>
 
@@ -182,7 +221,7 @@ function PageInactive() {
     <div className="flex items-center gap-2">
       <button onClick={() => handleWhatsApp(row._id, row.phone, row.name, row.dews)} className="px-2.5 py-1.5 bg-green-500 text-white text-xs font-medium rounded-lg hover:bg-green-600 flex items-center gap-1"><FaWhatsapp /> Send</button>
       <button onClick={() => setExpandedRow(expandedRow === row._id ? null : row._id)} className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700">Renew</button>
-      <button onClick={() => handleDelete(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
+      <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
     </div>
   );
 
@@ -208,9 +247,20 @@ function PageInactive() {
     <>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-            {row.name?.charAt(0)}
-          </div>
+          {row.profileImage ? (
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                alt={row.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          ) : (
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+              {row.name?.charAt(0)}
+            </div>
+          )}
           <div>
             <p className="font-medium text-gray-900">{row.name}</p>
             <p className="text-sm text-gray-500">{row.phone}</p>
@@ -231,7 +281,7 @@ function PageInactive() {
         <div className="flex gap-2">
           <button onClick={() => handleWhatsApp(row._id, row.phone, row.name, row.dews)} className="px-2 py-1.5 bg-green-500 text-white text-xs font-medium rounded flex items-center gap-1"><FaWhatsapp /> Send</button>
           <button onClick={() => setExpandedRow(expandedRow === row._id ? null : row._id)} className="px-2 py-1.5 bg-blue-600 text-white text-xs font-medium rounded">Renew</button>
-          <button onClick={() => handleDelete(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><FaTrash /></button>
+          <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><FaTrash /></button>
         </div>
       </div>
       {expandedRow === row._id && (
@@ -340,13 +390,59 @@ function PageInactive() {
         gender={genderFilter} // Pass gender for dynamic theming
       />
 
+      {/* Archived Members Section — Gated by Feature */}
+      {hasFeature('archiveExpired') && archivedMembers.length > 0 && (
+        <div className="mt-12 mb-20">
+          <button
+            onClick={() => setShowArchived(!showArchived)}
+            className="w-full flex items-center justify-between p-4 bg-gray-100 dark:bg-slate-800 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-700 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <FaUserTimes className="text-gray-500" />
+              <span className="font-bold text-gray-700 dark:text-gray-200 uppercase tracking-widest text-xs">
+                Archived Members ({archivedMembers.length})
+              </span>
+              <span className="text-[10px] text-gray-500 lowercase font-normal italic">— expired {">"} 3 months ago</span>
+            </div>
+            <span className="text-gray-400">{showArchived ? 'Hide' : 'Show'}</span>
+          </button>
+
+          {showArchived && (
+            <div className="mt-4 animate-fadeIn">
+              <DataTable
+                data={archivedMembers}
+                columns={columns}
+                loading={loading}
+                emptyMessage="No archived members"
+                sortConfig={sortConfig}
+                onSort={handleSort}
+                renderActions={renderActions}
+                renderMobileCard={renderMobileCard}
+                renderExpandedRow={renderExpandedRow}
+                expandedRowId={expandedRow}
+                hoverColor="hover:bg-gray-100"
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="fixed bottom-20 right-4 z-10 md:bottom-6 md:right-6">
         <button onClick={() => navigate("/inactivesoon")} className="flex items-center justify-center w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 hover:shadow-xl transition-shadow relative">
           <Lottie animationData={bellAnimation} loop style={{ width: 32, height: 32 }} />
           {pendingCount > 0 && <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">{pendingCount}</span>}
         </button>
       </div>
-    </AppLayout>
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+        onConfirm={handleDelete}
+        title="Delete Member"
+        message={`Are you sure you want to delete ${deleteModal.name}? This action cannot be undone.`}
+        type="danger"
+      />
+    </AppLayout >
   );
 }
 

@@ -5,7 +5,7 @@ import NewMember from "../components/admin/newMember";
 function PageNewMember() {
   return (
     <AppLayout showBackToList={true} showGenderSwitch={false}>
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full">
         <NewMember />
       </div>
     </AppLayout>

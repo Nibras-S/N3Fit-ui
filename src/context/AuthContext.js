@@ -12,6 +12,12 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [token, setToken] = useState(localStorage.getItem('n3gym_token'));
     const [loading, setLoading] = useState(true);
+    const [gymFeatures, setGymFeatures] = useState({
+        profilePhoto: true,
+        expenses: true,
+        announcements: true,
+        archiveExpired: true,
+    });
 
     // Set up axios interceptor
     useEffect(() => {
@@ -37,6 +43,17 @@ export const AuthProvider = ({ children }) => {
                 const res = await api.get('/api/auth/me');
                 if (res.data?.success) {
                     setUser(res.data.user);
+                    // Fetch gym features for non-superadmin users
+                    if (res.data.user.role !== 'superadmin') {
+                        try {
+                            const gymRes = await api.get('/api/gym/profile');
+                            if (gymRes.data?.features) {
+                                setGymFeatures(gymRes.data.features);
+                            }
+                        } catch (err) {
+                            console.error('Failed to load gym features:', err);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error('Auth check failed:', err);
@@ -69,6 +86,15 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
     }, []);
 
+    /**
+     * Check if a feature is enabled for the current gym.
+     * Superadmins always have all features enabled.
+     */
+    const hasFeature = useCallback((featureName) => {
+        if (user?.role === 'superadmin') return true;
+        return gymFeatures[featureName] !== false;
+    }, [user, gymFeatures]);
+
     const value = {
         user,
         token,
@@ -80,6 +106,8 @@ export const AuthProvider = ({ children }) => {
         isGymAdmin: user?.role === 'gymadmin',
         isStaff: user?.role === 'staff',
         api, // Pre-configured axios instance
+        gymFeatures,
+        hasFeature,
     };
 
     return (

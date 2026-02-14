@@ -58,9 +58,9 @@ export default function Price() {
   ];
 
   return (
-    <div className="section__container" id="pricing" style={{ paddingBottom: '12rem' }}>
+    <div className="section__container" id="pricing" style={{ paddingBottom: '6rem' }}>
 
-      <div style={{ textAlign: 'center', marginBottom: '8rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <h2 className="section__header">
           Simple, <span className="text-gradient">Transparent</span> Pricing.
         </h2>
@@ -169,123 +169,7 @@ export default function Price() {
         ))}
       </div>
 
-      {/* CTA Section */}
-      <div style={{
-        marginTop: '10rem',
-        textAlign: 'center',
-        background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%)',
-        borderRadius: '2rem',
-        padding: '6rem 4rem',
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        {/* Decorative Glow */}
-        <div style={{
-          position: 'absolute',
-          top: '-50%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%)',
-          pointerEvents: 'none',
-        }}></div>
-
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
-            fontWeight: '900',
-            letterSpacing: '-0.04em',
-            marginBottom: '1.5rem',
-          }}>
-            Ready to Transform Your Gym?
-          </h2>
-          <p style={{
-            fontSize: '1.2rem',
-            color: 'rgba(255,255,255,0.6)',
-            maxWidth: '550px',
-            margin: '0 auto 3rem',
-            lineHeight: '1.6',
-          }}>
-            Join 500+ gyms that trust N3 for member management, payments, and growth analytics.
-          </p>
-          <button
-            className="btn-landing"
-            onClick={() => navigate('/login')}
-            style={{
-              padding: '1.1rem 3rem',
-              fontSize: '1.1rem',
-              background: 'white',
-              color: '#0a0a0a',
-              boxShadow: '0 0 40px rgba(255,255,255,0.1)',
-            }}
-          >
-            Get Started Free <i className="ri-arrow-right-line"></i>
-          </button>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer style={{ marginTop: '8rem', borderTop: '1px solid #f3f4f6', paddingTop: '5rem' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr', gap: '5rem' }} className="footer-grid">
-          <div style={{ textAlign: 'left' }}>
-            <div style={{ fontWeight: '900', fontSize: '1.75rem', marginBottom: '1.5rem', letterSpacing: '-0.06em' }}>
-              <span style={{ background: '#0a0a0a', color: 'white', padding: '0.15rem 0.5rem', borderRadius: '4px', marginRight: '0.5rem' }}>N3</span>
-              GYM
-            </div>
-            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', maxWidth: '350px', fontSize: '1rem' }}>
-              The all-in-one SaaS platform for modern gym management. Built for owners who want to grow.
-            </p>
-          </div>
-
-          <div style={{ textAlign: 'left' }}>
-            <h4 style={{ fontWeight: '800', fontSize: '1rem', marginBottom: '1.5rem' }}>Product</h4>
-            <div style={{ display: 'grid', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              <span style={{ cursor: 'pointer' }}>Dashboard</span>
-              <span style={{ cursor: 'pointer' }}>Member Management</span>
-              <span style={{ cursor: 'pointer' }}>Payment Tracking</span>
-              <span style={{ cursor: 'pointer' }}>WhatsApp Reminders</span>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'left' }}>
-            <h4 style={{ fontWeight: '800', fontSize: '1rem', marginBottom: '1.5rem' }}>Company</h4>
-            <div style={{ display: 'grid', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              <span style={{ cursor: 'pointer' }}>About Us</span>
-              <span style={{ cursor: 'pointer' }}>Pricing</span>
-              <span style={{ cursor: 'pointer' }}>Contact</span>
-              <span style={{ cursor: 'pointer' }}>Privacy Policy</span>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'left' }}>
-            <h4 style={{ fontWeight: '800', fontSize: '1rem', marginBottom: '1.5rem' }}>Connect</h4>
-            <div style={{ display: 'grid', gap: '0.75rem', color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              <span style={{ cursor: 'pointer' }}>Instagram</span>
-              <span style={{ cursor: 'pointer' }}>Twitter / X</span>
-              <span style={{ cursor: 'pointer' }}>LinkedIn</span>
-              <span style={{ cursor: 'pointer' }}>YouTube</span>
-            </div>
-          </div>
-        </div>
-
-        <div style={{
-          marginTop: '5rem',
-          paddingTop: '2rem',
-          borderTop: '1px solid #f3f4f6',
-          display: 'flex',
-          justifyContent: 'space-between',
-          color: 'var(--text-muted)',
-          fontSize: '0.9rem',
-          flexWrap: 'wrap',
-          gap: '1rem',
-        }}>
-          <p>© 2025 N3 Technology Group. All rights reserved.</p>
-          <p>Made with ❤️ for Gym Owners.</p>
-        </div>
-      </footer>
-
+      {/* CTA Section and Footer removed to be handled by PageHome or dedicated Footer component */}
     </div>
   )
 }

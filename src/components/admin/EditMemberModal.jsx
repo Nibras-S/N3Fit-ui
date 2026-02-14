@@ -4,10 +4,12 @@ import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { FaMale, FaFemale, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 
 const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
     const [formData, setFormData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const { hasFeature } = useAuth();
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
@@ -88,6 +90,25 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
+                    {/* Profile Photo Preview — only if feature enabled */}
+                    {hasFeature('profilePhoto') && (
+                        <div className="flex justify-center mb-2">
+                            {formData.profileImage ? (
+                                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-slate-700 shadow-md">
+                                    <img
+                                        src={formData.profileImage.startsWith('http') ? formData.profileImage : `${backendUrl}${formData.profileImage}`}
+                                        alt={formData.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+                            ) : (
+                                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold ${formData.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                                    {formData.name?.charAt(0)}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     {/* Name */}
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">Full Name</label>

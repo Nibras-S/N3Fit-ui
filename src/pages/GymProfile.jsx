@@ -54,8 +54,8 @@ const GymProfile = () => {
     const handleLogoUpload = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        if (file.size > 2 * 1024 * 1024) {
-            toast.error("Logo must be under 2MB");
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error("Logo must be under 5MB");
             return;
         }
         setUploadingLogo(true);
@@ -111,7 +111,7 @@ const GymProfile = () => {
                                 onClick={() => fileInputRef.current?.click()}
                             >
                                 {gym?.logo ? (
-                                    <img src={`${backendUrl}${gym.logo}`} alt="Gym logo" className="w-full h-full object-cover" />
+                                    <img src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`} alt="Gym logo" className="w-full h-full object-cover" />
                                 ) : (
                                     <FaBuilding size={28} className="text-gray-300 dark:text-gray-500" />
                                 )}

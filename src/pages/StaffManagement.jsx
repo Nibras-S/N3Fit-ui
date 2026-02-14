@@ -84,11 +84,6 @@ const StaffManagement = () => {
                 });
                 toast.success("Staff updated!");
             } else {
-                if (!formData.password || formData.password.length < 6) {
-                    toast.error("Password must be at least 6 characters");
-                    setSubmitting(false);
-                    return;
-                }
                 await api.post("/api/auth/register", {
                     name: formData.name,
                     email: formData.email,
@@ -374,9 +369,8 @@ const StaffManagement = () => {
                                                     value={formData.password}
                                                     onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
                                                     className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                                                    placeholder="Min 6 characters"
+                                                    placeholder="Enter password"
                                                     required
-                                                    minLength={6}
                                                 />
                                                 <button
                                                     type="button"

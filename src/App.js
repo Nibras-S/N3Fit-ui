@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { NotificationProvider } from './context/NotificationContext';
 import PageHome from './pages/PageHome';
 import PageActive from './pages/PageActive';
 import PageInActive from './pages/PageInActive';
@@ -11,8 +12,13 @@ import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import StaffManagement from './pages/StaffManagement';
 import SuperAdminDashboard from './pages/SuperAdminDashboard';
+import GymDetails from './pages/GymDetails';
+import SuperAdminSettings from './pages/SuperAdminSettings';
 import SaaSPlanManagement from './pages/SaaSPlanManagement';
 import GymProfile from './pages/GymProfile';
+import Announcement from './pages/Announcement';
+import Notifications from './pages/Notifications';
+import Expenses from './pages/Expenses';
 import Invoice from './pages/Invoice';
 import AdminAuth from './components/admin/adminauth';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -40,46 +46,57 @@ function LoginGuard() {
   return <AdminAuth />;
 }
 
+
 function App() {
   return (
     <AuthProvider>
-      <div className="App min-h-screen font-sans">
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<PageHome />} />
-          <Route path="/login" element={<LoginGuard />} />
-          {/* Keep /admin as alias for login for backward compatibility */}
-          <Route path="/admin" element={<LoginGuard />} />
+      <NotificationProvider>
+        <div className="App min-h-screen font-sans">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/" element={<PageHome />} />
+            <Route path="/login" element={<LoginGuard />} />
+            {/* Keep /admin as alias for login for backward compatibility */}
+            <Route path="/admin" element={<LoginGuard />} />
 
-          {/* Gym Admin + Staff routes */}
-          <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-            <Route path="/active" element={<PageActive />} />
-            <Route path="/inactive" element={<PageInActive />} />
-            <Route path="/members/:id" element={<MemberProfile />} />
-            <Route path="/register" element={<PageNewMember />} />
-            <Route path="/inactivesoon" element={<PageNewMember2 />} />
-            <Route path="/manageUsers" element={<ManageUsers />} />
-            <Route path="/invoice/:id" element={<Invoice />} />
-          </Route>
+            {/* Shared routes for all authenticated users */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
+              <Route path="/announcement" element={<Announcement />} />
+              <Route path="/notifications" element={<Notifications />} />
+            </Route>
 
-          {/* Gym Admin-only routes */}
-          <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/staff" element={<StaffManagement />} />
-            <Route path="/gym-profile" element={<GymProfile />} />
-          </Route>
+            {/* Gym Admin + Staff routes */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+              <Route path="/active" element={<PageActive />} />
+              <Route path="/inactive" element={<PageInActive />} />
+              <Route path="/members/:id" element={<MemberProfile />} />
+              <Route path="/register" element={<PageNewMember />} />
+              <Route path="/inactivesoon" element={<PageNewMember2 />} />
+              <Route path="/manageUsers" element={<ManageUsers />} />
+              <Route path="/invoice/:id" element={<Invoice />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
 
-          {/* Super Admin routes */}
-          <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
-            <Route path="/superadmin" element={<SuperAdminDashboard />} />
-            <Route path="/superadmin/plans" element={<SaaSPlanManagement />} />
-          </Route>
+            {/* Gym Admin-only routes */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/staff" element={<StaffManagement />} />
+              <Route path="/expenses" element={<Expenses />} />
+            </Route>
 
-          {/* Catch-all redirect */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </div>
+            {/* Super Admin routes */}
+            <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+              <Route path="/superadmin" element={<SuperAdminDashboard />} />
+              <Route path="/superadmin/gyms/:id" element={<GymDetails />} />
+              <Route path="/superadmin/settings" element={<SuperAdminSettings />} />
+              <Route path="/superadmin/plans" element={<SaaSPlanManagement />} />
+            </Route>
+
+            {/* Catch-all redirect */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
+      </NotificationProvider>
     </AuthProvider>
   );
 }

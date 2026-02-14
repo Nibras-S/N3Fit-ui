@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaUserSlash, FaSortAmountUp, FaSortAmountDown } from 'react-icons/fa';
+import { FaUserSlash, FaSortAmountUp, FaSortAmountDown, FaCaretUp, FaCaretDown } from 'react-icons/fa';
 
 /**
  * Reusable DataTable Component
@@ -85,12 +85,14 @@ const DataTable = ({
     hoverColor = 'hover:bg-blue-50',
     renderExpandedRow = null,
     expandedRowId = null,
-    gender = 'all', // New prop
+    gender = 'all',
+    showSelection = false,
+    selectedIds = [],
+    onSelectionChange = null,
 }) => {
     // State for pagination and density
     const [currentPage, setCurrentPage] = React.useState(1);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
-
 
     // Calculate pagination
     const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -103,7 +105,27 @@ const DataTable = ({
         setCurrentPage(1);
     }, [data.length]);
 
-    const totalColumns = columns.length + (renderActions ? 1 : 0); // Depend on filtered data length
+    const totalColumns = columns.length + (renderActions ? 1 : 0) + (showSelection ? 1 : 0);
+
+    const handleSelectAll = (e) => {
+        if (!onSelectionChange) return;
+        if (e.target.checked) {
+            onSelectionChange(currentData.map(getRowKey));
+        } else {
+            onSelectionChange([]);
+        }
+    };
+
+    const handleSelectRow = (id) => {
+        if (!onSelectionChange) return;
+        if (selectedIds.includes(id)) {
+            onSelectionChange(selectedIds.filter(item => item !== id));
+        } else {
+            onSelectionChange([...selectedIds, id]);
+        }
+    };
+
+    const isAllSelected = currentData.length > 0 && currentData.every(row => selectedIds.includes(getRowKey(row)));
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -138,7 +160,6 @@ const DataTable = ({
 
     const headerClass = getHeaderColor();
 
-
     // Loading state
     if (loading) {
         return (
@@ -148,6 +169,7 @@ const DataTable = ({
                     <table className="w-full">
                         <thead className={`${headerClass} border-b`}>
                             <tr>
+                                {showSelection && <th className="px-4 py-3 text-left w-10"><div className="h-4 w-4 bg-gray-200 rounded"></div></th>}
                                 {columns.map((col, i) => (
                                     <th key={i} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">
                                         {col.label}
@@ -180,25 +202,37 @@ const DataTable = ({
 
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden flex flex-col">
-
-
             {/* Desktop Table */}
             <div className="hidden lg:block overflow-x-auto min-h-[400px]">
                 <table className="w-full">
                     <thead className={`${headerClass} border-b sticky top-0 z-10 transition-colors duration-300`}>
                         <tr>
+                            {showSelection && (
+                                <th className="px-4 py-3 text-left w-10">
+                                    <input
+                                        type="checkbox"
+                                        checked={isAllSelected}
+                                        onChange={handleSelectAll}
+                                        className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                    />
+                                </th>
+                            )}
                             {columns.map((col, i) => (
                                 <th
                                     key={i}
                                     onClick={col.sortable && onSort ? () => onSort(col.key) : undefined}
-                                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase ${col.sortable && onSort ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800' : ''}`}
+                                    className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase ${col.sortable && onSort ? 'cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors' : ''}`}
+                                    title={col.sortable ? `Sort by ${col.label}` : ''}
                                 >
-                                    {col.label}
-                                    {col.sortable && sortConfig?.key === col.key && (
-                                        sortConfig.direction === 'asc'
-                                            ? <FaSortAmountUp className="inline ml-1" />
-                                            : <FaSortAmountDown className="inline ml-1" />
-                                    )}
+                                    <div className="flex items-center gap-1">
+                                        {col.label}
+                                        {col.sortable && onSort && (
+                                            <div className="flex flex-col text-[10px] text-gray-400">
+                                                <FaCaretUp className={sortConfig?.key === col.key && sortConfig.direction === 'asc' ? 'text-blue-600 dark:text-blue-400' : ''} />
+                                                <FaCaretDown className={sortConfig?.key === col.key && sortConfig.direction === 'desc' ? 'text-blue-600 dark:text-blue-400' : ''} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </th>
                             ))}
                             {renderActions && (
@@ -207,58 +241,86 @@ const DataTable = ({
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
-                        {currentData.map((row, index) => (
-                            <React.Fragment key={getRowKey(row)}>
-                                <tr className={`${index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'} ${hoverColor} dark:hover:bg-slate-700 transition-colors`}>
-                                    {columns.map((col, i) => (
-                                        <td key={i} className="px-4 py-3 text-gray-900 dark:text-gray-200">
-                                            {col.render ? col.render(row, index) : row[col.key]}
-                                        </td>
-                                    ))}
-                                    {renderActions && (
-                                        <td className="px-4 py-3">
-                                            {renderActions(row, index)}
-                                        </td>
-                                    )}
-                                </tr>
-                                {/* Expanded row */}
-                                {renderExpandedRow && expandedRowId === getRowKey(row) && (
-                                    <tr className="bg-green-50 dark:bg-green-900/20">
-                                        <td colSpan={totalColumns} className="px-4 py-4">
-                                            {renderExpandedRow(row)}
-                                        </td>
+                        {currentData.map((row, index) => {
+                            const rowId = getRowKey(row);
+                            const isSelected = selectedIds.includes(rowId);
+                            return (
+                                <React.Fragment key={rowId}>
+                                    <tr className={`${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'} ${hoverColor} dark:hover:bg-slate-700 transition-colors`}>
+                                        {showSelection && (
+                                            <td className="px-4 py-3 w-10">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleSelectRow(rowId)}
+                                                    className="w-4 h-4 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer"
+                                                />
+                                            </td>
+                                        )}
+                                        {columns.map((col, i) => (
+                                            <td key={i} className="px-4 py-3 text-gray-900 dark:text-gray-200">
+                                                {col.render ? col.render(row, index) : row[col.key]}
+                                            </td>
+                                        ))}
+                                        {renderActions && (
+                                            <td className="px-4 py-3">
+                                                {renderActions(row, index)}
+                                            </td>
+                                        )}
                                     </tr>
-                                )}
-                            </React.Fragment>
-                        ))}
+                                    {/* Expanded row */}
+                                    {renderExpandedRow && expandedRowId === rowId && (
+                                        <tr className="bg-green-50 dark:bg-green-900/20">
+                                            <td colSpan={totalColumns} className="px-4 py-4">
+                                                {renderExpandedRow(row)}
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
 
-            {/* Mobile Cards - Show all because scrolling is natural on mobile, or paginate? Let's paginate mobile too for performance */}
+            {/* Mobile Cards */}
             <div className="lg:hidden divide-y divide-gray-100 dark:divide-slate-700">
-                {currentData.map((row, index) => (
-                    <div
-                        key={getRowKey(row)}
-                        className={`p-4 ${index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}
-                    >
-                        {renderMobileCard ? renderMobileCard(row, index) : (
-                            // Default mobile card
-                            <div>
-                                {columns.slice(0, 2).map((col, i) => (
-                                    <div key={i} className={i === 0 ? 'font-medium text-gray-900 dark:text-gray-100' : 'text-sm text-gray-500 dark:text-gray-400'}>
-                                        {col.render ? col.render(row, index) : row[col.key]}
-                                    </div>
-                                ))}
-                                {renderActions && (
-                                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
-                                        {renderActions(row, index)}
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                ))}
+                {currentData.map((row, index) => {
+                    const rowId = getRowKey(row);
+                    const isSelected = selectedIds.includes(rowId);
+                    return (
+                        <div
+                            key={rowId}
+                            className={`p-4 relative ${isSelected ? 'bg-blue-50/50 dark:bg-blue-900/10' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}
+                        >
+                            {showSelection && (
+                                <div className="absolute top-4 right-4">
+                                    <input
+                                        type="checkbox"
+                                        checked={isSelected}
+                                        onChange={() => handleSelectRow(rowId)}
+                                        className="w-5 h-5 rounded text-blue-600 border-gray-300 focus:ring-blue-500 cursor-pointer shadow-sm"
+                                    />
+                                </div>
+                            )}
+                            {renderMobileCard ? renderMobileCard(row, index) : (
+                                // Default mobile card
+                                <div>
+                                    {columns.slice(0, 2).map((col, i) => (
+                                        <div key={i} className={i === 0 ? 'font-medium text-gray-900 dark:text-gray-100 pr-8' : 'text-sm text-gray-500 dark:text-gray-400'}>
+                                            {col.render ? col.render(row, index) : row[col.key]}
+                                        </div>
+                                    ))}
+                                    {renderActions && (
+                                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
+                                            {renderActions(row, index)}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Pagination Controls */}

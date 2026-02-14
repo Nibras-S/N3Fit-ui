@@ -11,6 +11,7 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 function PageActive() {
   const navigate = useNavigate();
@@ -18,7 +19,8 @@ function PageActive() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [genderFilter, setGenderFilter] = useState('all');
-  const [sortConfig, setSortConfig] = useState({ key: 'dews', direction: 'asc' });
+  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
   const [expandedRow, setExpandedRow] = useState(null);
   const [selectedOption, setSelectedOption] = useState('1-Month');
   const [customDate, setCustomDate] = useState('');
@@ -84,8 +86,22 @@ function PageActive() {
       filtered = filtered.filter(u => u.name?.toLowerCase().includes(term) || u.phone?.includes(searchTerm));
     }
     filtered.sort((a, b) => {
-      if (sortConfig.key === 'dews') return sortConfig.direction === 'asc' ? a.dews - b.dews : b.dews - a.dews;
-      if (sortConfig.key === 'name') return sortConfig.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+      let valA = a[sortConfig.key];
+      let valB = b[sortConfig.key];
+
+      if (sortConfig.key === 'name') {
+        valA = valA?.toLowerCase() || "";
+        valB = valB?.toLowerCase() || "";
+      } else if (['date', 'endDate', 'createdAt'].includes(sortConfig.key)) {
+        valA = new Date(valA || 0);
+        valB = new Date(valB || 0);
+      } else if (sortConfig.key === 'dews') {
+        valA = parseInt(valA) || 0;
+        valB = parseInt(valB) || 0;
+      }
+
+      if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
+      if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
     return filtered;
@@ -121,8 +137,8 @@ function PageActive() {
     finally { setRenewing(false); }
   };
 
-  const handleDelete = async (id, name) => {
-    if (!window.confirm(`Delete ${name}?`)) return;
+  const handleDelete = async () => {
+    const { id, name } = deleteModal;
     try {
       await axios.delete(`${backendUrl}/api/contacts/${id}`);
       setMembers(prev => prev.filter(u => u._id !== id));
@@ -139,15 +155,29 @@ function PageActive() {
           className="flex items-center gap-3 cursor-pointer hover:bg-gray-50/80 p-1 -m-1 rounded-lg transition-colors group"
           onClick={() => navigate(`/members/${row._id}`)}
         >
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-            {row.name?.charAt(0)}
-          </div>
+          {row.profileImage ? (
+            <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                alt={row.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          ) : (
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+              {row.name?.charAt(0)}
+            </div>
+          )}
           <span className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">{row.name}</span>
         </div>
 
       )
     },
-    { key: 'phone', label: 'Phone', render: (row) => <span className="text-gray-500">{row.phone}</span> },
+    {
+      key: 'phone', label: 'Phone', sortable: true,
+      render: (row) => <span className="text-gray-500">{row.phone}</span>
+    },
     {
       key: 'dews', label: 'Days Left', sortable: true,
       render: (row) => (
@@ -156,14 +186,14 @@ function PageActive() {
         </span>
       )
     },
-    { key: 'date', label: 'Start Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.date)}</span> },
-    { key: 'endDate', label: 'End Date', render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.endDate)}</span> }
+    { key: 'date', label: 'Start Date', sortable: true, render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.date)}</span> },
+    { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 text-sm">{formatDate(row.endDate)}</span> }
   ];
 
   const renderActions = (row) => (
     <div className="flex items-center gap-2">
       <button onClick={() => setExpandedRow(expandedRow === row._id ? null : row._id)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700">Renew</button>
-      <button onClick={() => handleDelete(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
+      <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><FaTrash /></button>
     </div>
   );
 
@@ -189,9 +219,20 @@ function PageActive() {
     <>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
-            {row.name?.charAt(0)}
-          </div>
+          {row.profileImage ? (
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm">
+              <img
+                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                alt={row.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          ) : (
+            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+              {row.name?.charAt(0)}
+            </div>
+          )}
           <div>
             <p className="font-medium text-gray-900">{row.name}</p>
             <p className="text-sm text-gray-500">{row.phone}</p>
@@ -205,7 +246,7 @@ function PageActive() {
         <span className="text-xs text-gray-400">Ends: {formatDate(row.endDate)}</span>
         <div className="flex gap-2">
           <button onClick={() => setExpandedRow(expandedRow === row._id ? null : row._id)} className="px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg">Renew</button>
-          <button onClick={() => handleDelete(row._id, row.name)} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><FaTrash /></button>
+          <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 rounded"><FaTrash /></button>
         </div>
       </div>
       {expandedRow === row._id && (
@@ -326,7 +367,16 @@ function PageActive() {
           {pendingCount > 0 && <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">{pendingCount}</span>}
         </button>
       </div>
-    </AppLayout>
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}
+        onConfirm={handleDelete}
+        title="Delete Member"
+        message={`Are you sure you want to delete ${deleteModal.name}? This action cannot be undone.`}
+        type="danger"
+      />
+    </AppLayout >
   );
 }
 

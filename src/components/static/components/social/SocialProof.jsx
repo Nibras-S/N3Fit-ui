@@ -7,7 +7,7 @@ const testimonials = [
         name: "Alex Thompson",
         role: "Director, Pulse Athletics",
         image: "https://randomuser.me/api/portraits/men/12.jpg",
-        text: "The transition to N3 was seamless. Its intelligent dashboard gives us insights we never had before. It's the ChatGPT of gym management.",
+        text: "The transition to N3 FIT was seamless. Its intelligent dashboard gives us insights we never had before. It's the ChatGPT of gym management.",
         metric: "32% ROI Boost"
     },
     {
@@ -29,10 +29,10 @@ export default function SocialProof() {
     }, []);
 
     return (
-        <div className="section__container" style={{ padding: '10rem 1rem' }}>
-            <div style={{ textAlign: 'center', marginBottom: '6rem' }}>
+        <div className="section__container" style={{ padding: '5rem 1rem' }}>
+            <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
                 <h2 className="section__header">Trusted by <span className="text-gradient">Visionaries.</span></h2>
-                <p className="section__subheader">Join the world's most innovative studios using N3.</p>
+                <p className="section__subheader">Join the world's most innovative studios using N3 FIT.</p>
             </div>
 
             <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
@@ -44,7 +44,7 @@ export default function SocialProof() {
                         exit={{ opacity: 0, x: -20, scale: 0.98 }}
                         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
                         className="floating-card"
-                        style={{ padding: '6rem 4rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '4rem', alignItems: 'center' }}
+                        style={{ padding: '3rem 4rem', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '4rem', alignItems: 'center' }}
                     >
                         <div style={{ textAlign: 'left' }}>
                             <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>

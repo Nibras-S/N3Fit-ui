@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import EditMemberModal from '../components/admin/EditMemberModal';
+import ConfirmModal from '../components/ui/ConfirmModal';
 
 function MemberProfile() {
     const { id } = useParams();
@@ -18,6 +19,7 @@ function MemberProfile() {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
@@ -44,7 +46,6 @@ function MemberProfile() {
     };
 
     const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to delete this member?")) return;
         try {
             await axios.delete(`${backendUrl}/api/contacts/${id}`);
             toast.success("Member deleted successfully");
@@ -85,9 +86,19 @@ function MemberProfile() {
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${member.gender === 'Male' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
-                            {member.name?.charAt(0)}
-                        </div>
+                        {member.profileImage ? (
+                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-slate-700 shadow-md">
+                                <img
+                                    src={member.profileImage.startsWith('http') ? member.profileImage : `${backendUrl}${member.profileImage}`}
+                                    alt={member.name}
+                                    className="w-full h-full object-cover"
+                                />
+                            </div>
+                        ) : (
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${member.gender === 'Male' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
+                                {member.name?.charAt(0)}
+                            </div>
+                        )}
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{member.name}</h1>
                             <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1">
@@ -271,7 +282,7 @@ function MemberProfile() {
                                 <FaEdit /> Update Details
                             </button>
                             <button
-                                onClick={handleDelete}
+                                onClick={() => setIsDeleteModalOpen(true)}
                                 className="w-full py-2.5 px-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <FaExclamationCircle /> Delete Member
@@ -289,6 +300,15 @@ function MemberProfile() {
                     onUpdate={handleUpdateSuccess}
                 />
             )}
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+                title="Delete Member"
+                message={`Are you sure you want to delete ${member.name}? This action cannot be undone.`}
+                type="danger"
+            />
         </AppLayout>
     );
 }

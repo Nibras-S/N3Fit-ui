@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../layout/AppLayout";
+import ConfirmModal from "../components/ui/ConfirmModal";
 import {
     FaPlus, FaBuilding, FaUsers, FaRupeeSign, FaChartLine, FaToggleOn, FaToggleOff,
-    FaTimes, FaEye, FaEyeSlash, FaSearch, FaGlobe
+    FaTimes, FaSearch, FaGlobe, FaCogs, FaEdit, FaTrash, FaEye, FaEyeSlash
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
 const SuperAdminDashboard = () => {
     const { api } = useAuth();
+    const navigate = useNavigate();
     const [analytics, setAnalytics] = useState(null);
     const [gyms, setGyms] = useState([]);
     const [plans, setPlans] = useState([]);
@@ -24,6 +27,10 @@ const SuperAdminDashboard = () => {
         name: "", contactEmail: "", contactPhone: "", address: "",
         adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: ""
     });
+
+    // Deletion Modal State
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [gymToDelete, setGymToDelete] = useState(null);
 
     const fetchAll = useCallback(async () => {
         try {
@@ -79,6 +86,19 @@ const SuperAdminDashboard = () => {
         }
     };
 
+
+    // Delete gym (soft delete)
+    const handleDelete = async () => {
+        if (!gymToDelete) return;
+        try {
+            await api.delete(`/api/superadmin/gyms/${gymToDelete._id}`);
+            toast.success(`${gymToDelete.name} deleted successfully`);
+            fetchAll();
+        } catch (err) {
+            toast.error("Failed to delete gym");
+        }
+    };
+
     if (loading) {
         return (
             <AppLayout showGenderSwitch={false}>
@@ -97,7 +117,7 @@ const SuperAdminDashboard = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Platform Overview</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Super Admin — N3 Gym management platform</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Super Admin — N3 FIT management platform</p>
                     </div>
                     <button
                         onClick={() => setModalOpen(true)}
@@ -196,7 +216,11 @@ const SuperAdminDashboard = () => {
                             </thead>
                             <tbody>
                                 {filtered.map((gym) => (
-                                    <tr key={gym._id} className="border-b border-gray-50 dark:border-slate-700/50 hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                                    <tr
+                                        key={gym._id}
+                                        onClick={() => navigate(`/superadmin/gyms/${gym._id}`)}
+                                        className="border-b border-gray-50 dark:border-slate-700/50 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-all cursor-pointer group/row"
+                                    >
                                         <td className="px-5 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold ${gym.isActive ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
@@ -227,16 +251,43 @@ const SuperAdminDashboard = () => {
                                             {new Date(gym.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                                         </td>
                                         <td className="px-5 py-4 text-right">
-                                            <button
-                                                onClick={() => toggleGym(gym)}
-                                                className={`p-2 rounded-lg transition-colors ${gym.isActive
-                                                    ? "text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
-                                                    : "text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                    }`}
-                                                title={gym.isActive ? "Deactivate" : "Activate"}
-                                            >
-                                                {gym.isActive ? <FaToggleOn size={20} /> : <FaToggleOff size={20} />}
-                                            </button>
+                                            <div className="flex items-center justify-end gap-2" onClick={(e) => e.stopPropagation()}>
+                                                <button
+                                                    onClick={() => navigate(`/superadmin/gyms/${gym._id}?edit=true`)}
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors"
+                                                    title="Edit Details"
+                                                >
+                                                    <FaEdit size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setGymToDelete(gym);
+                                                        setIsDeleteModalOpen(true);
+                                                    }}
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                    title="Delete Gym"
+                                                >
+                                                    <FaTrash size={16} />
+                                                </button>
+                                                <div className="w-[1px] h-4 bg-gray-100 dark:bg-slate-700 mx-1"></div>
+                                                <button
+                                                    onClick={() => navigate(`/superadmin/gyms/${gym._id}#features`)}
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                                    title="Manage Features"
+                                                >
+                                                    <FaCogs size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => toggleGym(gym)}
+                                                    className={`p-2 rounded-lg transition-colors ${gym.isActive
+                                                        ? "text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
+                                                        : "text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                        }`}
+                                                    title={gym.isActive ? "Deactivate" : "Activate"}
+                                                >
+                                                    {gym.isActive ? <FaToggleOn size={20} /> : <FaToggleOff size={20} />}
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
@@ -374,9 +425,8 @@ const SuperAdminDashboard = () => {
                                             value={form.adminPassword}
                                             onChange={(e) => setForm(p => ({ ...p, adminPassword: e.target.value }))}
                                             className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                                            placeholder="Min 6 characters"
+                                            placeholder="Enter password"
                                             required
-                                            minLength={6}
                                         />
                                         <button
                                             type="button"
@@ -411,6 +461,16 @@ const SuperAdminDashboard = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <ConfirmModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
+                onConfirm={handleDelete}
+                title="Deactivate Gym"
+                message={`Are you sure you want to deactivate ${gymToDelete?.name}? This will move them to the Recycling Bin.`}
+                confirmText="Deactivate"
+                cancelText="Keep Active"
+            />
         </AppLayout>
     );
 };

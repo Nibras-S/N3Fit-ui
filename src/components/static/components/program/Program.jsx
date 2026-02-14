@@ -3,8 +3,8 @@ import { motion } from 'framer-motion';
 
 export default function Program() {
   return (
-    <section className="section__container" id="features" style={{ paddingBottom: '12rem' }}>
-      <div style={{ textAlign: 'center', marginBottom: '8rem' }}>
+    <section className="section__container" id="features" style={{ paddingBottom: '6rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <h2 className="section__header">Built for <span className="text-gradient">Infinite Scale.</span></h2>
         <p className="section__subheader">
           A modular intelligence platform designed to grow with your ambition.

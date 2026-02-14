@@ -10,18 +10,34 @@ import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip,
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
+    const { user } = useAuth();
+    const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (user && user.role === 'staff') {
+            navigate('/active');
+            return;
+        }
+        fetchStats();
+    }, [user]);
     const [collectingId, setCollectingId] = useState(null);
     const [collectMethod, setCollectMethod] = useState('Cash');
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchStats = async () => {
         try {
-            const res = await axios.get(`${backendUrl}/api/transactions/stats`);
-            setStats(res.data);
+            const [res, expenseRes] = await Promise.all([
+                axios.get(`${backendUrl}/api/transactions/stats`),
+                axios.get(`${backendUrl}/api/expenses/summary`)
+            ]);
+            setStats({ ...res.data, expenses: expenseRes.data });
         } catch (error) {
             console.error("Error fetching dashboard stats:", error);
         } finally {
@@ -45,7 +61,7 @@ const Dashboard = () => {
             fetchStats();
         } catch (error) {
             console.error("Error collecting payment:", error);
-            alert("Failed to collect payment");
+            toast.error("Failed to collect payment");
         }
     };
 
@@ -185,9 +201,11 @@ const Dashboard = () => {
                         <p className="text-xs text-gray-400">of {stats?.members?.total || 0} total</p>
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
-                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">New This Month</p>
-                        <p className="text-xl font-bold text-gray-800 dark:text-white">{stats?.members?.newThisMonth || 0}</p>
-                        <p className="text-xs text-gray-400">joined recently</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Net Profit</p>
+                        <p className={`text-xl font-bold ${stats?.expenses?.netProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {formatCurrency(stats?.expenses?.netProfit)}
+                        </p>
+                        <p className="text-xs text-gray-400">Revenue - Expenses</p>
                     </div>
                 </div>
 

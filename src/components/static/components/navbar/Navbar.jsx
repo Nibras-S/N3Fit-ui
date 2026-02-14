@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import './navbar.css';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -14,24 +13,51 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`nav ${scrolled ? 'nav--scrolled' : ''}`}>
-      <div className="nav__container">
-        <div className="nav__logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <span className="logo-icon--minimal">N3</span>
-          <span className="logo-text--minimal">GYM</span>
+    <motion.nav
+      className={`navbar ${scrolled ? 'glass-master' : ''}`}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000,
+        padding: '1.5rem 2rem',
+        background: scrolled ? 'rgba(255, 255, 255, 0.8)' : 'transparent',
+        backdropFilter: scrolled ? 'blur(20px)' : 'none',
+        borderBottom: scrolled ? '1px solid rgba(0, 0, 0, 0.05)' : 'none',
+        transition: 'all 0.3s ease'
+      }}
+    >
+      <div className="nav-container">
+        <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          <span className="logo-box">N3</span>
+          <span className="logo-text">FIT</span>
         </div>
 
-        <ul className="nav__links--minimal desktop-only">
-          <li className="link--minimal" onClick={() => document.getElementById('features').scrollIntoView({ behavior: 'smooth' })}>Solutions</li>
-          <li className="link--minimal" onClick={() => document.getElementById('benefits').scrollIntoView({ behavior: 'smooth' })}>Impact</li>
-          <li className="link--minimal" onClick={() => document.getElementById('pricing').scrollIntoView({ behavior: 'smooth' })}>Pricing</li>
-        </ul>
-
-        <div className="nav__actions--minimal">
-          <button onClick={() => navigate("/login")} className="btn-text--minimal">Log in</button>
-          <button onClick={() => navigate("/register")} className="btn-landing--sm">Start Free Trial</button>
+        <div className="nav-links">
+          <a href="#features" className="nav-link">Features</a>
+          <a href="#benefits" className="nav-link">Impact</a>
+          <a href="#pricing" className="nav-link">Pricing</a>
+          <a href="#testimonials" className="nav-link">Reviews</a>
         </div>
+
+        <div className="nav-actions" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <button className="btn-nav-secondary" onClick={() => navigate('/login')}>
+            Sign In
+          </button>
+          <button className="btn-nav-primary" onClick={() => navigate('/login')}>
+            Start Trial
+          </button>
+        </div>
+
+        {/* Mobile Menu Toggle placeholder */}
+        <button className="mobile-menu-toggle" style={{ display: 'none' }}>
+          <i className="ri-menu-3-line"></i>
+        </button>
       </div>
-    </nav>
-  )
+    </motion.nav>
+  );
 }
