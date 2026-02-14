@@ -8,7 +8,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../layout/AppLayout';
 import PageHeader from '../components/ui/PageHeader';
-import QRPage from './QRPage';
 
 const Announcement = () => {
     const { api, user } = useAuth();
@@ -17,8 +16,6 @@ const Announcement = () => {
     const [contacts, setContacts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMembers, setSelectedMembers] = useState([]);
-    const [showQR, setShowQR] = useState(false);
-    const [whatsappStatus, setWhatsappStatus] = useState('unknown');
     const [mode, setMode] = useState(user?.role === 'superadmin' ? 'internal' : 'whatsapp'); // whatsapp, internal
     const [gyms, setGyms] = useState([]);
     const [selectedGyms, setSelectedGyms] = useState([]);
@@ -40,7 +37,6 @@ const Announcement = () => {
             fetchGyms();
         } else {
             fetchContacts();
-            checkWhatsappStatus();
         }
     }, [user]);
 
@@ -64,15 +60,6 @@ const Announcement = () => {
             toast.error('Failed to load contacts');
         } finally {
             setFetchingContacts(false);
-        }
-    };
-
-    const checkWhatsappStatus = async () => {
-        try {
-            const res = await api.get('/api/whatsapp/status');
-            setWhatsappStatus(res.data.connected ? 'connected' : 'disconnected');
-        } catch (err) {
-            setWhatsappStatus('error');
         }
     };
 
@@ -132,11 +119,7 @@ const Announcement = () => {
             return;
         }
 
-        if (mode === 'whatsapp' && whatsappStatus !== 'connected') {
-            toast.error('WhatsApp is not connected. Please connect first.');
-            setShowQR(true);
-            return;
-        }
+
 
         setLoading(true);
         try {
@@ -196,7 +179,7 @@ const Announcement = () => {
             <div className="max-w-5xl mx-auto pb-10">
                 <Toaster position="top-right" />
 
-                {showQR && <QRPage onClose={() => { setShowQR(false); checkWhatsappStatus(); }} />}
+
 
                 <PageHeader
                     title={user?.role === 'superadmin' ? 'Internal Broadcast' : 'WhatsApp Announcement'}
@@ -215,14 +198,9 @@ const Announcement = () => {
                                     {mode === 'whatsapp' ? 'Draft WhatsApp Message' : 'Draft Internal Message'}
                                 </h2>
                                 {mode === 'whatsapp' ? (
-                                    <div className="flex items-center gap-2">
-                                        <span className={`w-2 h-2 rounded-full ${whatsappStatus === 'connected' ? 'bg-green-500' : 'bg-red-500'}`}></span>
-                                        <button
-                                            onClick={() => setShowQR(true)}
-                                            className="text-xs font-medium text-blue-600 hover:underline"
-                                        >
-                                            {whatsappStatus === 'connected' ? 'WhatsApp Connected' : 'Connect WhatsApp'}
-                                        </button>
+                                    <div className="flex items-center gap-1.5 px-3 py-1 bg-green-50 dark:bg-green-900/20 rounded-full">
+                                        <FaWhatsapp className="text-green-500 text-[10px]" />
+                                        <span className="text-[10px] font-bold text-green-600 uppercase tracking-wider">Cloud API</span>
                                     </div>
                                 ) : (
                                     <div className="flex items-center gap-1.5 px-3 py-1 bg-orange-50 dark:bg-orange-900/20 rounded-full">
@@ -452,11 +430,8 @@ const Announcement = () => {
 
                         <button
                             onClick={handleSend}
-                            disabled={loading || (mode === 'whatsapp' && whatsappStatus !== 'connected')}
-                            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] ${mode === 'internal' || whatsappStatus === 'connected'
-                                ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25'
-                                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                                }`}
+                            disabled={loading}
+                            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25`}
                         >
                             {loading ? (
                                 <>

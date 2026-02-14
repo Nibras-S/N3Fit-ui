@@ -222,33 +222,57 @@ const Settings = () => {
                         <FaCog size={14} />
                         Appearance
                     </button>
+                    <button
+                        onClick={() => setActiveTab('gym')}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'gym'
+                            ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm ring-1 ring-gray-200 dark:ring-slate-600"
+                            : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                            }`}
+                    >
+                        <FaBuilding size={14} />
+                        Gym Info
+                    </button>
+                    {user?.role === 'gymadmin' && (
+                        <button
+                            onClick={() => setActiveTab('billing')}
+                            className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 flex items-center gap-2 ${activeTab === 'billing'
+                                ? "bg-white dark:bg-slate-700 text-green-600 dark:text-green-400 shadow-sm ring-1 ring-gray-200 dark:ring-slate-600"
+                                : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                }`}
+                        >
+                            <FaMoneyBillWave size={14} />
+                            Pricing
+                        </button>
+                    )}
                 </div>
-                {user?.role === 'gymadmin' && activeTab === 'gym' && (
+                {(user?.role === 'gymadmin' || user?.role === 'staff') && activeTab === 'gym' && (
                     <div className="space-y-6">
                         <div className="flex justify-between items-end">
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">Gym Branding</h2>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your gym's identity and information</p>
                             </div>
-                            <button
-                                onClick={() => {
-                                    if (isEditingBranding) {
-                                        setGymForm({
-                                            name: gym?.name || "",
-                                            contactEmail: gym?.contactEmail || "",
-                                            contactPhone: gym?.contactPhone || "",
-                                            address: gym?.address || "",
-                                        });
-                                    }
-                                    setIsEditingBranding(!isEditingBranding);
-                                }}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingBranding
-                                    ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
-                                    : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'
-                                    }`}
-                            >
-                                {isEditingBranding ? 'Cancel' : 'Edit Profile'}
-                            </button>
+                            {user?.role === 'gymadmin' && (
+                                <button
+                                    onClick={() => {
+                                        if (isEditingBranding) {
+                                            setGymForm({
+                                                name: gym?.name || "",
+                                                contactEmail: gym?.contactEmail || "",
+                                                contactPhone: gym?.contactPhone || "",
+                                                address: gym?.address || "",
+                                            });
+                                        }
+                                        setIsEditingBranding(!isEditingBranding);
+                                    }}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingBranding
+                                        ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
+                                        : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'
+                                        }`}
+                                >
+                                    {isEditingBranding ? 'Cancel' : 'Edit Profile'}
+                                </button>
+                            )}
                         </div>
 
                         {/* Logo + Quick Info */}
@@ -257,8 +281,8 @@ const Settings = () => {
                             <div className="px-6 pb-6">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-10">
                                     <div
-                                        className="relative w-20 h-20 rounded-xl bg-white dark:bg-slate-700 border-4 border-white dark:border-slate-800 shadow-lg flex items-center justify-center overflow-hidden cursor-pointer group"
-                                        onClick={() => isEditingBranding && fileInputRef.current?.click()}
+                                        className={`relative w-20 h-20 rounded-xl bg-white dark:bg-slate-700 border-4 border-white dark:border-slate-800 shadow-lg flex items-center justify-center overflow-hidden ${user?.role === 'gymadmin' && isEditingBranding ? 'cursor-pointer group' : ''}`}
+                                        onClick={() => user?.role === 'gymadmin' && isEditingBranding && fileInputRef.current?.click()}
                                     >
                                         {gym?.logo ? (
                                             <img src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`} alt="Gym logo" className="w-full h-full object-cover" />

@@ -121,27 +121,24 @@ function PageInactive() {
 
   const handleRenew = async (userId) => {
     setRenewing(true);
-    const daysToAdd = { '1-Month': 30, '2-Month': 60, '3-Month': 90 }[selectedOption] || 0;
-    if (!daysToAdd) return setRenewing(false);
+    if (!selectedOption) return setRenewing(false);
 
     try {
-      const { data: contact } = await axios.get(`${backendUrl}/api/contacts/${userId}`);
+      // Always start from today or custom date — server computes endDate and dews
       const newStart = customDate ? new Date(customDate) : new Date();
-      const newEnd = new Date(newStart);
-      newEnd.setDate(newEnd.getDate() + daysToAdd);
-      const today = new Date(); today.setDate(today.getDate() - 1);
-      const dews = Math.floor((newEnd - today) / (1000 * 60 * 60 * 24));
 
       await axios.put(`${backendUrl}/api/contacts/${userId}`, {
-        date: newStart.toISOString(), endDate: newEnd.toISOString(), status: 'Active',
-        plan: selectedOption, dews, amount: parseInt(amount), paymentMethod, paymentStatus
+        date: newStart.toISOString(),
+        plan: selectedOption,
+        amount: parseInt(amount),
+        paymentMethod,
+        paymentStatus
       });
       await axios.patch(`${backendUrl}/api/reminders/reset/${userId}`, { sentCount: 0, messageStatus: 'Pending', lastSentAt: null });
 
-      toast.success(`Renewed for ${selectedOption}!`);
+      toast.success(`Renewed for ${selectedOption}! WhatsApp confirmation sent.`);
       fetchMembers();
       setExpandedRow(null);
-      window.open(`https://wa.me/${contact.phone}?text=${encodeURIComponent(`Hello! Your plan has been renewed for ${selectedOption}. Valid till ${formatDate(newEnd)}. Thank you!`)}`, '_blank');
     } catch { toast.error('Failed to renew'); }
     finally { setRenewing(false); }
   };

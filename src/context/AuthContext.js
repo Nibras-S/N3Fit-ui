@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
         expenses: true,
         announcements: true,
         archiveExpired: true,
+        whatsappNotifications: false,
     });
 
     // Set up axios interceptor

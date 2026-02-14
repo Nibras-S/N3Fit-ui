@@ -36,7 +36,8 @@ const GymDetails = () => {
         profilePhoto: true,
         expenses: true,
         announcements: true,
-        archiveExpired: true
+        archiveExpired: true,
+        whatsappNotifications: false
     });
     const [updatingFeatures, setUpdatingFeatures] = useState(false);
 
@@ -73,6 +74,10 @@ const GymDetails = () => {
                 subscriptionExpiry: gymRes.data.subscriptionExpiry ? new Date(gymRes.data.subscriptionExpiry).toISOString().split('T')[0] : "",
                 isActive: gymRes.data.isActive
             });
+
+            if (gymRes.data.features) {
+                setGymFeatures(gymRes.data.features);
+            }
         } catch (err) {
             toast.error("Failed to load gym details");
             navigate("/superadmin");
@@ -390,7 +395,8 @@ const GymDetails = () => {
                                     { key: 'profilePhoto', label: 'Member Profile Photos', icon: '👤', desc: 'Allow admins to upload member photos' },
                                     { key: 'expenses', label: 'Expense Tracking', icon: '💰', desc: 'Enable expense and cash flow management' },
                                     { key: 'announcements', label: 'WhatsApp Announcements', icon: '📢', desc: 'Enable bulk WhatsApp messaging' },
-                                    { key: 'archiveExpired', label: 'Auto-Archive Expired', icon: '📦', desc: 'Automatically archive memberships' }
+                                    { key: 'archiveExpired', label: 'Auto-Archive Expired', icon: '📦', desc: 'Automatically archive memberships' },
+                                    { key: 'whatsappNotifications', label: 'WhatsApp Notifications', icon: '💬', desc: 'Auto-send payment & expiry reminders' }
                                 ].map((feature) => (
                                     <button
                                         key={feature.key}
