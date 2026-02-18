@@ -1,0 +1,274 @@
+/* N3 FIT — Blue SaaS Landing Page Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css');
+
+:root {
+    --max-width: 1400px;
+    --brand-50: #eff6ff;
+    --brand-100: #dbeafe;
+    --brand-200: #bfdbfe;
+    --brand-300: #93c5fd;
+    --brand-400: #60a5fa;
+    --brand-500: #3b82f6;
+    --brand-600: #2563eb;
+    --brand-700: #1d4ed8;
+    --brand-800: #1e40af;
+    --brand-900: #1e3a8a;
+    --brand-950: #172554;
+
+    --surface-bg: #f8fafc;
+    --surface-card: #ffffff;
+    --text-main: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+    --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.15);
+    --shadow-blue: 0 8px 30px rgba(59, 130, 246, 0.25);
+    --transition-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.landing-page-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background: var(--surface-bg);
+    color: var(--text-main);
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ─── Section Layout ─── */
+.section__container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* ─── Typography ─── */
+.section__header {
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    color: var(--text-main);
+}
+
+.section__subheader {
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: var(--text-secondary);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* ─── Navbar ─── */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 1rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.navbar.scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.nav-container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+}
+
+.logo-box {
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-700));
+    color: white;
+    padding: 0.2rem 0.65rem;
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.logo-text {
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+}
+
+.nav-links {
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--brand-600);
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--brand-500);
+    transition: width 0.3s var(--transition-smooth);
+    border-radius: 2px;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
+
+/* Nav Buttons */
+.btn-nav-secondary {
+    padding: 0.5rem 1.25rem;
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-nav-secondary:hover {
+    color: var(--brand-600);
+}
+
+.btn-nav-primary {
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, var(--brand-500), var(--brand-600));
+    color: white;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+    font-family: 'Inter', sans-serif;
+}
+
+.btn-nav-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+}
+
+/* ─── Animated Counter ─── */
+@keyframes countUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Float Animation ─── */
+@keyframes floatY {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-15px);
+    }
+}
+
+.animate-float {
+    animation: floatY 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+    animation: floatY 6s ease-in-out 3s infinite;
+}
+
+/* ─── Glass Card ─── */
+.glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+    border-radius: 1.5rem;
+    box-shadow: var(--shadow-md);
+}
+
+/* ─── Mobile Menu ─── */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-main);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 992px) {
+
+    .nav-links,
+    .nav-actions {
+        display: none;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .section__header {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .section__container {
+        padding: 1.5rem 1rem;
+    }
+}
