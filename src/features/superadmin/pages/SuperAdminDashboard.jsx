@@ -117,7 +117,7 @@ const SuperAdminDashboard = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Platform Overview</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Super Admin — N3 FIT management platform</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Super Admin — Fit management platform</p>
                     </div>
                     <button
                         onClick={() => setModalOpen(true)}
@@ -133,7 +133,7 @@ const SuperAdminDashboard = () => {
                         <div className="bg-white/10 backdrop-blur rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2 opacity-75">
                                 <FaBuilding size={12} />
-                                <p className="text-xs uppercase">Total Gyms</p>
+                                <p className="text-xs uppercase">Total Fit Clubs</p>
                             </div>
                             <p className="text-2xl font-bold">{analytics?.totalGyms || 0}</p>
                             <p className="text-xs opacity-60 mt-1">{analytics?.activeGyms || 0} active</p>
@@ -144,7 +144,7 @@ const SuperAdminDashboard = () => {
                                 <p className="text-xs uppercase">Total Members</p>
                             </div>
                             <p className="text-2xl font-bold">{(analytics?.totalMembers || 0).toLocaleString()}</p>
-                            <p className="text-xs opacity-60 mt-1">across all gyms</p>
+                            <p className="text-xs opacity-60 mt-1">across all fit clubs</p>
                         </div>
                         <div className="bg-white/10 backdrop-blur rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2 opacity-75">
@@ -168,7 +168,7 @@ const SuperAdminDashboard = () => {
                                 <p className="text-xs uppercase">Inactive</p>
                             </div>
                             <p className="text-2xl font-bold text-red-300">{analytics?.inactiveGyms || 0}</p>
-                            <p className="text-xs opacity-60 mt-1">gyms paused</p>
+                            <p className="text-xs opacity-60 mt-1">fit clubs paused</p>
                         </div>
                     </div>
                 </div>
@@ -180,7 +180,7 @@ const SuperAdminDashboard = () => {
                             <div key={i} className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
                                 <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">{p._id || "No Plan"}</p>
                                 <p className="text-xl font-bold text-gray-900 dark:text-white mt-1">{p.count}</p>
-                                <p className="text-xs text-gray-400">gyms</p>
+                                <p className="text-xs text-gray-400">fit clubs</p>
                             </div>
                         ))}
                     </div>
@@ -193,7 +193,7 @@ const SuperAdminDashboard = () => {
                         type="text"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        placeholder="Search gyms..."
+                        placeholder="Search fit clubs..."
                         className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
                     />
                 </div>
@@ -265,7 +265,7 @@ const SuperAdminDashboard = () => {
                                                         setIsDeleteModalOpen(true);
                                                     }}
                                                     className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                                                    title="Delete Gym"
+                                                    title="Delete Fit Club"
                                                 >
                                                     <FaTrash size={16} />
                                                 </button>
@@ -323,7 +323,7 @@ const SuperAdminDashboard = () => {
                             onClick={(e) => e.stopPropagation()}
                         >
                             <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700 sticky top-0 bg-white dark:bg-slate-800 z-10">
-                                <h3 className="font-bold text-gray-900 dark:text-white text-lg">Create New Gym</h3>
+                                <h3 className="font-bold text-gray-900 dark:text-white text-lg">Create New Fit Club</h3>
                                 <button
                                     onClick={() => setModalOpen(false)}
                                     className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
@@ -334,9 +334,9 @@ const SuperAdminDashboard = () => {
 
                             <form onSubmit={handleCreate} className="p-5 space-y-4">
                                 {/* Gym Details */}
-                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Gym Details</p>
+                                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Fit Club Details</p>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Gym Name *</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Fit Club Name *</label>
                                     <input
                                         type="text"
                                         value={form.name}
@@ -453,7 +453,7 @@ const SuperAdminDashboard = () => {
                                     >
                                         {submitting ? (
                                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                        ) : "Create Gym"}
+                                        ) : "Create Fit Club"}
                                     </button>
                                 </div>
                             </form>
@@ -466,7 +466,7 @@ const SuperAdminDashboard = () => {
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDelete}
-                title="Deactivate Gym"
+                title="Deactivate Fit Club"
                 message={`Are you sure you want to deactivate ${gymToDelete?.name}? This will move them to the Recycling Bin.`}
                 confirmText="Deactivate"
                 cancelText="Keep Active"

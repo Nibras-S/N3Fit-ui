@@ -24,7 +24,10 @@ const SaaSPlanManagement = () => {
     const fetchPlans = useCallback(async () => {
         try {
             const res = await api.get("/api/superadmin/plans");
-            setPlans(res.data);
+            const data = Array.isArray(res.data?.data) ? res.data.data
+                : Array.isArray(res.data?.plans) ? res.data.plans
+                    : Array.isArray(res.data) ? res.data : [];
+            setPlans(data);
         } catch (err) {
             toast.error("Failed to load plans");
         } finally {

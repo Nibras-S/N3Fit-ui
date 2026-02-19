@@ -1,7 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import api from '../../../shared/services/api';
-import PhoneInput from 'react-phone-input-2';
-import 'react-phone-input-2/lib/style.css';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
 import {
@@ -16,7 +14,8 @@ import toast, { Toaster } from 'react-hot-toast';
 function NewMember() {
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("+91");
+  const [phone, setPhone] = useState("");
+  const [countryCode, setCountryCode] = useState("+91");
   const [dob, setDob] = useState("");
   const [plan, setPlan] = useState("1-Month");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -31,6 +30,7 @@ function NewMember() {
 
   // Payment State
   const [amount, setAmount] = useState(0);
+  const [admissionFee, setAdmissionFee] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [paymentStatus, setPaymentStatus] = useState("Paid");
@@ -50,10 +50,13 @@ function NewMember() {
   useEffect(() => {
     api.get(`${backendUrl}/api/settings`)
       .then(res => {
-        setSettings(res.data);
+        // Handle both new { success, data: {...} } and old direct object shapes
+        const data = res.data?.data ?? res.data;
+        setAdmissionFee(data?.admissionFee || 0);
+        setSettings(data);
         // Set default plan to first active plan if available
-        if (res.data.plans && res.data.plans.length > 0) {
-          const activePlans = res.data.plans.filter(p => p.isActive);
+        if (data?.plans && data.plans.length > 0) {
+          const activePlans = data.plans.filter(p => p.isActive);
           if (activePlans.length > 0) {
             setPlan(activePlans[0].name);
           }
@@ -95,7 +98,7 @@ function NewMember() {
   // Browser Tab Closure Protection & Cleanup
   useEffect(() => {
     const isDirty = name.trim() !== "" ||
-      (phone !== "+91" && phone !== "") ||
+      (phone !== "" && phone !== "") ||
       photoBlob !== null ||
       gender !== "" ||
       dob !== "" ||
@@ -212,25 +215,29 @@ function NewMember() {
     e.preventDefault();
     setSubmitting(true);
 
-    let daysToAdd = plan === "1-Month" ? 30 : plan === "2-Month" ? 60 : 90;
-    const startDate = new Date(date);
-    const expirationDate = new Date(startDate);
-    expirationDate.setDate(startDate.getDate() + daysToAdd);
-    const dews = Math.ceil((expirationDate - new Date()) / (1000 * 60 * 60 * 24));
-
     const formData = new FormData();
     formData.append('name', name);
-    formData.append('phone', phone.replace(/[ \-()]/g, ''));
+    // Sanitize phone
+    formData.append('phone', `${countryCode}${phone}`.replace(/[ \-()]/g, ''));
     formData.append('plan', plan);
-    formData.append('date', date);
+    if (date) formData.append('date', date);
     formData.append('gender', gender);
-    formData.append('dob', dob);
-    formData.append('dews', dews);
-    formData.append('status', dews >= 0 ? "Active" : "InActive");
-    formData.append('status', dews >= 0 ? "Active" : "InActive");
-    const totalAmount = parseInt(amount) + (settings?.admissionFee || 0) - parseInt(discount || 0);
+    if (dob) formData.append('dob', dob);
+
+    // Status and Dews are calculated by backend model pre-save hook
+
+    const safeAmount = (val) => {
+      const parsed = parseInt(val);
+      return isNaN(parsed) ? 0 : parsed;
+    };
+
+    const baseAmount = safeAmount(amount);
+    const admFee = safeAmount(admissionFee);
+    const disc = safeAmount(discount);
+    const totalAmount = baseAmount + admFee - disc;
+
     formData.append('amount', totalAmount);
-    formData.append('discount', parseInt(discount || 0));
+    formData.append('discount', disc);
     formData.append('paymentMethod', paymentMethod);
     formData.append('paymentStatus', paymentStatus);
 
@@ -239,11 +246,9 @@ function NewMember() {
     }
 
     try {
-      await api.post(`${backendUrl}/api/contacts/`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      await api.post(`${backendUrl}/api/contacts/`, formData);
       toast.success('Member enrolled successfully!');
-      setTimeout(() => navigate('/active'), 1500);
+      setTimeout(() => navigate('/members'), 1500);
     } catch (err) {
       toast.error('Enrollment failed');
     } finally {
@@ -347,15 +352,23 @@ function NewMember() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Phone</label>
-                      <PhoneInput
-                        country="in"
-                        value={phone}
-                        onlyCountries={['in']}
-                        onChange={(value) => setPhone(value)}
-                        containerClass="!border-none"
-                        inputClass="!w-full !py-5 !px-4 !rounded-xl !bg-gray-50 dark:!bg-slate-900/50 !border-gray-100 dark:!border-slate-700 !text-sm font-medium focus:!border-blue-500"
-                        buttonClass="!bg-gray-50 dark:!bg-slate-900/50 !border-gray-100 dark:!border-slate-700 !rounded-l-xl"
-                      />
+                      <div className="flex">
+                        <input
+                          type="text"
+                          value={countryCode}
+                          onChange={(e) => setCountryCode(e.target.value)}
+                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-r-0 border-gray-100 dark:border-slate-700 rounded-l-xl outline-none focus:border-blue-500 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                          placeholder="+91"
+                        />
+                        <input
+                          type="tel"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-r-xl outline-none focus:border-blue-500 text-sm font-medium"
+                          placeholder="9876543210"
+                          maxLength={10}
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">DOB</label>
@@ -468,13 +481,22 @@ function NewMember() {
                     <FaMoneyBillWave className="text-green-500" size={18} /> Payment
                   </h2>
 
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-3 gap-3">
                     <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase mb-1 block">Amount (₹)</label>
+                      <label className="text-[9px] font-black text-gray-400 uppercase mb-1 block">Plan (₹)</label>
                       <input
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl font-black text-base outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[9px] font-black text-gray-400 uppercase mb-1 block">Admission (₹)</label>
+                      <input
+                        type="number"
+                        value={admissionFee}
+                        onChange={(e) => setAdmissionFee(e.target.value)}
                         className="w-full px-3 py-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl font-black text-base outline-none"
                       />
                     </div>
@@ -497,7 +519,7 @@ function NewMember() {
                       </div>
                       <div className="flex justify-between text-[11px]">
                         <span className="text-gray-400 font-bold uppercase">Admission Fee</span>
-                        <span className="text-gray-900 dark:text-white font-bold">₹{settings?.admissionFee || 0}</span>
+                        <span className="text-gray-900 dark:text-white font-bold">₹{admissionFee || 0}</span>
                       </div>
                       <div className="flex justify-between text-[11px]">
                         <span className="text-gray-400 font-bold uppercase">Discount</span>
@@ -505,7 +527,7 @@ function NewMember() {
                       </div>
                       <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-end">
                         <span className="text-[10px] font-black uppercase text-blue-600">Total</span>
-                        <span className="text-2xl font-black text-blue-600">₹{parseInt(amount) + (settings?.admissionFee || 0) - parseInt(discount || 0)}</span>
+                        <span className="text-2xl font-black text-blue-600">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
                       </div>
                     </div>
                   </div>
@@ -567,13 +589,13 @@ function NewMember() {
                     </div>
                     <div>
                       <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase leading-tight">{name}</h2>
-                      <p className="text-blue-600 font-bold tracking-widest text-[10px] uppercase mt-0.5">{gender} • {phone}</p>
+                      <p className="text-blue-600 font-bold tracking-widest text-[10px] uppercase mt-0.5">{gender} • {countryCode}{phone}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-6 bg-gray-50 dark:bg-slate-900/50 p-5 rounded-2xl">
                     <div className="border-r border-gray-100 dark:border-slate-700 pr-4">
-                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Gym Plan</p>
+                      <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Membership Plan</p>
                       <p className="text-xs font-bold text-gray-900 dark:text-white">{plan.toUpperCase()}</p>
                       <p className="text-[10px] text-gray-500 mt-1">Starts {new Date(date).toLocaleDateString('en-IN')}</p>
                     </div>

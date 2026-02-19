@@ -6,8 +6,8 @@ const FAQ = () => {
 
     const faqs = [
         {
-            q: "Is N3 FIT cloud-based?",
-            a: "Yes! N3 FIT is 100% cloud-based. Access your gym's data from any device — laptop, tablet, or phone — securely from anywhere."
+            q: "Is Fit cloud-based?",
+            a: "Yes! Fit is 100% cloud-based. Access your gym's data from any device — laptop, tablet, or phone — securely from anywhere."
         },
         {
             q: "Does it support multi-branch gyms?",
@@ -15,11 +15,11 @@ const FAQ = () => {
         },
         {
             q: "Can I migrate data from Excel or another software?",
-            a: "Yes, we offer free CSV/Excel data import. Upload your member list and N3 FIT auto-maps the fields. Our team assists with complex migrations."
+            a: "Yes, we offer free CSV/Excel data import. Upload your member list and Fit auto-maps the fields. Our team assists with complex migrations."
         },
         {
             q: "How does the WhatsApp integration work?",
-            a: "N3 FIT connects to the WhatsApp Cloud API to send automated renewal reminders, bulk announcements, and personalized birthday wishes — all from your dashboard."
+            a: "Fit connects to the WhatsApp Cloud API to send automated renewal reminders, bulk announcements, and personalized birthday wishes — all from your dashboard."
         },
         {
             q: "Does it support GST billing?",
@@ -48,7 +48,7 @@ const FAQ = () => {
                     <h2 className="font-display text-3xl md:text-5xl font-extrabold text-slate-900 mb-4">
                         Got Questions?
                     </h2>
-                    <p className="text-lg text-slate-500">Everything you need to know about N3 FIT.</p>
+                    <p className="text-lg text-slate-500">Everything you need to know about Fit.</p>
                 </motion.div>
 
                 <div className="space-y-3">

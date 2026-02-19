@@ -42,6 +42,17 @@ body {
 @tailwind components;
 @tailwind utilities;
 
+/* Hide scrollbar utility — cross-browser */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+
 /* Clean Dashboard Layout */
 .dashboard-bg {
   background: #f5f7fa;

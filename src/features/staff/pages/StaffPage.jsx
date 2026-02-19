@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
     FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers, FaUserCheck, FaUserTimes,
     FaTimes, FaEye, FaEyeSlash, FaSearch
@@ -29,11 +30,15 @@ const StaffManagement = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
+    const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
     const fetchStaff = useCallback(async () => {
         try {
             const res = await api.get("/api/gym/staff");
-            setStaff(res.data);
+            const data = Array.isArray(res.data?.data) ? res.data.data
+                : Array.isArray(res.data?.staff) ? res.data.staff
+                    : Array.isArray(res.data) ? res.data : [];
+            setStaff(data);
         } catch (err) {
             toast.error("Failed to load staff");
         } finally {
@@ -113,17 +118,24 @@ const StaffManagement = () => {
         }
     };
 
-    // Delete
-    const handleDelete = async (id) => {
+    // Delete Trigger
+    const handleDelete = (id) => {
+        setConfirmDeleteId(id);
+    };
+
+    // Confirm Delete
+    const confirmDelete = async () => {
+        if (!confirmDeleteId) return;
         try {
-            setDeletingId(id);
-            await api.delete(`/api/gym/staff/${id}`);
+            setDeletingId(confirmDeleteId);
+            await api.delete(`/api/gym/staff/${confirmDeleteId}`);
             toast.success("Staff removed");
             fetchStaff();
         } catch (err) {
             toast.error("Failed to remove staff");
         } finally {
             setDeletingId(null);
+            setConfirmDeleteId(null);
         }
     };
 
@@ -155,7 +167,7 @@ const StaffManagement = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your gym's team members</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your fit club's team members</p>
                     </div>
                     <button
                         onClick={openCreateModal}
@@ -166,7 +178,7 @@ const StaffManagement = () => {
                 </div>
 
                 {/* Stats Row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
@@ -216,7 +228,8 @@ const StaffManagement = () => {
 
                 {/* Staff Table */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30">
@@ -300,6 +313,58 @@ const StaffManagement = () => {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-700">
+                        {filtered.length === 0 ? (
+                            <div className="text-center py-12 text-gray-400">
+                                <FaUserShield size={28} className="mx-auto mb-3 opacity-40" />
+                                <p className="font-medium">No staff members yet</p>
+                                <p className="text-xs mt-1">Click "Add Staff" to invite your first team member</p>
+                            </div>
+                        ) : (
+                            filtered.map((member) => (
+                                <div key={member._id} className="p-4">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                                {member.name?.charAt(0)?.toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-gray-900 dark:text-white text-sm">{member.name}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{member.email}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => toggleActive(member)}
+                                            className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
+                                                ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                                                : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                                                }`}
+                                        >
+                                            {member.isActive ? "Active" : "Inactive"}
+                                        </button>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex gap-1.5 flex-wrap">
+                                            {(member.permissions || []).map(p => (
+                                                <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 capitalize">{p}</span>
+                                            ))}
+                                        </div>
+                                        <div className="flex items-center gap-1">
+                                            <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                                                <FaEdit size={14} />
+                                            </button>
+                                            <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
+                                                className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
+                                                {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div> : <FaTrash size={13} />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
@@ -435,6 +500,18 @@ const StaffManagement = () => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={!!confirmDeleteId}
+                onClose={() => setConfirmDeleteId(null)}
+                onConfirm={confirmDelete}
+                title="Remove Staff Member"
+                message="Are you sure you want to remove this staff member? This action cannot be undone."
+                confirmText="Remove Staff"
+                cancelText="Cancel"
+                type="danger"
+            />
         </AppLayout>
     );
 };

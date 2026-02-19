@@ -17,7 +17,9 @@ const Invoice = () => {
         const fetchInvoice = async () => {
             try {
                 const res = await api.get(`/api/transactions/${id}`);
-                setTransaction(res.data);
+                // Handle both new { success, data: {...} } and old direct object shapes
+                const txData = res.data?.data ?? res.data;
+                setTransaction(txData);
             } catch (err) {
                 toast.error("Failed to load invoice");
                 console.error(err);
@@ -89,7 +91,7 @@ const Invoice = () => {
                         {gym?.logo ? (
                             <img
                                 src={`${backendUrl}${gym.logo}`}
-                                alt="Gym Logo"
+                                alt="Fit Club Logo"
                                 className="w-16 h-16 object-contain rounded-lg bg-gray-50"
                             />
                         ) : (
@@ -98,7 +100,7 @@ const Invoice = () => {
                             </div>
                         )}
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{gym?.name || "N3 FIT"}</h1>
+                            <h1 className="text-2xl font-bold text-gray-900">{gym?.name || "Fit"}</h1>
                             <p className="text-sm text-gray-500 max-w-[250px]">{gym?.address}</p>
                             <p className="text-sm text-gray-500 mt-1">
                                 {gym?.contactPhone && <span>Tel: {gym.contactPhone}</span>}
@@ -143,7 +145,7 @@ const Invoice = () => {
                     <tbody className="divide-y divide-gray-100">
                         <tr>
                             <td className="py-4 px-4 text-sm text-gray-900">
-                                <p className="font-medium">Gym Membership Subscription</p>
+                                <p className="font-medium">Fit Club Membership Subscription</p>
                                 <p className="text-xs text-gray-500 mt-0.5">{plan} Plan</p>
                             </td>
                             <td className="py-4 px-4 text-sm text-gray-600 text-right">{plan}</td>
@@ -173,7 +175,7 @@ const Invoice = () => {
                 {/* Footer */}
                 <div className="border-t border-gray-100 pt-8 text-center text-sm text-gray-400">
                     <p>Thank you for your business!</p>
-                    <p className="mt-1 text-xs">Generated via N3 FIT Management Software</p>
+                    <p className="mt-1 text-xs">Generated via Fit Management Software</p>
                 </div>
             </div>
 

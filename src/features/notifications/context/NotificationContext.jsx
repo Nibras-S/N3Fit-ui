@@ -18,10 +18,15 @@ export const NotificationProvider = ({ children }) => {
         setLoading(true);
         try {
             const res = await api.get('/api/notifications/my');
-            setNotifications(res.data);
-            setUnreadCount(res.data.filter(n => !n.isRead).length);
+            // Handle both new { success, data: [] } and old { success, notifications: [] } shapes
+            const data = Array.isArray(res.data?.data) ? res.data.data
+                : Array.isArray(res.data?.notifications) ? res.data.notifications
+                    : Array.isArray(res.data) ? res.data : [];
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.isRead).length);
         } catch (err) {
             console.error('Failed to fetch notifications', err);
+            setNotifications([]);
         } finally {
             setLoading(false);
         }
@@ -31,8 +36,10 @@ export const NotificationProvider = ({ children }) => {
         if (!user || user.role === 'superadmin') return;
         try {
             const res = await api.get('/api/notifications/active-warning');
-            if (res.data) {
-                setActiveWarning(res.data);
+            // Handle both new { success, data: {...} } and old direct object shapes
+            const warning = res.data?.data ?? res.data?.warning ?? (res.data?.success === undefined ? res.data : null);
+            if (warning && warning._id) {
+                setActiveWarning(warning);
             }
         } catch (err) {
             console.error('Failed to fetch warning', err);

@@ -33,10 +33,10 @@ const CallToAction = () => {
                     <h2 className="font-display text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
                         Ready to Transform
                         <br />
-                        Your Gym Operations?
+                        Your Fit Club Operations?
                     </h2>
                     <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto leading-relaxed">
-                        Join 500+ gym owners who switched to N3 FIT and never looked back. Start your free trial today — setup takes under 10 minutes.
+                        Join 500+ fit club owners who switched to Fit and never looked back. Start your free trial today — setup takes under 10 minutes.
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">

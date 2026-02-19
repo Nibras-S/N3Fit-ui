@@ -65,10 +65,10 @@ const Features = () => {
                     <span className="text-blue-600 font-semibold tracking-wider text-sm uppercase mb-3 block">Powerful Features</span>
                     <h2 className="font-display text-3xl md:text-5xl font-extrabold text-slate-900 mb-6">
                         Everything to Run a{' '}
-                        <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">World-Class Gym</span>
+                        <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">World-Class Fit Club</span>
                     </h2>
                     <p className="text-lg text-slate-500">
-                        Powerful automation packed into a simple, intuitive interface — designed for gym owners, not IT experts.
+                        Powerful automation packed into a simple, intuitive interface — designed for fit club owners, not IT experts.
                     </p>
                 </motion.div>
 

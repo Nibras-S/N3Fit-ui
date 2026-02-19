@@ -30,7 +30,8 @@ function MemberProfile() {
                     api.get(`${backendUrl}/api/transactions?memberId=${id}`)
                 ]);
                 setMember(memberRes.data);
-                setTransactions(txnRes.data);
+                const txnData = txnRes.data;
+                setTransactions(Array.isArray(txnData) ? txnData : []);
             } catch (error) {
                 console.error("Error fetching member details:", error);
                 toast.error("Failed to load member details");
@@ -100,7 +101,7 @@ function MemberProfile() {
                             </div>
                         )}
                         <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{member.name}</h1>
+                            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{member.name}</h1>
                             <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1">
                                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews >= 0 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
                                     {statusText}
@@ -205,46 +206,81 @@ function MemberProfile() {
                             </div>
 
                             {transactions.length > 0 ? (
-                                <table className="w-full text-left">
-                                    <thead className="bg-gray-50 dark:bg-slate-900">
-                                        <tr>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Plan</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Method</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                                <>
+                                    {/* Desktop Table */}
+                                    <table className="hidden md:table w-full text-left">
+                                        <thead className="bg-gray-50 dark:bg-slate-900">
+                                            <tr>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Date</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Plan</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Amount</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Method</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
+                                                <th className="px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                                            {transactions.map((txn) => (
+                                                <tr key={txn._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 group">
+                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
+                                                        {new Date(txn.transactionDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    </td>
+                                                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-white font-medium">{txn.plan}</td>
+                                                    <td className="px-6 py-4 text-sm font-bold text-gray-800 dark:text-gray-200">₹{txn.amount}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{txn.paymentMethod}</td>
+                                                    <td className="px-6 py-4">
+                                                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                            }`}>
+                                                            {txn.paymentStatus}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-4">
+                                                        <button
+                                                            onClick={() => navigate(`/invoice/${txn._id}`)}
+                                                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                                                            title="View Invoice"
+                                                        >
+                                                            Invoice
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+
+                                    {/* Mobile Card View */}
+                                    <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-700">
                                         {transactions.map((txn) => (
-                                            <tr key={txn._id} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/50 group">
-                                                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">
-                                                    {new Date(txn.transactionDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
-                                                </td>
-                                                <td className="px-6 py-4 text-sm text-gray-900 dark:text-white font-medium">{txn.plan}</td>
-                                                <td className="px-6 py-4 text-sm font-bold text-gray-800 dark:text-gray-200">₹{txn.amount}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{txn.paymentMethod}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`text-xs px-2 py-1 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                        txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
-                                                        }`}>
-                                                        {txn.paymentStatus}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4">
+                                            <div key={txn._id} className="p-4 flex items-center justify-between gap-3">
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="font-medium text-sm text-gray-900 dark:text-white">{txn.plan}</span>
+                                                        <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                            }`}>
+                                                            {txn.paymentStatus}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                                        <span>{new Date(txn.transactionDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+                                                        <span>•</span>
+                                                        <span>{txn.paymentMethod}</span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right shrink-0">
+                                                    <p className="font-bold text-gray-800 dark:text-gray-200 text-sm">₹{txn.amount}</p>
                                                     <button
                                                         onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                        className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        title="View Invoice"
+                                                        className="text-blue-500 text-xs font-medium mt-0.5"
                                                     >
                                                         Invoice
                                                     </button>
-                                                </td>
-                                            </tr>
+                                                </div>
+                                            </div>
                                         ))}
-                                    </tbody>
-                                </table>
+                                    </div>
+                                </>
                             ) : (
                                 <div className="p-8 text-center text-gray-500 dark:text-gray-400">
                                     No transaction history found.

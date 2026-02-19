@@ -24,7 +24,7 @@ export default function PageHome() {
   });
 
   useEffect(() => {
-    document.title = 'N3 FIT — All-in-One Gym Management Platform';
+    document.title = 'Fit — All-in-One Fitness Management Platform';
   }, []);
 
   return (

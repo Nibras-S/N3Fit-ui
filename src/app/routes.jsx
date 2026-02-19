@@ -6,16 +6,15 @@ import LoginGuard from '../features/auth/components/LoginGuard';
 import LandingPage from '../features/landing/pages/LandingPage';
 
 // Members
-import ActiveMembersPage from '../features/members/pages/ActiveMembersPage';
-import InactiveMembersPage from '../features/members/pages/InactiveMembersPage';
+import MembersPage from '../features/members/pages/MembersPage';
 import MemberProfilePage from '../features/members/pages/MemberProfilePage';
 import RegisterMemberPage from '../features/members/pages/RegisterMemberPage';
 import InactiveSoonPage from '../features/members/pages/InactiveSoonPage';
-import ManageMembersPage from '../features/members/pages/ManageMembersPage';
 
 // Dashboard & Analytics
 import DashboardPage from '../features/dashboard/pages/DashboardPage';
 import ExpensesPage from '../features/expenses/pages/ExpensesPage';
+import TransactionsPage from '../features/transactions/pages/TransactionsPage';
 
 // Staff, Settings, Notifications, Whatsapp
 import StaffPage from '../features/staff/pages/StaffPage';
@@ -52,19 +51,22 @@ export default function AppRoutes() {
 
             {/* ── Gym Admin + Staff ───────────────────────────────── */}
             <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-                <Route path="/active" element={<ActiveMembersPage />} />
-                <Route path="/inactive" element={<InactiveMembersPage />} />
+                <Route path="/members" element={<MembersPage />} />
                 <Route path="/members/:id" element={<MemberProfilePage />} />
                 <Route path="/register" element={<RegisterMemberPage />} />
                 <Route path="/inactivesoon" element={<InactiveSoonPage />} />
-                <Route path="/manageUsers" element={<ManageMembersPage />} />
                 <Route path="/invoice/:id" element={<InvoicePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                {/* Legacy redirects */}
+                <Route path="/active" element={<Navigate to="/members?tab=active" replace />} />
+                <Route path="/inactive" element={<Navigate to="/members?tab=expired" replace />} />
+                <Route path="/manageUsers" element={<Navigate to="/members?tab=all" replace />} />
             </Route>
 
             {/* ── Gym Admin Only ──────────────────────────────────── */}
             <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
             </Route>

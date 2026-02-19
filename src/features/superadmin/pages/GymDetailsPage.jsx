@@ -96,7 +96,7 @@ const GymDetails = () => {
         setUpdating(true);
         try {
             await api.put(`/api/superadmin/gyms/${id}`, form);
-            toast.success("Gym updated successfully!");
+            toast.success("Fit Club updated successfully!");
             setIsEditing(false); // Back to view mode
             fetchData();
         } catch (err) {
@@ -123,7 +123,7 @@ const GymDetails = () => {
     const handleDelete = async () => {
         try {
             await api.delete(`/api/superadmin/gyms/${id}`);
-            toast.success("Gym moved to Recycling Bin");
+            toast.success("Fit Club moved to Recycling Bin");
             navigate("/superadmin");
         } catch (err) {
             toast.error("Failed to delete gym");
@@ -156,7 +156,7 @@ const GymDetails = () => {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                     <PageHeader
                         title={gym.name}
-                        subtitle={`Gym Management — ${gym.gymCode}`}
+                        subtitle={`Fit Club Management — ${gym.gymCode}`}
                     />
                     <div className="flex items-center gap-3">
                         <button
@@ -187,13 +187,13 @@ const GymDetails = () => {
                                 </div>
                                 <div>
                                     <h3 className="font-bold text-gray-900 dark:text-white">Basic Information</h3>
-                                    <p className="text-xs text-gray-500">Edit core gym profile and contact details</p>
+                                    <p className="text-xs text-gray-500">Edit core fit club profile and contact details</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 gap-5">
                                 <div>
-                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Gym Display Name</label>
+                                    <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Fit Club Display Name</label>
                                     {isEditing ? (
                                         <input
                                             type="text"
@@ -207,7 +207,7 @@ const GymDetails = () => {
                                     )}
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div className="grid grid-cols-1 gap-5">
                                     <div>
                                         <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Contact Email</label>
                                         <div className="relative">
@@ -383,7 +383,7 @@ const GymDetails = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900 dark:text-white">Feature Permissions</h3>
-                                        <p className="text-xs text-gray-500">Enable or disable specific modules for this gym</p>
+                                        <p className="text-xs text-gray-500">Enable or disable specific modules for this fit club</p>
                                     </div>
                                 </div>
                                 {updatingFeatures && (
@@ -443,7 +443,7 @@ const GymDetails = () => {
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-gray-900 dark:text-white">Staff Members</h3>
-                                        <p className="text-xs text-gray-500">List of active staff accounts for this gym</p>
+                                        <p className="text-xs text-gray-500">List of active staff accounts for this fit club</p>
                                     </div>
                                 </div>
                                 <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1 rounded-full text-xs font-bold">
@@ -503,7 +503,7 @@ const GymDetails = () => {
                                             <p className="font-bold text-gray-900 dark:text-white">{gym.admin.name}</p>
                                             <p className="text-xs text-gray-500 flex items-center gap-1">
                                                 <FaUserShield className="text-[10px]" />
-                                                Gym Administrator
+                                                Fit Club Administrator
                                             </p>
                                         </div>
                                     </div>
@@ -524,14 +524,14 @@ const GymDetails = () => {
                                         className="w-full py-3 rounded-2xl border border-red-100 dark:border-red-900/30 text-red-500 text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
                                     >
                                         <FaTrash size={12} />
-                                        Delete Gym Account
+                                        Delete Fit Club Account
                                     </button>
                                 </div>
                             ) : (
                                 <div className="p-6 text-center">
                                     <FaExclamationTriangle className="mx-auto text-amber-500 mb-2" />
                                     <p className="text-xs font-bold text-gray-500">No Admin Found</p>
-                                    <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">System administrator account for this gym might have been deleted.</p>
+                                    <p className="text-[10px] text-gray-400 mt-1 leading-relaxed">System administrator account for this fit club might have been deleted.</p>
                                 </div>
                             )}
                         </div>
@@ -610,10 +610,10 @@ const GymDetails = () => {
                     isOpen={isDeleteModalOpen}
                     onClose={() => setIsDeleteModalOpen(false)}
                     onConfirm={handleDelete}
-                    title="Soft Delete Gym"
+                    title="Soft Delete Fit Club"
                     message={`Are you sure you want to deactivate ${gym.name}? It will be moved to the Recycling Bin and will no longer be able to access the platform.`}
-                    confirmText="Delete Gym"
-                    cancelText="Keep Gym"
+                    confirmText="Delete Fit Club"
+                    cancelText="Keep Fit Club"
                 />
             </div>
         </AppLayout>

@@ -22,7 +22,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         if (user && user.role === 'staff') {
-            navigate('/active');
+            navigate('/members');
             return;
         }
         fetchStats();
@@ -68,7 +68,7 @@ const Dashboard = () => {
     // Colors
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#3b82f6', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
     const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#ef4444' };
-    const PLAN_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#f97316', '#06b6d4'];
+    const PLAN_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#f97316', '#06b6d4']; // kept for potential future use
 
     // Format currency
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
@@ -89,7 +89,6 @@ const Dashboard = () => {
     const trendData = stats?.monthlyTrend || [];
     const pendingPayments = stats?.pendingPayments || [];
     const expiringSoon = stats?.expiringSoon || [];
-    const planData = stats?.income?.byPlan || [];
     const monthChange = stats?.income?.monthChange || 0;
 
     return (
@@ -97,8 +96,8 @@ const Dashboard = () => {
             <div className="space-y-6 pb-10">
                 {/* Header */}
                 <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Financial Dashboard</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-sm">Complete business overview with revenue tracking</p>
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Financial Dashboard</h1>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Complete business overview with revenue tracking</p>
                 </div>
 
                 {/* ========== DAILY REPORT SECTION ========== */}
@@ -185,7 +184,7 @@ const Dashboard = () => {
                             <span className="text-xs text-gray-400">vs last month</span>
                         </div>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
+                    <div className="hidden sm:block bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
                         <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Yearly Revenue</p>
                         <p className="text-xl font-bold text-gray-800 dark:text-white">{formatCurrency(stats?.income?.yearlyActual)}</p>
                         <p className="text-xs text-gray-400">{stats?.income?.yearlyCount || 0} transactions</p>
@@ -195,7 +194,7 @@ const Dashboard = () => {
                         <p className="text-xl font-bold text-red-600 dark:text-red-400">{formatCurrency(stats?.income?.outstandingDues)}</p>
                         <p className="text-xs text-gray-400">{stats?.income?.outstandingCount || 0} pending</p>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
+                    <div className="hidden sm:block bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
                         <p className="text-xs text-gray-500 dark:text-gray-400 uppercase font-medium">Active Members</p>
                         <p className="text-xl font-bold text-gray-800 dark:text-white">{stats?.members?.active || 0}</p>
                         <p className="text-xs text-gray-400">of {stats?.members?.total || 0} total</p>
@@ -222,7 +221,8 @@ const Dashboard = () => {
                                 {formatCurrency(stats?.income?.outstandingDues)} outstanding
                             </span>
                         </div>
-                        <div className="overflow-x-auto">
+                        {/* Desktop Table */}
+                        <div className="hidden md:block overflow-x-auto">
                             <table className="w-full text-left">
                                 <thead>
                                     <tr className="border-b border-yellow-200 dark:border-yellow-900/30">
@@ -313,43 +313,61 @@ const Dashboard = () => {
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Mobile Card View */}
+                        <div className="md:hidden space-y-3">
+                            {pendingPayments.slice(0, 10).map((txn) => (
+                                <div key={txn._id} className="bg-white dark:bg-slate-800 rounded-xl p-4 border border-yellow-200/50 dark:border-yellow-900/20">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-9 h-9 rounded-full bg-yellow-200 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-400 flex items-center justify-center text-sm font-bold">
+                                                {txn.memberName?.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm">{txn.memberName}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                    {new Date(txn.transactionDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-red-600 dark:text-red-400">{formatCurrency(txn.amount)}</p>
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${txn.paymentStatus === 'Pending' ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400' : 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400'}`}>
+                                                {txn.paymentStatus}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {collectingId === txn._id ? (
+                                            <>
+                                                <select value={collectMethod} onChange={(e) => setCollectMethod(e.target.value)}
+                                                    className="text-xs border rounded-lg px-2 py-1.5 flex-1 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+                                                    <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option>
+                                                </select>
+                                                <button onClick={() => handleCollectPayment(txn._id)} className="p-2 bg-green-600 text-white rounded-lg text-xs"><FaCheck /></button>
+                                                <button onClick={() => setCollectingId(null)} className="p-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs">✕</button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => setCollectingId(txn._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-medium">Collect</button>
+                                                {txn.phone && (
+                                                    <>
+                                                        <a href={`https://wa.me/91${txn.phone}?text=Hi ${txn.memberName}, reminder for pending fee of ${formatCurrency(txn.amount)}.`}
+                                                            target="_blank" rel="noopener noreferrer" className="p-2 bg-green-500 text-white rounded-lg"><FaWhatsapp size={14} /></a>
+                                                        <a href={`tel:${txn.phone}`} className="p-2 bg-blue-500 text-white rounded-lg"><FaPhone size={14} /></a>
+                                                    </>
+                                                )}
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
 
                 {/* Charts Row */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    {/* Plan Popularity */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="font-bold text-gray-800 dark:text-white">Plan Popularity</h3>
-                            <FaChartPie className="text-gray-400" />
-                        </div>
-                        {planData.length > 0 ? (
-                            <div className="space-y-3">
-                                {planData.map((plan, idx) => {
-                                    const maxCount = Math.max(...planData.map(p => p.count));
-                                    const percentage = (plan.count / maxCount) * 100;
-                                    return (
-                                        <div key={plan._id} className="space-y-1">
-                                            <div className="flex justify-between text-sm">
-                                                <span className="font-medium text-gray-700 dark:text-gray-200">{plan._id}</span>
-                                                <span className="text-gray-500 dark:text-gray-400">{plan.count} members</span>
-                                            </div>
-                                            <div className="h-2 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                                                <div
-                                                    className="h-full rounded-full transition-all"
-                                                    style={{ width: `${percentage}%`, backgroundColor: PLAN_COLORS[idx % PLAN_COLORS.length] }}
-                                                ></div>
-                                            </div>
-                                            <p className="text-xs text-gray-400">{formatCurrency(plan.total)} revenue</p>
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <div className="h-32 flex items-center justify-center text-gray-400">No plan data</div>
-                        )}
-                    </div>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                     {/* Payment Method Breakdown */}
                     <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
@@ -402,9 +420,10 @@ const Dashboard = () => {
                 <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
                     <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-gray-800 dark:text-white">Recent Transactions</h3>
-                        <span className="text-xs text-gray-400">Last 10</span>
+                        <button onClick={() => navigate('/transactions')} className="text-xs text-blue-600 dark:text-blue-400 font-medium hover:underline">View All →</button>
                     </div>
-                    <div className="overflow-x-auto">
+                    {/* Desktop Table */}
+                    <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
                                 <tr className="border-b border-gray-100 dark:border-slate-700">
@@ -460,6 +479,43 @@ const Dashboard = () => {
                                 )}
                             </tbody>
                         </table>
+                    </div>
+
+                    {/* Mobile Card View */}
+                    <div className="md:hidden space-y-3">
+                        {stats?.recentTransactions?.map((txn) => (
+                            <div key={txn._id} className="flex items-center gap-3 p-3 rounded-xl border border-gray-100 dark:border-slate-700 hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                                <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold shrink-0">
+                                    {txn.memberName?.charAt(0)}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-medium text-gray-800 dark:text-gray-200 text-sm truncate">{txn.memberName}</p>
+                                        <p className="font-bold text-gray-800 dark:text-white text-sm shrink-0 ml-2">{formatCurrency(txn.amount)}</p>
+                                    </div>
+                                    <div className="flex items-center justify-between mt-1">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                                                {new Date(txn.transactionDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                            </span>
+                                            <span className="text-xs text-gray-400">•</span>
+                                            <span className="text-xs text-gray-500 dark:text-gray-400">{txn.plan}</span>
+                                        </div>
+                                        <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' :
+                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400' : 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400'
+                                            }`}>
+                                            <span className={`w-1.5 h-1.5 rounded-full ${txn.paymentStatus === 'Paid' ? 'bg-green-500' : txn.paymentStatus === 'Pending' ? 'bg-yellow-500' : 'bg-orange-500'}`}></span>
+                                            {txn.paymentStatus}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                        {(!stats?.recentTransactions || stats.recentTransactions.length === 0) && (
+                            <div className="text-center py-8 text-gray-400">
+                                No transactions found. Add members to start tracking.
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

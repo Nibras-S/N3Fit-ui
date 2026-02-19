@@ -18,8 +18,15 @@ const AllMembers = () => {
     const navigate = useNavigate();
     const [members, setMembers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalRecords, setTotalRecords] = useState(0);
+
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: "" });
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
@@ -27,11 +34,37 @@ const AllMembers = () => {
     const [editData, setEditData] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+    // Search Debounce
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setPage(1);
+        }, 500);
+        return () => clearTimeout(handler);
+    }, [searchTerm]);
+
     const fetchMembers = async () => {
         setLoading(true);
         try {
-            const response = await api.get(`${backendUrl}/api/contacts/`);
-            setMembers(response.data);
+            const params = {
+                page,
+                limit,
+                status: 'all', // Fetch both Active and Inactive
+                search: debouncedSearch,
+                gender: genderFilter,
+                sortBy: sortConfig.key,
+                sortOrder: sortConfig.direction,
+                includeExpired: true
+            };
+
+            const response = await api.get(`${backendUrl}/api/contacts/`, { params });
+
+            // Response is auto-unwrapped to: { data: [], pagination: {} }
+            const data = response.data?.data || [];
+            const pagination = response.data?.pagination || {};
+
+            setMembers(data);
+            setTotalRecords(pagination.total || 0);
         } catch (error) {
             toast.error('Failed to load members');
         } finally {
@@ -39,43 +72,24 @@ const AllMembers = () => {
         }
     };
 
-    useEffect(() => { fetchMembers(); }, []);
+    // Fetch when params change
+    useEffect(() => {
+        fetchMembers();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [backendUrl, page, limit, debouncedSearch, genderFilter, sortConfig]);
 
     const stats = useMemo(() => ({
-        total: members.length,
-        male: members.filter(u => u.gender === "Male").length,
-        female: members.filter(u => u.gender === "Female").length,
-        active: members.filter(u => u.dews >= 0).length
-    }), [members]);
+        total: totalRecords,
+        male: 0, // Placeholder
+        female: 0, // Placeholder
+        active: 0 // Placeholder
+    }), [totalRecords]);
 
-    const filteredMembers = useMemo(() => {
-        let filtered = members;
-        if (genderFilter !== 'all') filtered = filtered.filter(u => u.gender === genderFilter);
-        filtered = filtered.filter(u => u.phone?.includes(searchTerm) || u.name?.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        filtered.sort((a, b) => {
-            let valA = a[sortConfig.key];
-            let valB = b[sortConfig.key];
-
-            if (sortConfig.key === 'name') {
-                valA = valA?.toLowerCase() || "";
-                valB = valB?.toLowerCase() || "";
-            } else if (['date', 'endDate', 'createdAt'].includes(sortConfig.key)) {
-                valA = new Date(valA || 0);
-                valB = new Date(valB || 0);
-            } else if (sortConfig.key === 'dews') {
-                valA = parseInt(valA) || 0;
-                valB = parseInt(valB) || 0;
-            }
-
-            if (valA < valB) return sortConfig.direction === 'asc' ? -1 : 1;
-            if (valA > valB) return sortConfig.direction === 'asc' ? 1 : -1;
-            return 0;
-        });
-        return filtered;
-    }, [members, searchTerm, genderFilter, sortConfig]);
-
-    const handleSort = (key) => setSortConfig(prev => ({ key, direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc' }));
+    // handleSort updates state which triggers fetch
+    const handleSort = (key) => setSortConfig(prev => ({
+        key,
+        direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
 
     const handleDeleteClick = async () => {
         const { id, name } = deleteModal;
@@ -248,7 +262,7 @@ const AllMembers = () => {
 
             {/* DataTable */}
             <DataTable
-                data={filteredMembers}
+                data={members}
                 columns={columns}
                 loading={loading}
                 emptyMessage="No members found"
@@ -259,6 +273,12 @@ const AllMembers = () => {
                 renderMobileCard={renderMobileCard}
                 hoverColor="hover:bg-blue-50"
                 gender={genderFilter} // Pass gender for dynamic theming
+                serverSide={true}
+                count={totalRecords}
+                page={page}
+                onPageChange={setPage}
+                onRowsPerPageChange={setLimit}
+                rowsPerPage={limit}
             />
 
             <ConfirmModal

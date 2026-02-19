@@ -24,9 +24,15 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 );
 
-// ── Response interceptor: handle 401 ─────────────────────────────
+// ── Response interceptor: unwrap API envelope + handle 401 ───────
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // Auto-unwrap standardized { success: true, data: ... } responses
+        if (response.data && typeof response.data === 'object' && response.data.success === true && 'data' in response.data) {
+            response.data = response.data.data;
+        }
+        return response;
+    },
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('n3gym_token');

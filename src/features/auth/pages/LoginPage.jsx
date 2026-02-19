@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import n3Logo from '../../../assets/n3Logo.png';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaBuilding } from "react-icons/fa";
@@ -24,18 +25,18 @@ function AdminAuth() {
       const payload = { email: email.trim(), password };
       if (activeTab === "staff") {
         if (!gymCode.trim()) {
-          toast.error("Gym Code is required for staff login");
+          toast.error("Club Code is required for staff login");
           setLoading(false);
           return;
         }
-        payload.gymCode = gymCode.trim();
+        payload.gymCode = gymCode.replace(/\s+/g, '').trim();
       }
 
       const user = await login(payload.email, payload.password, payload.gymCode);
       toast.success("Welcome back!");
 
       setTimeout(() => {
-        switch (user.role) {
+        switch (user?.role) {
           case "superadmin":
             navigate("/superadmin", { replace: true });
             break;
@@ -74,10 +75,8 @@ function AdminAuth() {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <span className="text-white font-bold text-lg">N3</span>
-            </div>
-            <span className="text-white/90 font-semibold text-lg">Gym Management</span>
+            <img src={n3Logo} alt="Fit" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
+            <span className="text-white/90 font-semibold text-lg">Fit · Fitness Management</span>
           </div>
 
           {/* Hero Content */}
@@ -88,7 +87,7 @@ function AdminAuth() {
               transition={{ duration: 0.6 }}
               className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6"
             >
-              Manage Your Gym,
+              Manage Your Fit Club,
               <br />
               <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
                 Effortlessly.
@@ -100,7 +99,7 @@ function AdminAuth() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-white/60 text-lg leading-relaxed max-w-md"
             >
-              Members, payments, invoices, and staff — all in one powerful dashboard built for gym owners.
+              Members, payments, invoices, and staff — all in one powerful dashboard built for fit club owners.
             </motion.p>
 
             {/* Stats */}
@@ -111,7 +110,7 @@ function AdminAuth() {
               className="flex gap-8 mt-10"
             >
               {[
-                { num: "500+", label: "Active Gyms" },
+                { num: "500+", label: "Active Fit Clubs" },
                 { num: "50K+", label: "Members Managed" },
                 { num: "99.9%", label: "Uptime" },
               ].map((stat, i) => (
@@ -125,7 +124,7 @@ function AdminAuth() {
 
           {/* Footer */}
           <p className="text-white/30 text-sm">
-            Powered by N3-Gym &middot; SaaS Platform
+            Powered by Fit &middot; Fitness Management Platform
           </p>
         </div>
       </div>
@@ -140,10 +139,8 @@ function AdminAuth() {
         >
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
-              <span className="text-white font-bold text-lg">N3</span>
-            </div>
-            <span className="text-gray-900 dark:text-white font-semibold text-lg">Gym Management</span>
+            <img src={n3Logo} alt="Fit" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            <span className="text-gray-900 dark:text-white font-semibold text-lg">Fit · Fitness Management</span>
           </div>
 
           <div className="mb-8">
@@ -199,7 +196,7 @@ function AdminAuth() {
                   transition={{ duration: 0.25 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Gym Code
+                    Club Code
                   </label>
                   <div className="relative">
                     <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
@@ -232,7 +229,7 @@ function AdminAuth() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
-                  placeholder={activeTab === "staff" ? "staff@gym.com" : "admin@gym.com"}
+                  placeholder={activeTab === "staff" ? "staff@fitclub.com" : "admin@fitclub.com"}
                   required
                   autoComplete="email"
                 />
@@ -285,7 +282,7 @@ function AdminAuth() {
           {/* Footer */}
           <div className="mt-10 pt-6 border-t border-gray-100 dark:border-slate-800 text-center">
             <p className="text-xs text-gray-400 dark:text-gray-500">
-              Powered by <span className="font-semibold text-gray-500 dark:text-gray-400">N3-Gym</span> &middot; SaaS Platform
+              Powered by <span className="font-semibold text-gray-500 dark:text-gray-400">Fit</span> &middot; Fitness Management Platform
             </p>
           </div>
         </motion.div>

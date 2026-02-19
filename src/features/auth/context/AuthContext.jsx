@@ -25,13 +25,16 @@ export const AuthProvider = ({ children }) => {
             }
             try {
                 const res = await api.get('/api/auth/me');
-                if (res.data?.success) {
-                    setUser(res.data.user);
+                // After auto-unwrap interceptor, res.data IS the user object directly
+                const userData = res.data;
+                if (userData?.role || userData?.email) {
+                    setUser(userData);
                     // Fetch gym features
                     try {
                         const gymRes = await api.get('/api/gym/profile');
-                        if (gymRes.data?.features) {
-                            setGymFeatures(prev => ({ ...prev, ...gymRes.data.features }));
+                        const gymData = gymRes.data;
+                        if (gymData?.features) {
+                            setGymFeatures(prev => ({ ...prev, ...gymData.features }));
                         }
                     } catch (err) {
                         console.error('Failed to load gym features:', err);
@@ -53,11 +56,13 @@ export const AuthProvider = ({ children }) => {
         const payload = { email, password };
         if (gymCode) payload.gymCode = gymCode;
         const res = await api.post('/api/auth/login', payload);
-        if (res.data?.success) {
-            localStorage.setItem('n3gym_token', res.data.token);
-            setToken(res.data.token);
-            setUser(res.data.user);
-            return res.data.user;
+        // After auto-unwrap interceptor, res.data IS { token, user } directly
+        const resData = res.data;
+        if (resData?.token && resData?.user) {
+            localStorage.setItem('n3gym_token', resData.token);
+            setToken(resData.token);
+            setUser(resData.user);
+            return resData.user;
         }
         throw new Error('Login failed');
     };
@@ -65,9 +70,11 @@ export const AuthProvider = ({ children }) => {
     const refreshUser = useCallback(async () => {
         try {
             const res = await api.get('/api/auth/me');
-            if (res.data?.success) {
-                setUser(res.data.user);
-                return res.data.user;
+            // After auto-unwrap, res.data IS the user object
+            const userData = res.data;
+            if (userData?.role || userData?.email) {
+                setUser(userData);
+                return userData;
             }
         } catch (err) {
             console.error('Failed to refresh user:', err);

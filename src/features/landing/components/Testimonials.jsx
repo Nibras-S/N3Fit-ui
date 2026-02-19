@@ -7,7 +7,7 @@ const Testimonials = () => {
             name: "Rajesh Kumar",
             role: "Owner, PowerFit Gym",
             image: "https://randomuser.me/api/portraits/men/32.jpg",
-            text: "After switching to N3 FIT, our renewal rate jumped from 60% to 85%. The WhatsApp reminders alone saved us ₹2L/month in missed renewals.",
+            text: "After switching to Fit, our renewal rate jumped from 60% to 85%. The WhatsApp reminders alone saved us ₹2L/month in missed renewals.",
             stat: "+42%",
             statLabel: "retention boost"
         },
@@ -23,7 +23,7 @@ const Testimonials = () => {
             name: "Amit Patel",
             role: "Manager, Iron Paradise",
             image: "https://randomuser.me/api/portraits/men/65.jpg",
-            text: "We manage 3 branches with 2,000+ members on N3 FIT. The multi-branch dashboard is a game-changer. Setup took just 2 hours!",
+            text: "We manage 3 branches with 2,000+ members on Fit. The multi-branch dashboard is a game-changer. Setup took just 2 hours!",
             stat: "2,000+",
             statLabel: "members tracked"
         }
@@ -43,7 +43,7 @@ const Testimonials = () => {
                         Trusted by{' '}
                         <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">500+ Gyms</span>
                     </h2>
-                    <p className="text-lg text-slate-500">See how gym owners are transforming their business with N3 FIT.</p>
+                    <p className="text-lg text-slate-500">See how gym owners are transforming their business with Fit.</p>
                 </motion.div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">

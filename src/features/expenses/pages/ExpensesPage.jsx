@@ -20,7 +20,7 @@ const Expenses = () => {
 
     useEffect(() => {
         if (user && user.role === 'staff') {
-            navigate('/active');
+            navigate('/members');
         }
     }, [user]);
 
@@ -97,7 +97,7 @@ const Expenses = () => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `N3Fit_Expenses_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `Fit_Expenses_${new Date().toISOString().split('T')[0]}.csv`);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -173,7 +173,7 @@ const Expenses = () => {
                 </div>
 
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center">
@@ -217,14 +217,14 @@ const Expenses = () => {
                             <span className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Top Category</span>
                         </div>
                         <p className="text-xl font-bold text-gray-900 dark:text-white truncate">
-                            {summary?.categoryBreakdown[0]?._id || 'None'}
+                            {summary?.categoryBreakdown?.[0]?._id || 'None'}
                         </p>
                         <p className="text-xs text-gray-400 mt-1">Highest spending area</p>
                     </div>
                 </div>
 
                 {/* Table Section */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden no-scrollbar">
                     <div className="p-5 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <FaHistory className="text-gray-400" />

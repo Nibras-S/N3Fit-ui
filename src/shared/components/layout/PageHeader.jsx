@@ -32,7 +32,7 @@ const PageHeader = ({
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{title}</h1>
                     {stats.length > 0 && (
-                        <div className="flex items-center gap-4 mt-1">
+                        <div className="hidden lg:flex items-center gap-4 mt-1">
                             {stats.map((stat, i) => (
                                 <div key={i} className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
                                     {stat.icon && <stat.icon className="text-gray-400 dark:text-gray-500" />}

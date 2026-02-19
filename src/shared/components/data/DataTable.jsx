@@ -89,21 +89,34 @@ const DataTable = ({
     showSelection = false,
     selectedIds = [],
     onSelectionChange = null,
+    serverSide = false,
+    count = 0,
+    page = 1,
+    onPageChange = null,
+    onRowsPerPageChange = null,
+    rowsPerPage: propRowsPerPage // Rename to avoid conflict with state
 }) => {
-    // State for pagination and density
-    const [currentPage, setCurrentPage] = React.useState(1);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    // State for client-side pagination
+    const [clientPage, setClientPage] = React.useState(1);
+    const [clientRowsPerPage, setClientRowsPerPage] = React.useState(10);
 
-    // Calculate pagination
-    const totalPages = Math.ceil(data.length / rowsPerPage);
+    // Determine values based on serverSide prop
+    const currentPage = serverSide ? page : clientPage;
+    const rowsPerPage = serverSide ? propRowsPerPage || 10 : clientRowsPerPage;
+    const totalRecords = serverSide ? count : data.length;
+    const totalPages = Math.ceil(totalRecords / rowsPerPage);
+
+    // Data slicing
+    // If serverSide, data is already sliced. If clientSide, slice it here.
+    const currentData = serverSide ? data : data.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+
     const startIndex = (currentPage - 1) * rowsPerPage;
-    const endIndex = startIndex + rowsPerPage;
-    const currentData = data.slice(startIndex, endIndex);
+    const endIndex = Math.min(startIndex + rowsPerPage, totalRecords);
 
-    // Reset page when data length changes (e.g. filtering)
+    // Reset page when data length changes (only for client-side filtering)
     React.useEffect(() => {
-        setCurrentPage(1);
-    }, [data.length]);
+        if (!serverSide) setClientPage(1);
+    }, [data.length, serverSide]);
 
     const totalColumns = columns.length + (renderActions ? 1 : 0) + (showSelection ? 1 : 0);
 
@@ -129,13 +142,22 @@ const DataTable = ({
 
     const handlePageChange = (newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
-            setCurrentPage(newPage);
+            if (serverSide) {
+                if (onPageChange) onPageChange(newPage);
+            } else {
+                setClientPage(newPage);
+            }
         }
     };
 
     const handleRowsPerChange = (e) => {
-        setRowsPerPage(Number(e.target.value));
-        setCurrentPage(1);
+        const newRows = Number(e.target.value);
+        if (serverSide) {
+            if (onRowsPerPageChange) onRowsPerPageChange(newRows);
+        } else {
+            setClientRowsPerPage(newRows);
+            setClientPage(1);
+        }
     };
 
     // Calculate visible pages for pagination (e.g. 1 2 3 ... 10)
@@ -203,7 +225,7 @@ const DataTable = ({
     return (
         <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden flex flex-col">
             {/* Desktop Table */}
-            <div className="hidden lg:block overflow-x-auto min-h-[400px]">
+            <div className="hidden lg:block overflow-x-auto hide-scrollbar min-h-[400px]">
                 <table className="w-full">
                     <thead className={`${headerClass} border-b sticky top-0 z-10 transition-colors duration-300`}>
                         <tr>

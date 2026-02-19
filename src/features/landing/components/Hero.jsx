@@ -45,7 +45,7 @@ const Hero = () => {
     }, []);
 
     const stats = [
-        { value: 500, suffix: '+', label: 'Active Gyms' },
+        { value: 500, suffix: '+', label: 'Active Clubs' },
         { value: 50000, suffix: '+', label: 'Members Managed' },
         { value: 99.9, suffix: '%', label: 'Uptime SLA' },
         { value: 4.9, suffix: '★', label: 'Rating' },
@@ -57,7 +57,7 @@ const Hero = () => {
             <div className="absolute inset-0 -z-20">
                 <img
                     src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=2670"
-                    alt="Gym Background"
+                    alt="Fit Club Background"
                     className="w-full h-full object-cover opacity-10"
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-white via-white/90 to-white/60"></div>
@@ -71,18 +71,18 @@ const Hero = () => {
                     >
                         <span className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold mb-8 border border-blue-200/50">
                             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                            #1 Rated Gym Management Platform
+                            #1 Rated Fitness Management Platform
                         </span>
 
                         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold text-slate-900 mb-6 leading-[1.1] tracking-tight">
-                            Run Your Gym Like a
+                            Run Your Fit Club Like a
                             <span className="block bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 bg-clip-text text-transparent">
                                 Modern Business
                             </span>
                         </h1>
 
                         <p className="text-lg md:text-xl text-slate-500 mb-10 max-w-2xl mx-auto leading-relaxed">
-                            Automate billing, track attendance, boost retention, and grow your revenue — all from one beautiful dashboard. Built for gym owners, not IT experts.
+                            Automate billing, track attendance, boost retention, and grow your revenue — all from one beautiful dashboard. Built for fit club owners, not IT experts.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
@@ -138,8 +138,8 @@ const Hero = () => {
 
                             {/* Slideshow */}
                             {[
-                                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2670", // Gym Interior
-                                "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=2670", // Dark Gym
+                                "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=2670", // Fit Club Interior
+                                "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=2670", // Dark Fit Club
                                 "https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&q=80&w=2670", // Weights
                                 "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&q=80&w=2670"  // Cardio
                             ].map((img, index) => (

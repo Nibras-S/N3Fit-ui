@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import n3Logo from '../../../assets/n3Logo.png';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -42,8 +43,8 @@ export default function Navbar() {
       >
         <div className="nav-container">
           <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            <span className="logo-box">N3</span>
-            <span className="logo-text">FIT</span>
+            <img src={n3Logo} alt="Fit" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            <span className="logo-text">Fit</span>
           </div>
 
           <div className="nav-links">

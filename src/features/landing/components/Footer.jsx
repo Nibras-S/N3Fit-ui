@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import n3Logo from '../../../assets/n3Logo.png';
 
 export default function Footer() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function Footer() {
     ],
     Support: [
       { label: 'Help Center', href: '#' },
-      { label: 'Email: support@n3fit.com', href: 'mailto:support@n3fit.com' },
+      { label: 'Email: contact@n3solution.com', href: 'mailto:contact@n3solution.com' },
       { label: 'WhatsApp Chat', href: '#' },
       { label: 'Documentation', href: '#' },
     ],
@@ -45,12 +46,12 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand */}
           <div className="lg:col-span-2">
-            <div className="flex items-center gap-1.5 mb-5 cursor-pointer" onClick={() => navigate('/')}>
-              <span className="bg-gradient-to-br from-blue-400 to-blue-600 text-white px-2.5 py-1 rounded-lg text-xl font-extrabold font-display">N3</span>
-              <span className="text-xl font-extrabold font-display text-white">FIT</span>
+            <div className="flex items-center gap-2 mb-5 cursor-pointer" onClick={() => navigate('/')}>
+              <img src={n3Logo} alt="Fit" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
+              <span className="text-xl font-extrabold font-display text-white">Fit</span>
             </div>
             <p className="text-slate-400 leading-relaxed max-w-sm mb-6 text-sm">
-              The all-in-one SaaS platform for modern gym management. Built for owners who want to automate operations, boost retention, and grow revenue.
+              The all-in-one SaaS platform for modern fit club management. Built for owners who want to automate operations, boost retention, and grow revenue.
             </p>
             <div className="flex gap-3">
               {socials.map((s, i) => (
@@ -87,7 +88,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
-          <p>© 2026 N3 FIT. All rights reserved.</p>
+          <p>© 2026 Fit. All rights reserved.</p>
           <div className="flex gap-6">
             <a href="#" className="hover:text-blue-400 transition-colors">Privacy Policy</a>
             <a href="#" className="hover:text-blue-400 transition-colors">Terms of Service</a>

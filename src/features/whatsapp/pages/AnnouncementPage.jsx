@@ -44,7 +44,10 @@ const Announcement = () => {
         setFetchingGyms(true);
         try {
             const res = await api.get('/api/superadmin/gyms');
-            setGyms(res.data);
+            const data = Array.isArray(res.data?.data) ? res.data.data
+                : Array.isArray(res.data?.gyms) ? res.data.gyms
+                    : Array.isArray(res.data) ? res.data : [];
+            setGyms(data);
         } catch (err) {
             toast.error('Failed to load gyms');
         } finally {
@@ -55,7 +58,10 @@ const Announcement = () => {
     const fetchContacts = async () => {
         try {
             const res = await api.get('/api/contacts/');
-            setContacts(res.data);
+            const data = Array.isArray(res.data?.data) ? res.data.data
+                : Array.isArray(res.data?.contacts) ? res.data.contacts
+                    : Array.isArray(res.data) ? res.data : [];
+            setContacts(data);
         } catch (err) {
             toast.error('Failed to load contacts');
         } finally {
@@ -140,7 +146,7 @@ const Announcement = () => {
             } else {
                 // Internal Notification/Warning
                 if (form.audience === 'selected' && selectedGyms.length === 0) {
-                    toast.error('Please select at least one gym');
+                    toast.error('Please select at least one fit club');
                     setLoading(false);
                     return;
                 }
@@ -183,7 +189,7 @@ const Announcement = () => {
 
                 <PageHeader
                     title={user?.role === 'superadmin' ? 'Internal Broadcast' : 'WhatsApp Announcement'}
-                    subtitle={user?.role === 'superadmin' ? 'Post news or urgent warnings to gym dashboards' : 'Broadcast messages to your gym members instantly'}
+                    subtitle={user?.role === 'superadmin' ? 'Post news or urgent warnings to fit club dashboards' : 'Broadcast messages to your fit club members instantly'}
                 />
 
                 {/* No more toggle - feature is strictly role-based */}
@@ -321,8 +327,8 @@ const Announcement = () => {
                                     ))
                                 ) : (
                                     [
-                                        { id: 'all', label: 'All Gyms', desc: 'Broadcast to every gym on platform' },
-                                        { id: 'selected', label: 'Select Gyms', desc: 'Target specific gym locations' }
+                                        { id: 'all', label: 'All Fit Clubs', desc: 'Broadcast to every fit club on platform' },
+                                        { id: 'selected', label: 'Select Fit Clubs', desc: 'Target specific fit club locations' }
                                     ].map(opt => (
                                         <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
                                             <input
@@ -392,7 +398,7 @@ const Announcement = () => {
                                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
                                         <input
                                             type="text"
-                                            placeholder="Search gyms..."
+                                            placeholder="Search fit clubs..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
                                             className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-lg text-xs outline-none"

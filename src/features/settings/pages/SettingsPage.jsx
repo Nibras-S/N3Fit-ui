@@ -81,21 +81,24 @@ const Settings = () => {
                 api.get("/api/gym/profile")
             ]);
 
-            if (settingsRes.data) {
+            // Handle both new { success, data: {...} } and old direct object shapes
+            const settingsData = settingsRes.data?.data ?? settingsRes.data;
+            if (settingsData && typeof settingsData === 'object' && !settingsData.success) {
                 setSettings(prev => ({
                     ...prev,
-                    ...settingsRes.data,
-                    subscriptionPrices: { ...prev.subscriptionPrices, ...settingsRes.data.subscriptionPrices }
+                    ...settingsData,
+                    subscriptionPrices: { ...prev.subscriptionPrices, ...settingsData.subscriptionPrices }
                 }));
             }
 
-            if (gymRes.data) {
-                setGym(gymRes.data);
+            const gymData = gymRes.data?.data ?? gymRes.data;
+            if (gymData && gymData._id) {
+                setGym(gymData);
                 setGymForm({
-                    name: gymRes.data.name || "",
-                    contactEmail: gymRes.data.contactEmail || "",
-                    contactPhone: gymRes.data.contactPhone || "",
-                    address: gymRes.data.address || "",
+                    name: gymData.name || "",
+                    contactEmail: gymData.contactEmail || "",
+                    contactPhone: gymData.contactPhone || "",
+                    address: gymData.address || "",
                 });
             }
         } catch (error) {
@@ -135,7 +138,9 @@ const Settings = () => {
         setSaving(true);
         try {
             const res = await api.put("/api/gym/profile", gymForm);
-            setGym(res.data);
+            // Handle both new { success, data: {...} } and old direct object shapes
+            const gymData = res.data?.data ?? res.data;
+            if (gymData && gymData._id) setGym(gymData);
             toast.success("Gym profile updated!");
             setIsEditingBranding(false);
         } catch (err) {
@@ -256,8 +261,8 @@ const Settings = () => {
                                 <>
                                     <SettingItem
                                         icon={<FaBuilding />}
-                                        title="Gym Info"
-                                        subtitle="Manage gym branding and details"
+                                        title="Fit Club Info"
+                                        subtitle="Manage fit club branding and details"
                                         onClick={() => setActiveTab('gym')}
                                     />
                                     <div className="h-px bg-gray-50 dark:bg-slate-700/50 mx-4"></div>
@@ -312,8 +317,8 @@ const Settings = () => {
                     <div className="space-y-6">
                         <div className="flex justify-between items-end">
                             <div>
-                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Gym Branding</h2>
-                                <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your gym's identity and information</p>
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Fit Club Branding</h2>
+                                <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your fit club's identity and information</p>
                             </div>
                             {user?.role === 'gymadmin' && (
                                 <button
@@ -348,7 +353,7 @@ const Settings = () => {
                                         onClick={() => user?.role === 'gymadmin' && isEditingBranding && fileInputRef.current?.click()}
                                     >
                                         {gym?.logo ? (
-                                            <img src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`} alt="Gym logo" className="w-full h-full object-cover" />
+                                            <img src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`} alt="Fit Club logo" className="w-full h-full object-cover" />
                                         ) : (
                                             <FaBuilding size={28} className="text-gray-300 dark:text-gray-500" />
                                         )}
@@ -397,7 +402,7 @@ const Settings = () => {
                                         <FaBarcode className="text-blue-600 dark:text-blue-400" size={14} />
                                     </div>
                                     <div>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Gym Code</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Club Code</p>
                                         <p className="font-bold font-mono text-gray-900 dark:text-white">{gym?.gymCode}</p>
                                     </div>
                                 </div>
@@ -425,7 +430,7 @@ const Settings = () => {
                             <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
                                 <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                     <FaBuilding className="text-blue-500" />
-                                    Gym Information
+                                    Fit Club Information
                                 </h2>
                                 {isEditingBranding && (
                                     <button
@@ -440,11 +445,11 @@ const Settings = () => {
 
                             <div className="p-6 space-y-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Gym Name</label>
+                                    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Fit Club Name</label>
                                     {isEditingBranding ? (
                                         <input type="text" value={gymForm.name} onChange={(e) => setGymForm(p => ({ ...p, name: e.target.value }))}
                                             className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                            placeholder="Your Gym Name" />
+                                            placeholder="Your Fit Club Name" />
                                     ) : (
                                         <p className="text-base font-semibold text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{gymForm.name || "N/A"}</p>
                                     )}

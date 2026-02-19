@@ -6,8 +6,8 @@ const HowItWorks = () => {
         {
             num: "01",
             icon: "ri-settings-3-line",
-            title: "Set Up Your Gym",
-            desc: "Configure your gym profile, membership plans, and staff roles in under 10 minutes.",
+            title: "Set Up Your Fit Club",
+            desc: "Configure your fit club profile, membership plans, and staff roles in under 10 minutes.",
             color: "from-blue-400 to-blue-500"
         },
         {

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import n3Logo from '../../../assets/n3Logo.png';
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
@@ -24,9 +25,11 @@ import {
   FaCheckDouble,
   FaCircle,
   FaMoon,
-  FaSun
+  FaSun,
+  FaDownload
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
+import InstallPWA from "../pwa/InstallPWA";
 
 /**
  * Main app layout with role-aware sidebar and mobile navigation.
@@ -118,17 +121,7 @@ export function AppLayout({
   const navItems = [
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
     { path: "/superadmin/plans", label: "SaaS Plans", icon: FaCrown, roles: ["superadmin"] },
-    {
-      label: "Members",
-      icon: FaUsers,
-      roles: ["gymadmin", "staff"],
-      defaultPath: "/active",
-      subItems: [
-        { path: "/active", label: "Active Members", icon: FaUserCheck },
-        { path: "/inactive", label: "Expired Members", icon: FaUserTimes },
-        { path: "/manageUsers", label: "All Members", icon: FaUsers },
-      ]
-    },
+    { path: "/members", label: "Members", icon: FaUsers, roles: ["gymadmin", "staff"] },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     {
       label: "Analysis",
@@ -182,10 +175,26 @@ export function AppLayout({
 
   const userInitial = user?.name?.charAt(0)?.toUpperCase() || "U";
   const userName = user?.name || "User";
-  const userRole = user?.role === "gymadmin" ? "Gym Admin" : user?.role === "staff" ? "Staff" : user?.role === "superadmin" ? "Super Admin" : "Admin";
-  const gymName = user?.gym?.name || "N3 FIT";
+  const userRole = user?.role === "gymadmin" ? "Admin" : user?.role === "staff" ? "Staff" : user?.role === "superadmin" ? "Super Admin" : "Admin";
+  const gymName = user?.gym?.name || "Fit";
+  const gymCode = user?.gym?.gymCode;
   const gymLogo = user?.gym?.logo;
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+  // Dedicated bottom nav items (role-aware)
+  const bottomNavItems = user?.role === 'superadmin'
+    ? [
+      { path: "/superadmin", label: "Dashboard", icon: FaBuilding },
+      { path: "/superadmin/plans", label: "Plans", icon: FaCrown },
+      { path: "/superadmin/settings", label: "Settings", icon: FaCog },
+    ]
+    : [
+      { path: "/dashboard", label: "Dashboard", icon: FaChartPie },
+      { path: "/members", label: "Members", icon: FaUsers },
+      { path: "/register", label: "New", icon: FaUserPlus },
+      { path: "/notifications", label: "Alerts", icon: FaBell, badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
+      { path: "/settings", label: "Settings", icon: FaCog },
+    ];
 
   const getImageUrl = (path) => {
     if (!path) return null;
@@ -205,8 +214,8 @@ export function AppLayout({
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center overflow-hidden shrink-0">
-                <span className="text-white font-bold text-sm">N3</span>
+              <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-white">
+                <img src={n3Logo} alt="Fit" className="w-full h-full object-contain" />
               </div>
             )}
             <div className="min-w-0">
@@ -296,6 +305,9 @@ export function AppLayout({
             })}
           </nav>
 
+          {/* Install PWA Banner */}
+          <InstallPWA />
+
           {/* Profile Section with Modal */}
           <div className="pt-4 border-t border-gray-100 dark:border-slate-700 mt-auto relative">
             <AnimatePresence>
@@ -348,6 +360,13 @@ export function AppLayout({
                         <FaSignOutAlt />
                         Logout
                       </button>
+                      <button
+                        onClick={toggleTheme}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                      >
+                        {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-600" />}
+                        <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
+                      </button>
                     </div>
                   </motion.div>
                 </>
@@ -374,6 +393,9 @@ export function AppLayout({
                   <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></div>
                   <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-medium uppercase tracking-wider leading-none">{gymName}</p>
                 </div>
+                {gymCode && (
+                  <span className="text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">{gymCode}</span>
+                )}
               </div>
               <div className={`transition-transform duration-200 ${profileModalOpen ? 'rotate-180' : ''}`}>
                 <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -381,7 +403,7 @@ export function AppLayout({
                 </svg>
               </div>
             </button>
-            <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 mt-4 opacity-50">Powered by N3 FIT</p>
+            <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 mt-4 opacity-50">Powered by Fit</p>
           </div>
         </div>
       </aside>
@@ -396,8 +418,8 @@ export function AppLayout({
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center overflow-hidden">
-                <span className="text-white font-bold text-sm">N3</span>
+              <div className="w-8 h-8 rounded-lg overflow-hidden flex items-center justify-center bg-white">
+                <img src={n3Logo} alt="Fit" className="w-full h-full object-contain" />
               </div>
             )}
             <span className="font-bold text-gray-900 dark:text-white text-sm">{gymName}</span>
@@ -520,6 +542,19 @@ export function AppLayout({
                   >
                     <FaSignOutAlt /> Logout
                   </button>
+
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                    <button
+                      onClick={() => {
+                        toggleTheme();
+                        setMobileMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                    >
+                      {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-500" />}
+                      <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             </motion.div>
@@ -531,7 +566,7 @@ export function AppLayout({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="flex-1 p-4 md:p-6"
+          className="flex-1 p-4 md:p-6 pb-24 lg:pb-6"
         >
           {children}
         </motion.div>
@@ -592,13 +627,14 @@ export function AppLayout({
       {/* Mobile Bottom Navigation */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 safe-area-pb">
         <div className="flex items-center justify-around py-2 px-2">
-          {navItems.slice(0, 4).map(({ path, label, icon: Icon }) => (
+          {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
             <BottomNavButton
               key={path}
               active={isActive(path)}
               onClick={() => safeNavigate(path)}
-              label={label.split(" ")[0]}
+              label={label}
               icon={<Icon className="text-lg" />}
+              badge={badge}
             />
           ))}
         </div>
@@ -610,16 +646,23 @@ export function AppLayout({
   );
 }
 
-function BottomNavButton({ active, onClick, label, icon }) {
+function BottomNavButton({ active, onClick, label, icon, badge }) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-0.5 min-w-[56px] py-1.5 px-2 rounded-lg transition-colors ${active
+      className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] py-1.5 px-1.5 rounded-lg transition-colors relative ${active
         ? "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 font-medium"
         : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700/50"
         }`}
     >
-      {icon}
+      <div className="relative">
+        {icon}
+        {badge && (
+          <span className="absolute -top-1.5 -right-2.5 bg-red-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-full min-w-[14px] text-center leading-none">
+            {badge}
+          </span>
+        )}
+      </div>
       <span className="text-[10px]">{label}</span>
     </button>
   );
