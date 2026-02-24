@@ -36,14 +36,14 @@ export default function Navbar() {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          background: scrolled ? 'rgba(255,255,255,0.92)' : 'transparent',
-          backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none',
-          borderBottom: scrolled ? '1px solid rgba(59,130,246,0.1)' : 'none',
+          background: scrolled ? 'rgba(10,10,10,0.85)' : 'transparent',
+          backdropFilter: scrolled ? 'blur(24px) saturate(180%)' : 'none',
+          borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : 'none',
         }}
       >
         <div className="nav-container">
           <div className="logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-            <img src={n3Logo} alt="Fit" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
+            <img src={n3Logo} alt="Fit" style={{ height: '36px', width: 'auto', objectFit: 'contain', filter: 'brightness(1.2)' }} />
             <span className="logo-text">Fit</span>
           </div>
 
@@ -60,7 +60,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          <div className="nav-actions" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+          <div className="nav-actions">
             <button className="btn-nav-secondary" onClick={() => navigate('/login')}>
               Sign In
             </button>
@@ -80,7 +80,7 @@ export default function Navbar() {
         </div>
       </motion.nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — Dark Glass */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -88,22 +88,38 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-x-0 top-16 z-[999] mx-4 mt-2 rounded-2xl bg-white/95 backdrop-blur-xl border border-blue-100 shadow-xl p-6"
+            className="fixed inset-x-0 top-16 z-[999] mx-4 mt-2 rounded-2xl border shadow-xl p-6"
+            style={{
+              background: 'rgba(10,10,10,0.95)',
+              backdropFilter: 'blur(24px)',
+              borderColor: 'rgba(255,255,255,0.08)',
+            }}
           >
             <div className="flex flex-col gap-4">
               {links.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
-                  className="text-slate-700 font-medium text-lg py-2 hover:text-blue-600 transition-colors"
+                  className="font-medium text-lg py-2 transition-colors"
+                  style={{ color: '#aaa' }}
+                  onMouseEnter={(e) => e.target.style.color = '#00d4ff'}
+                  onMouseLeave={(e) => e.target.style.color = '#aaa'}
                   onClick={(e) => { e.preventDefault(); scrollToSection(link.href); }}
                 >
                   {link.label}
                 </a>
               ))}
-              <hr className="border-slate-200" />
+              <hr style={{ borderColor: 'rgba(255,255,255,0.08)' }} />
               <button
-                className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold shadow-blue-sm"
+                className="w-full py-3 rounded-xl font-bold"
+                style={{ background: 'transparent', color: '#fff', border: '1px solid rgba(255,255,255,0.15)' }}
+                onClick={() => { setMobileOpen(false); navigate('/login'); }}
+              >
+                Sign In
+              </button>
+              <button
+                className="w-full py-3 rounded-xl font-bold"
+                style={{ background: 'linear-gradient(135deg, #4040e0, #00d4ff)', color: '#ffffff' }}
                 onClick={() => { setMobileOpen(false); navigate('/login'); }}
               >
                 Start Free Trial
@@ -111,7 +127,7 @@ export default function Navbar() {
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
+      </AnimatePresence >
     </>
   );
 }

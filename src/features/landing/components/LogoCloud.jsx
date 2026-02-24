@@ -1,35 +1,42 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 
 const LogoCloud = () => {
-    const logos = [
-        { name: 'PowerFit', icon: 'ri-boxing-line' },
-        { name: 'Iron Paradise', icon: 'ri-sword-line' },
-        { name: 'Yoga Bliss', icon: 'ri-mental-health-line' },
-        { name: 'FitZone', icon: 'ri-heart-pulse-line' },
-        { name: 'CrossFit Elite', icon: 'ri-fire-line' },
-        { name: 'Muscle Factory', icon: 'ri-shield-star-line' },
+    const brands = [
+        'POWERFIT', 'IRON PARADISE', 'YOGA BLISS', 'FITZONE',
+        'CROSSFIT ELITE', 'MUSCLE FACTORY', 'BODY RUSH', 'FLEX GYM',
+        'POWER HOUSE', 'FIT NATION', 'CORE STRENGTH', 'APEX FITNESS',
     ];
 
+    // Double the brands for seamless infinite scroll
+    const marqueeItems = [...brands, ...brands];
+
     return (
-        <section className="py-14 bg-white border-y border-slate-100">
-            <div className="container mx-auto px-4">
-                <p className="text-center text-sm text-slate-400 font-medium mb-8 tracking-wider uppercase">
-                    Trusted by leading fitness brands across India
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14">
-                    {logos.map((logo, i) => (
-                        <motion.div
+        <section className="py-8 overflow-hidden" style={{ background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+            <div className="relative">
+                {/* Gradient fades on edges */}
+                <div className="absolute left-0 top-0 bottom-0 w-24 z-10" style={{ background: 'linear-gradient(to right, #0a0a0a, transparent)' }}></div>
+                <div className="absolute right-0 top-0 bottom-0 w-24 z-10" style={{ background: 'linear-gradient(to left, #0a0a0a, transparent)' }}></div>
+
+                <div className="marquee-track">
+                    {marqueeItems.map((brand, i) => (
+                        <div
                             key={i}
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            transition={{ delay: i * 0.1 }}
-                            viewport={{ once: true }}
-                            className="flex items-center gap-2 text-slate-300 hover:text-blue-500 transition-colors cursor-default"
+                            className="flex items-center gap-8 px-8"
+                            style={{ whiteSpace: 'nowrap' }}
                         >
-                            <i className={`${logo.icon} text-2xl`}></i>
-                            <span className="text-lg font-bold tracking-tight">{logo.name}</span>
-                        </motion.div>
+                            <span
+                                className="text-xl font-bold tracking-widest uppercase"
+                                style={{
+                                    color: 'rgba(255,255,255,0.12)',
+                                    fontFamily: "'Outfit', sans-serif",
+                                    letterSpacing: '0.15em',
+                                    fontSize: '1.1rem',
+                                }}
+                            >
+                                {brand}
+                            </span>
+                            <span style={{ color: 'rgba(0,212,255,0.3)', fontSize: '0.5rem' }}>◆</span>
+                        </div>
                     ))}
                 </div>
             </div>

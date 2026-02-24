@@ -71,24 +71,43 @@ const Announcement = () => {
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
-        if (!file) return;
+        if (!file) {
+            toast.error('No file selected');
+            return;
+        }
 
         if (file.size > 5 * 1024 * 1024) {
             toast.error('Image must be under 5MB');
             return;
         }
 
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validTypes.includes(file.type)) {
+            toast.error('Only JPG and PNG images are supported by WhatsApp');
+            return;
+        }
+
         const reader = new FileReader();
         reader.onloadend = () => {
+            const base64Data = reader.result.split(',')[1];
+            if (!base64Data) {
+                toast.error('Failed to process image file');
+                return;
+            }
+
             setForm(prev => ({
                 ...prev,
                 image: {
-                    data: reader.result.split(',')[1],
+                    data: base64Data,
                     mimetype: file.type,
                     filename: file.name
                 },
                 imagePreview: reader.result
             }));
+            toast.success('Image attached successfully!');
+        };
+        reader.onerror = () => {
+            toast.error('Error reading the file');
         };
         reader.readAsDataURL(file);
     };
@@ -135,6 +154,10 @@ const Announcement = () => {
                     setLoading(false);
                     return;
                 }
+
+                // Debug log before sending
+                console.log("Sending payload to backend with image:", !!form.image);
+
                 const res = await api.post('/api/whatsapp/announcement', {
                     ...form,
                     selectedMembers: form.audience === 'selected' ? selectedMembers : []
@@ -161,7 +184,10 @@ const Announcement = () => {
                 }
             }
         } catch (err) {
-            toast.error(err.response?.data?.error || 'Failed to send');
+            console.error("Announcement Error:", err);
+            const errorMessage = err.response?.data?.error || err.message || 'Failed to send';
+            // Need to make sure the errorMessage is a string, not an object
+            toast.error(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage));
         } finally {
             setLoading(false);
         }

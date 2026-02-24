@@ -1,82 +1,125 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import SplitText from './SplitText';
 
 const Problem = () => {
-    const problems = [
+    const ecosystem = [
         {
-            icon: "ri-file-list-3-line",
-            title: "Manual Tracking",
-            description: "Hours wasted on paper registers and spreadsheets that are error-prone and impossible to scale.",
-            stat: "20+ hrs/week",
-            statLabel: "wasted on admin"
+            icon: "ri-user-star-line",
+            title: "N3 MEMBERS",
+            description: "Complete 360° member lifecycle management. Track profiles, history, health stats, and engagement from signup to renewal.",
         },
         {
-            icon: "ri-money-dollar-circle-line",
-            title: "Revenue Leakage",
-            description: "Missed renewals, forgotten payments, and unclear billing lead to thousands in lost revenue monthly.",
-            stat: "₹50K+",
-            statLabel: "avg. monthly loss"
+            icon: "ri-bank-card-line",
+            title: "N3 BILLING",
+            description: "Automated billing, GST invoicing, payment tracking, and smart renewal reminders. Never miss revenue again.",
         },
         {
-            icon: "ri-user-unfollow-line",
-            title: "Member Churn",
-            description: "Without engagement tracking and reminders, members silently cancel and never return.",
-            stat: "30%",
-            statLabel: "avg. annual churn"
+            icon: "ri-whatsapp-line",
+            title: "N3 CONNECT",
+            description: "WhatsApp Cloud API integration for automated renewal alerts, birthday wishes, and bulk announcements.",
         },
         {
-            icon: "ri-bar-chart-2-line",
-            title: "Zero Insights",
-            description: "Flying blind without data — which plans sell best? Which trainers retain members? No way to know.",
-            stat: "0",
-            statLabel: "data-driven decisions"
-        }
+            icon: "ri-pie-chart-line",
+            title: "N3 ANALYTICS",
+            description: "Real-time dashboards with revenue, retention, staff performance, and growth metrics — data-driven decisions.",
+        },
+        {
+            icon: "ri-user-settings-line",
+            title: "N3 STAFF",
+            description: "Role-based access control, staff performance tracking, permissions management, and trainer scheduling.",
+        },
+        {
+            icon: "ri-store-2-line",
+            title: "N3 BRANCHES",
+            description: "Multi-location management from a single super admin dashboard. Per-branch analytics and centralized control.",
+        },
     ];
 
     return (
-        <section className="py-24 bg-slate-50">
+        <section className="py-24 overflow-hidden" style={{ background: '#0f0f0f' }}>
             <div className="container mx-auto px-4">
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
+                {/* Section header */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5 }}
+                    className="text-center max-w-3xl mx-auto mb-16"
+                >
+                    <span
+                        className="text-sm font-semibold tracking-widest uppercase mb-4 block"
+                        style={{ color: '#00d4ff' }}
                     >
-                        <span className="text-blue-600 font-semibold tracking-wider text-sm uppercase mb-3 block">The Problem</span>
-                        <h2 className="font-display text-3xl md:text-5xl font-extrabold text-slate-900 mb-5">
-                            Still Running Your Fit Club on{' '}
-                            <span className="bg-gradient-to-r from-blue-500 to-blue-700 bg-clip-text text-transparent">Paper & Excel?</span>
-                        </h2>
-                        <p className="text-lg text-slate-500 leading-relaxed">
-                            Manual processes cost fit club owners time, money, and members every single day.
-                        </p>
-                    </motion.div>
-                </div>
+                        Our Ecosystem
+                    </span>
+                    <div className="mb-5" style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em' }}>
+                        <SplitText
+                            text="ONE PLATFORM."
+                            className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white mr-3 block md:inline-block"
+                            delay={30} duration={1} ease="power3.out" splitType="chars"
+                            from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
+                            tag="h2"
+                        />
+                        <SplitText
+                            text="INFINITE POWER."
+                            className="text-3xl md:text-5xl lg:text-6xl font-extrabold block md:inline-block"
+                            delay={30} duration={1} ease="power3.out" splitType="chars"
+                            from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
+                            tag="span"
+                            style={{
+                                background: 'linear-gradient(135deg, #4040e0, #00e5ff)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent',
+                            }}
+                        />
+                    </div>
+                    <p style={{ color: '#666', fontSize: '1.1rem', lineHeight: 1.7 }}>
+                        A complete ecosystem of fitness management solutions — everything you need to run, grow, and scale your fitness business.
+                    </p>
+                </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {problems.map((problem, index) => (
+                {/* Horizontal scrolling cards */}
+                <div className="flex gap-5 overflow-x-auto pb-6 snap-x snap-mandatory" style={{
+                    scrollbarWidth: 'none',
+                    msOverflowStyle: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                }}>
+                    <style>{`.flex::-webkit-scrollbar { display: none; }`}</style>
+                    {ecosystem.map((item, index) => (
                         <motion.div
                             key={index}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={{ opacity: 0, y: 30 }}
                             whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.1, duration: 0.5 }}
+                            transition={{ delay: index * 0.08, duration: 0.5 }}
                             viewport={{ once: true }}
-                            whileHover={{ y: -5 }}
-                            className="bg-white p-8 rounded-2xl border border-slate-100 hover:border-blue-200 shadow-sm hover:shadow-lg transition-all group"
+                            whileHover={{ y: -8, borderColor: 'rgba(0,212,255,0.25)' }}
+                            className="flex-shrink-0 w-[320px] md:w-[350px] p-7 rounded-2xl snap-start transition-all duration-300 cursor-default group"
+                            style={{
+                                background: 'rgba(255,255,255,0.03)',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                backdropFilter: 'blur(8px)',
+                            }}
                         >
-                            <div className="w-14 h-14 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center text-2xl mb-6 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-                                <i className={problem.icon}></i>
+                            <div
+                                className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl mb-6 transition-all duration-300"
+                                style={{
+                                    background: 'linear-gradient(135deg, rgba(64,64,224,0.12), rgba(0,212,255,0.12))',
+                                    color: '#00d4ff',
+                                }}
+                            >
+                                <i className={item.icon}></i>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-900 mb-3">{problem.title}</h3>
-                            <p className="text-slate-500 text-sm leading-relaxed mb-5">
-                                {problem.description}
+                            <h3 className="text-lg font-bold mb-3 tracking-wide transition-colors" style={{
+                                color: '#fff',
+                                fontFamily: "'Outfit', sans-serif",
+                                letterSpacing: '0.05em',
+                            }}>
+                                {item.title}
+                            </h3>
+                            <p className="text-sm leading-relaxed" style={{ color: '#666' }}>
+                                {item.description}
                             </p>
-                            {/* Dynamic stat */}
-                            <div className="pt-4 border-t border-slate-100">
-                                <span className="text-2xl font-extrabold text-blue-600 font-display">{problem.stat}</span>
-                                <span className="text-xs text-slate-400 ml-2">{problem.statLabel}</span>
-                            </div>
                         </motion.div>
                     ))}
                 </div>

@@ -24,15 +24,18 @@ export default function PageHome() {
   });
 
   useEffect(() => {
-    document.title = 'Fit — All-in-One Fitness Management Platform';
+    document.title = 'N3 Fit — All-in-One Fitness Management Platform';
   }, []);
 
   return (
-    <div className="landing-page-wrapper bg-white min-h-screen relative">
-      {/* Scroll Progress Bar */}
+    <div className="landing-page-wrapper min-h-screen relative" style={{ background: '#0a0a0a' }}>
+      {/* Scroll Progress Bar — Accent Color */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 to-blue-600 origin-left z-[9999]"
-        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[3px] origin-left z-[9999]"
+        style={{
+          scaleX,
+          background: 'linear-gradient(to right, #4040e0, #00e5ff)',
+        }}
       />
 
       <Navbar />
@@ -52,17 +55,21 @@ export default function PageHome() {
 
       <Footer />
 
-      {/* Scroll to top */}
+      {/* Scroll to top — Dark + Accent */}
       <motion.button
-        className="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl shadow-lg shadow-blue-500/30 flex items-center justify-center z-40 hover:shadow-xl transition-shadow"
+        className="fixed bottom-8 right-8 w-12 h-12 rounded-xl flex items-center justify-center z-40 transition-shadow"
         initial={{ opacity: 0, scale: 0 }}
         whileInView={{ opacity: 1, scale: 1 }}
         viewport={{ once: false, margin: "0px 0px -200px 0px" }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        style={{
+          background: 'linear-gradient(135deg, #4040e0, #00d4ff)',
+          color: '#ffffff',
+        }}
       >
-        <i className="ri-arrow-up-line text-xl"></i>
+        <i className="ri-arrow-up-line text-xl font-bold"></i>
       </motion.button>
     </div>
   );
