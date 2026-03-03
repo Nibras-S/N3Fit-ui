@@ -8,15 +8,25 @@ import { useAuth } from '../../auth/context/AuthContext';
 
 const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
     const [formData, setFormData] = useState(null);
+    const [originalData, setOriginalData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState(null);
     const { hasFeature } = useAuth();
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
-        const fetchMember = async () => {
+        const fetchData = async () => {
             try {
-                const response = await api.get(`${backendUrl}/api/contacts/${memberId}`);
-                setFormData(response.data);
+                const [memberRes, settingsRes] = await Promise.all([
+                    api.get(`${backendUrl}/api/contacts/${memberId}`),
+                    api.get(`${backendUrl}/api/settings`)
+                ]);
+                const memberData = memberRes.data;
+                setFormData(memberData);
+                setOriginalData({ ...memberData });
+
+                const settingsData = settingsRes.data?.data ?? settingsRes.data;
+                setSettings(settingsData);
             } catch (error) {
                 toast.error('Failed to load member data');
                 onClose();
@@ -24,17 +34,47 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                 setLoading(false);
             }
         };
-        if (memberId) fetchMember();
+        if (memberId) fetchData();
     }, [memberId, backendUrl, onClose]);
+
+    // Compute planDays from settings for a given plan name
+    const computePlanDays = (planName) => {
+        if (!settings?.plans) return null;
+        const plan = settings.plans.find(p => p.name === planName);
+        if (!plan) return null;
+        const type = plan.durationType || 'months';
+        if (type === 'days') return plan.duration;
+        if (type === 'weeks') return plan.duration * 7;
+        return plan.duration * 30; // months
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const updateData = {
-                ...formData,
-                // Ensure specific fields are numbers/strings as needed
-                amount: formData.amount ? parseInt(formData.amount) : 0
+                name: formData.name,
+                phone: formData.phone,
+                plan: formData.plan,
+                gender: formData.gender,
+                date: formData.date,
+                paymentStatus: formData.paymentStatus,
+                paymentMethod: formData.paymentMethod,
             };
+
+            // Detect if this is a renewal (plan or amount changed)
+            const planChanged = formData.plan !== originalData.plan;
+            const amountChanged = formData.amount !== originalData.amount;
+            const isRenewal = planChanged || amountChanged;
+
+            if (isRenewal) {
+                updateData._isRenewal = true;
+                updateData.amount = formData.amount ? parseInt(formData.amount) : 0;
+                updateData.discount = formData.discount ? parseInt(formData.discount) : 0;
+
+                // Compute planDays from settings
+                const planDays = computePlanDays(formData.plan);
+                if (planDays) updateData.planDays = planDays;
+            }
 
             await api.put(`${backendUrl}/api/contacts/${formData._id}`, updateData);
 
@@ -47,8 +87,29 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
         }
     };
 
-    if (loading) return null; // Or a spinner
+    // Get active plans from settings, fallback to hardcoded
+    const getPlans = () => {
+        if (settings?.plans && settings.plans.length > 0) {
+            return settings.plans.filter(p => p.isActive).map(p => ({
+                value: p.name,
+                label: p.name,
+                duration: p.duration,
+                durationType: p.durationType || 'months',
+            }));
+        }
+        return [
+            { value: "1-Month", label: "1 Month" },
+            { value: "2-Month", label: "2 Months" },
+            { value: "3-Month", label: "3 Months" },
+            { value: "6-Month", label: "6 Months" },
+            { value: "12-Month", label: "1 Year" },
+        ];
+    };
+
+    if (loading) return null;
     if (!formData) return null;
+
+    const plans = getPlans();
 
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm animate-fadeIn">
@@ -109,7 +170,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                         />
                     </div>
 
-                    {/* Plan */}
+                    {/* Plan — loaded from settings */}
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">Membership Plan</label>
                         <select
@@ -117,11 +178,9 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                             onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
                             className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
                         >
-                            <option value="1-Month">1 Month</option>
-                            <option value="2-Month">2 Months</option>
-                            <option value="3-Month">3 Months</option>
-                            <option value="6-Month">6 Months</option>
-                            <option value="12-Month">1 Year</option>
+                            {plans.map(p => (
+                                <option key={p.value} value={p.value}>{p.label}</option>
+                            ))}
                         </select>
                     </div>
 

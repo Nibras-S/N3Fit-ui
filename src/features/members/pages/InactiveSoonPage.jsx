@@ -107,7 +107,8 @@ Send payment screenshot to confirm. Stay fit! 💪`;
       await api.post(`${backendUrl}/api/reminders/send/${_id}`);
 
       // Open WhatsApp with pre-filled message
-      const phoneNumber = phone.startsWith("91") ? phone : `91${phone}`;
+      const digits = phone.replace(/[^\d]/g, '');
+      const phoneNumber = digits.length === 10 ? `91${digits}` : digits;
       window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
 
       toast.success('Opening WhatsApp...');

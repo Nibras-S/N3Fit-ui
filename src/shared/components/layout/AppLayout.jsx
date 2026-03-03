@@ -56,7 +56,20 @@ export function AppLayout({
     setActiveWarning
   } = useNotifications();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    // Support query param matching: '/members?tab=active' matches when location is '/members' with tab=active
+    if (path.includes('?')) {
+      const [pathPart, queryPart] = path.split('?');
+      if (location.pathname !== pathPart) return false;
+      const params = new URLSearchParams(queryPart);
+      const searchParams = new URLSearchParams(location.search);
+      for (const [key, value] of params) {
+        if (searchParams.get(key) !== value) return false;
+      }
+      return true;
+    }
+    return location.pathname === path;
+  };
 
   const [showWarningModal, setShowWarningModal] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
@@ -121,7 +134,17 @@ export function AppLayout({
   const navItems = [
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
     { path: "/superadmin/plans", label: "SaaS Plans", icon: FaCrown, roles: ["superadmin"] },
-    { path: "/members", label: "Members", icon: FaUsers, roles: ["gymadmin", "staff"] },
+    {
+      label: "Members",
+      icon: FaUsers,
+      roles: ["gymadmin", "staff"],
+      defaultPath: "/members?tab=active",
+      subItems: [
+        { path: "/members?tab=active", label: "Active", icon: FaUserCheck },
+        { path: "/members?tab=inactive", label: "Expired", icon: FaUserTimes },
+        { path: "/members?tab=all", label: "All Members", icon: FaUsers },
+      ]
+    },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     {
       label: "Analysis",

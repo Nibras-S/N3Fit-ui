@@ -17,7 +17,7 @@ import {
 
 const TAB_CONFIG = [
     { key: 'active', label: 'Active', icon: FaUserCheck, status: 'Active' },
-    { key: 'expired', label: 'Expired', icon: FaUserTimes, status: 'Inactive' },
+    { key: 'inactive', label: 'Expired', icon: FaUserTimes, status: 'InActive' },
     { key: 'all', label: 'All Members', icon: FaUsers, status: 'all' },
 ];
 
@@ -42,11 +42,22 @@ const MembersPage = () => {
     const [paginationMeta, setPaginationMeta] = useState({});
     const [loading, setLoading] = useState(true);
 
-    // ── Modals ──────────────────────────────────────────────────
+    // ── Modals & Inline Actions ──────────────────────────────────
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: '' });
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState(null);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+    // ── Inline Renewal State ────────────────────────────────────
+    const [renewingMemberId, setRenewingMemberId] = useState(null);
+    const [renewForm, setRenewForm] = useState({
+        plan: '',
+        date: '',
+        amount: '',
+        paymentMethod: 'Cash',
+        paymentStatus: 'Paid',
+    });
+    const [settings, setSettings] = useState(null);
 
     // ── Expiring Soon count (for warning FAB) ───────────────────
     const [pendingCount, setPendingCount] = useState(0);
@@ -88,10 +99,12 @@ const MembersPage = () => {
             if (tabCfg.key === 'all') params.includeExpired = true;
 
             const response = await api.get(`${backendUrl}/api/contacts/`, { params });
-            const data = response.data?.data || [];
-            const pagination = response.data?.pagination || {};
+            // API returns { success, data: { data: [...], pagination: {...} } }
+            const payload = response.data?.data || response.data || {};
+            const data = payload.data || payload || [];
+            const pagination = payload.pagination || {};
 
-            setMembers(data);
+            setMembers(Array.isArray(data) ? data : []);
             setTotalRecords(pagination.total || 0);
             setPaginationMeta(pagination);
         } catch (error) {
@@ -104,6 +117,16 @@ const MembersPage = () => {
     useEffect(() => {
         fetchMembers();
     }, [backendUrl, page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
+
+    // ── Fetch settings for plans ────────────────────────────────
+    useEffect(() => {
+        api.get(`${backendUrl}/api/settings`)
+            .then(res => {
+                const settingsData = res.data?.data ?? res.data;
+                setSettings(settingsData);
+            })
+            .catch(err => console.error('Failed to load settings', err));
+    }, [backendUrl]);
 
     // ── Fetch expiring soon count ───────────────────────────────
     useEffect(() => {
@@ -145,13 +168,41 @@ const MembersPage = () => {
 
     // ── Renew ───────────────────────────────────────────────────
     const handleRenew = (memberId) => {
-        navigate(`/members/${memberId}?action=renew`);
+        if (renewingMemberId === memberId) {
+            setRenewingMemberId(null); // toggle off
+        } else {
+            setRenewForm({
+                plan: '',
+                date: '',
+                amount: '',
+                paymentMethod: 'Cash',
+                paymentStatus: 'Paid',
+            });
+            setRenewingMemberId(memberId);
+        }
+    };
+
+    const submitRenewal = async (memberId) => {
+        if (!renewForm.plan || !renewForm.amount) {
+            toast.error('Please select a plan and enter an amount');
+            return;
+        }
+
+        try {
+            await api.put(`${backendUrl}/api/contacts/${memberId}`, { ...renewForm, _isRenewal: true });
+            toast.success('Membership renewed successfully');
+            setRenewingMemberId(null);
+            fetchMembers(); // refresh
+        } catch (error) {
+            toast.error('Failed to renew membership');
+        }
     };
 
     // ── WhatsApp ────────────────────────────────────────────────
     const handleWhatsApp = (member) => {
         if (!member.phone) return;
-        const phone = member.phone.startsWith('91') ? member.phone : `91${member.phone}`;
+        const digits = member.phone.replace(/[^\d]/g, '');
+        const phone = digits.length === 10 ? `91${digits}` : digits;
         const message = `Hi ${member.name}, your gym membership has expired. Please renew to continue enjoying our services! 💪`;
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     };
@@ -205,17 +256,18 @@ const MembersPage = () => {
             base.push({
                 key: 'status', label: 'Status',
                 render: (row) => (
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
-                        {row.dews >= 0 ? 'Active' : 'Expired'}
+                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                        {row.dews > 0 ? 'Active' : 'Expired'}
                     </span>
                 )
             });
         }
+        // Note: dews <= 0 = Expired per backend pre-save hook (status = 'InActive' when dews <= 0)
 
         base.push(
             {
                 key: 'dews', label: 'Days Left', sortable: true,
-                render: (row) => <span className={row.dews < 0 ? 'text-red-500 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews}</span>
+                render: (row) => <span className={row.dews <= 0 ? 'text-red-500 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>
             },
             { key: 'date', label: 'Start Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.date)}</span> },
             { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
@@ -227,11 +279,13 @@ const MembersPage = () => {
     // ── Actions ─────────────────────────────────────────────────
     const renderActions = (row) => (
         <div className="flex gap-2">
-            {activeTab === 'expired' && (
-                <button onClick={() => handleRenew(row._id)} className="p-1.5 text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg" title="Renew">
-                    <FaRedo />
-                </button>
-            )}
+            <button
+                onClick={() => handleRenew(row._id)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg transition-colors"
+                title="Renew Membership"
+            >
+                <FaRedo size={11} /> Renew
+            </button>
             {activeTab === 'expired' && row.phone && (
                 <button onClick={() => handleWhatsApp(row)} className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg" title="WhatsApp">
                     <FaWhatsapp />
@@ -271,21 +325,19 @@ const MembersPage = () => {
                     </div>
                 </div>
                 {activeTab === 'all' && (
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
-                        {row.dews >= 0 ? 'Active' : 'Expired'}
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                        {row.dews > 0 ? 'Active' : 'Expired'}
                     </span>
                 )}
             </div>
             <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
-                <span className={row.dews < 0 ? 'text-red-500 font-medium' : ''}>{row.dews} days</span>
+                <span className={row.dews <= 0 ? 'text-red-500 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
                 <span>{formatDate(row.endDate)}</span>
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700">
-                {activeTab === 'expired' && (
-                    <button onClick={() => handleRenew(row._id)} className="flex-1 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 font-medium rounded-lg text-sm flex items-center justify-center gap-2">
-                        <FaRedo /> Renew
-                    </button>
-                )}
+                <button onClick={() => handleRenew(row._id)} className="flex-1 py-2 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors">
+                    <FaRedo size={11} /> Renew
+                </button>
                 {activeTab === 'expired' && row.phone && (
                     <button onClick={() => handleWhatsApp(row)} className="py-2 px-3 bg-green-50 dark:bg-green-900/20 text-green-600 font-medium rounded-lg text-sm flex items-center justify-center">
                         <FaWhatsapp />
@@ -300,6 +352,9 @@ const MembersPage = () => {
             </div>
         </>
     );
+
+    // ── Selected Renewing Member for Modal ──────────────────────
+    const renewingMember = members.find(m => m._id === renewingMemberId);
 
     // ── Tab title for header ────────────────────────────────────
     const currentTab = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
@@ -319,25 +374,8 @@ const MembersPage = () => {
                 ]}
             />
 
-            {/* Tab Bar */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-1 mb-6 shadow-sm">
-                <div className="flex">
-                    {TAB_CONFIG.map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg text-sm font-medium transition-all ${activeTab === tab.key
-                                    ? 'bg-gray-900 dark:bg-blue-600 text-white shadow-sm'
-                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700'
-                                }`}
-                        >
-                            <tab.icon className="text-xs" />
-                            <span className="hidden sm:inline">{tab.label}</span>
-                            <span className="sm:hidden">{tab.key === 'all' ? 'All' : tab.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
+
+
 
             {/* Toolbar */}
             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 mb-6 shadow-sm">
@@ -424,6 +462,92 @@ const MembersPage = () => {
             </div>
 
             {/* Modals */}
+            {renewingMemberId && renewingMember && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                        <div className="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                                <FaRedo className="text-blue-500" /> Renew {renewingMember.name}
+                            </h3>
+                            <button onClick={() => setRenewingMemberId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                                ✕
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Plan</label>
+                                <select
+                                    value={renewForm.plan}
+                                    onChange={(e) => {
+                                        const newPlan = e.target.value;
+                                        const planObj = settings?.plans?.find(p => p.name === newPlan);
+                                        setRenewForm({
+                                            ...renewForm,
+                                            plan: newPlan,
+                                            amount: planObj ? planObj.price : '',
+                                        });
+                                    }}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                >
+                                    <option value="">Select Plan...</option>
+                                    {settings?.plans?.map((p, i) => (
+                                        <option key={i} value={p.name}>{p.name} (₹{p.price})</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
+                                    <input
+                                        type="date"
+                                        value={renewForm.date}
+                                        onChange={(e) => setRenewForm({ ...renewForm, date: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (₹)</label>
+                                    <input
+                                        type="number"
+                                        value={renewForm.amount}
+                                        onChange={(e) => setRenewForm({ ...renewForm, amount: e.target.value })}
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method</label>
+                                <select
+                                    value={renewForm.paymentMethod}
+                                    onChange={(e) => setRenewForm({ ...renewForm, paymentMethod: e.target.value })}
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                >
+                                    <option value="Cash">Cash</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="Card">Card</option>
+                                    <option value="Bank Transfer">Bank Transfer</option>
+                                    <option value="Pending">Pending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="p-6 border-t border-gray-100 dark:border-slate-700 bg-gray-50 flex gap-3 dark:bg-slate-800/50 justify-end">
+                            <button
+                                onClick={() => setRenewingMemberId(null)}
+                                className="px-6 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => submitRenewal(renewingMemberId)}
+                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors text-sm"
+                            >
+                                Renew Membership
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
                 onClose={() => setDeleteModal({ ...deleteModal, isOpen: false })}

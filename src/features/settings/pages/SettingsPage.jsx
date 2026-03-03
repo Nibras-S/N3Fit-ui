@@ -6,7 +6,7 @@ import {
     FaSave, FaCog, FaMoneyBillWave, FaSun, FaMoon,
     FaBuilding, FaCamera, FaEnvelope, FaPhone, FaMapMarkerAlt,
     FaBarcode, FaCrown, FaCalendarAlt, FaUser, FaEye, FaEyeSlash,
-    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaBell, FaDownload, FaUsers, FaCheckCircle
+    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaBell, FaDownload, FaUsers, FaCheckCircle, FaTimes
 } from 'react-icons/fa';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import AppLayout from '../../../shared/components/layout/AppLayout';
@@ -36,17 +36,16 @@ const Settings = () => {
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const { api, user, login, logout, refreshUser } = useAuth();
-    const [showPhotoMenu, setShowPhotoMenu] = useState(false);
     const fileInputRef = React.useRef(null);
 
     const [isEditingPricing, setIsEditingPricing] = useState(false);
     const [isEditingBranding, setIsEditingBranding] = useState(false);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
-    const [showPasswordFields, setShowPasswordFields] = useState(false);
-    const [activeTab, setActiveTab] = useState('main');
-
     const [showPassword, setShowPassword] = useState(false);
-    const [profileForm, setProfileForm] = useState({ name: "", email: "", password: "", confirmPassword: "" });
+    const [activeTab, setActiveTab] = useState('main');
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({ newPassword: "", confirmPassword: "" });
+    const [profileForm, setProfileForm] = useState({ name: "", email: "" });
 
     const [settings, setSettings] = useState({
         subscriptionPrices: {
@@ -69,7 +68,7 @@ const Settings = () => {
     useEffect(() => {
         fetchAllData();
         if (user) {
-            setProfileForm({ name: user.name || "", email: user.email || "", password: "", confirmPassword: "" });
+            setProfileForm({ name: user.name || "", email: user.email || "" });
         }
     }, [backendUrl, user]);
 
@@ -175,28 +174,42 @@ const Settings = () => {
 
     const handleProfileSave = async (e) => {
         if (e) e.preventDefault();
+        setSaving(true);
+        try {
+            await api.put("/api/auth/profile", {
+                name: profileForm.name,
+                email: profileForm.email,
+            });
+            toast.success("Profile updated!");
+            setIsEditingProfile(false);
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to update profile");
+        } finally {
+            setSaving(false);
+        }
+    };
 
-        if (profileForm.password && profileForm.password !== profileForm.confirmPassword) {
+    const handlePasswordUpdate = async (e) => {
+        if (e) e.preventDefault();
+        if (!passwordData.newPassword) {
+            toast.error("Please enter a new password");
+            return;
+        }
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
             toast.error("Passwords do not match");
             return;
         }
 
         setSaving(true);
         try {
-            const res = await api.put("/api/auth/profile", {
-                name: profileForm.name,
-                email: profileForm.email,
-                password: profileForm.password || undefined // Only send if not empty
+            await api.put("/api/auth/profile", {
+                password: passwordData.newPassword
             });
-            if (res.data.success) {
-                toast.success("Profile updated!");
-                setIsEditingProfile(false);
-                setShowPasswordFields(false); // Hide password fields
-                // Clear password fields
-                setProfileForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
-            }
+            toast.success("Password updated successfully!");
+            setShowPasswordModal(false);
+            setPasswordData({ newPassword: "", confirmPassword: "" });
         } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to update profile");
+            toast.error(err.response?.data?.message || "Failed to update password");
         } finally {
             setSaving(false);
         }
@@ -504,21 +517,22 @@ const Settings = () => {
                                 <h2 className="text-xl font-bold text-gray-900 dark:text-white">{user?.role === 'staff' ? 'Staff Details' : 'Personal Profile'}</h2>
                                 <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your own account information</p>
                             </div>
-                            <button
-                                onClick={() => {
-                                    if (isEditingProfile) {
-                                        setProfileForm({ name: user?.name || "", email: user?.email || "", password: "", confirmPassword: "" });
-                                        setShowPasswordFields(false);
-                                    }
-                                    setIsEditingProfile(!isEditingProfile);
-                                }}
-                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingProfile
-                                    ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
-                                    : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'
-                                    }`}
-                            >
-                                {isEditingProfile ? 'Cancel' : 'Edit Profile'}
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => {
+                                        if (isEditingProfile) {
+                                            setProfileForm({ name: user?.name || "", email: user?.email || "" });
+                                        }
+                                        setIsEditingProfile(!isEditingProfile);
+                                    }}
+                                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingProfile
+                                        ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100'
+                                        : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'
+                                        }`}
+                                >
+                                    {isEditingProfile ? 'Cancel' : 'Edit Profile'}
+                                </button>
+                            </div>
                         </div>
 
                         {/* Personal Profile Section with Photo - Redesigned */}
@@ -542,44 +556,11 @@ const Settings = () => {
                                         </div>
                                         {/* Always-visible edit button */}
                                         <button
-                                            onClick={() => setShowPhotoMenu(!showPhotoMenu)}
+                                            onClick={() => document.getElementById('user-photo-upload').click()}
                                             className="absolute bottom-0 right-0 w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-lg flex items-center justify-center border-3 border-white dark:border-slate-800 transition-all hover:scale-110 z-10"
                                         >
                                             <FaCamera size={13} />
                                         </button>
-                                        {/* Dropdown menu */}
-                                        {showPhotoMenu && (
-                                            <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 translate-y-full bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-gray-100 dark:border-slate-700 py-2 w-48 z-50">
-                                                <button
-                                                    onClick={() => {
-                                                        setShowPhotoMenu(false);
-                                                        document.getElementById('user-photo-upload').click();
-                                                    }}
-                                                    className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-slate-700 flex items-center gap-3 transition-colors"
-                                                >
-                                                    <FaCamera size={12} className="text-blue-500" />
-                                                    Upload New Photo
-                                                </button>
-                                                {user?.profileImage && (
-                                                    <button
-                                                        onClick={async () => {
-                                                            setShowPhotoMenu(false);
-                                                            try {
-                                                                await api.delete("/api/auth/profile/photo");
-                                                                await refreshUser();
-                                                                toast.success("Profile photo removed");
-                                                            } catch (err) {
-                                                                toast.error("Failed to remove photo");
-                                                            }
-                                                        }}
-                                                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3 transition-colors"
-                                                    >
-                                                        <span className="text-lg leading-none">&times;</span>
-                                                        Remove Current
-                                                    </button>
-                                                )}
-                                            </div>
-                                        )}
                                         <input
                                             id="user-photo-upload"
                                             type="file"
@@ -672,67 +653,13 @@ const Settings = () => {
                                         )}
                                     </div>
                                     <div className="sm:col-span-2 border-t border-gray-100 dark:border-slate-700 pt-4 mt-2">
-                                        {!showPasswordFields ? (
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    setIsEditingProfile(true);
-                                                    setShowPasswordFields(true);
-                                                }}
-                                                className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2"
-                                            >
-                                                <FaCog size={12} /> Change Password
-                                            </button>
-                                        ) : (
-                                            <>
-                                                <div className="flex justify-between items-center mb-4">
-                                                    <h3 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
-                                                        <FaCog size={12} className="text-gray-400" /> Change Password
-                                                    </h3>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setShowPasswordFields(false);
-                                                            setProfileForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
-                                                        }}
-                                                        className="text-xs text-red-500 hover:text-red-600"
-                                                    >
-                                                        Cancel Change
-                                                    </button>
-                                                </div>
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">New Password</label>
-                                                        <div className="relative">
-                                                            <input
-                                                                type={showPassword ? "text" : "password"}
-                                                                value={profileForm.password}
-                                                                onChange={(e) => setProfileForm(p => ({ ...p, password: e.target.value }))}
-                                                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                                                placeholder="Enter new password"
-                                                            />
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => setShowPassword(!showPassword)}
-                                                                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                                            >
-                                                                {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Confirm Password</label>
-                                                        <input
-                                                            type={showPassword ? "text" : "password"}
-                                                            value={profileForm.confirmPassword}
-                                                            onChange={(e) => setProfileForm(p => ({ ...p, confirmPassword: e.target.value }))}
-                                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                                                            placeholder="Confirm new password"
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </>
-                                        )}
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPasswordModal(true)}
+                                            className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2"
+                                        >
+                                            <FaCog size={12} /> Change Password
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -747,31 +674,35 @@ const Settings = () => {
                                 <FaMoneyBillWave className="text-green-500" />
                                 Plan Management
                             </h2>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
                                 {isEditingPricing && (
                                     <button
                                         onClick={saveSettings}
                                         disabled={saving}
-                                        className="text-xs bg-green-600 text-white px-3 py-1.5 rounded border border-green-700 hover:bg-green-700 disabled:opacity-50"
+                                        className="text-xs bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center gap-1.5 shadow-md shadow-green-500/20 transition-all"
                                     >
-                                        {saving ? 'Saving...' : 'Save Pricing'}
+                                        <FaSave size={11} />
+                                        {saving ? 'Saving...' : 'Save Changes'}
                                     </button>
                                 )}
                                 {user?.role === 'gymadmin' && (
                                     <button
                                         onClick={() => {
                                             if (isEditingPricing) {
-                                                // Reset settings if needed, but usually we just toggle
                                                 fetchAllData();
                                             }
                                             setIsEditingPricing(!isEditingPricing);
                                         }}
-                                        className={`text-xs px-3 py-1.5 rounded border transition-colors ${isEditingPricing
-                                            ? 'bg-red-50 text-red-600 border-red-200'
-                                            : 'bg-blue-50 text-blue-600 border-blue-200'
+                                        className={`text-xs px-4 py-2 rounded-xl font-semibold flex items-center gap-1.5 transition-all ${isEditingPricing
+                                            ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-red-100'
+                                            : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-500/20'
                                             }`}
                                     >
-                                        {isEditingPricing ? 'Cancel' : 'Edit Charges'}
+                                        {isEditingPricing ? (
+                                            <><FaTimes size={10} /> Discard</>
+                                        ) : (
+                                            <><FaCog size={10} /> Edit Plans</>
+                                        )}
                                     </button>
                                 )}
                             </div>
@@ -818,13 +749,13 @@ const Settings = () => {
                                     <button
                                         onClick={() => {
                                             const customCount = (settings.plans || []).filter(p => !p.isDefault).length;
-                                            const newPlan = { name: `Custom Plan ${customCount + 1}`, duration: 1, price: 0, isActive: true, isDefault: false };
+                                            const newPlan = { name: `Custom Plan ${customCount + 1}`, duration: 1, durationType: 'months', price: 0, isActive: true, isDefault: false };
                                             setSettings(prev => ({
                                                 ...prev,
                                                 plans: [...(prev.plans || []), newPlan]
                                             }));
                                         }}
-                                        className="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 flex items-center gap-1"
+                                        className="text-xs bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 flex items-center gap-1.5 font-semibold shadow-md shadow-purple-500/20 transition-all"
                                     >
                                         <FaCrown size={10} /> Add Custom Plan
                                     </button>
@@ -856,7 +787,7 @@ const Settings = () => {
                                                         />
                                                     )}
                                                     {plan.isDefault ? (
-                                                        <span className="text-xs text-gray-500">{plan.duration} Month{plan.duration > 1 ? 's' : ''}</span>
+                                                        <span className="text-xs text-gray-500">{plan.duration} {plan.durationType === 'days' ? (plan.duration > 1 ? 'Days' : 'Day') : plan.durationType === 'weeks' ? (plan.duration > 1 ? 'Weeks' : 'Week') : (plan.duration > 1 ? 'Months' : 'Month')}</span>
                                                     ) : (
                                                         <div className="flex items-center gap-2">
                                                             <input
@@ -869,7 +800,19 @@ const Settings = () => {
                                                                 }}
                                                                 className="w-16 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                                             />
-                                                            <span className="text-xs text-gray-500">months</span>
+                                                            <select
+                                                                value={plan.durationType || 'months'}
+                                                                onChange={(e) => {
+                                                                    const newPlans = [...settings.plans];
+                                                                    newPlans[index].durationType = e.target.value;
+                                                                    setSettings({ ...settings, plans: newPlans });
+                                                                }}
+                                                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                                            >
+                                                                <option value="days">Days</option>
+                                                                <option value="weeks">Weeks</option>
+                                                                <option value="months">Months</option>
+                                                            </select>
                                                         </div>
                                                     )}
                                                     <div className="relative">
@@ -893,7 +836,7 @@ const Settings = () => {
                                                         {plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>}
                                                         {!plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-blue-100 dark:bg-blue-900/30 text-blue-500 px-1.5 py-0.5 rounded">Custom</span>}
                                                     </div>
-                                                    <span className="text-xs text-gray-500">{plan.duration} Month{plan.duration > 1 ? 's' : ''}</span>
+                                                    <span className="text-xs text-gray-500">{plan.duration} {plan.durationType === 'days' ? (plan.duration > 1 ? 'Days' : 'Day') : plan.durationType === 'weeks' ? (plan.duration > 1 ? 'Weeks' : 'Week') : (plan.duration > 1 ? 'Months' : 'Month')}</span>
                                                     <span className="font-bold text-gray-900 dark:text-white text-sm">₹{plan.price.toLocaleString('en-IN')}</span>
                                                 </>
                                             )}
@@ -974,6 +917,80 @@ const Settings = () => {
                                     </span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Password Change Modal */}
+                {showPasswordModal && (
+                    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                                        <FaShieldAlt />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Change Password</h2>
+                                </div>
+                                <button
+                                    onClick={() => setShowPasswordModal(false)}
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+                                >
+                                    <FaTimes className="text-gray-500 dark:text-gray-400" />
+                                </button>
+                            </div>
+
+                            <form onSubmit={handlePasswordUpdate} className="p-6 space-y-4">
+                                <div>
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">New Password</label>
+                                    <div className="relative">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={passwordData.newPassword}
+                                            onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                            placeholder="Enter new password"
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                        >
+                                            {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">Confirm Password</label>
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        value={passwordData.confirmPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        placeholder="Confirm new password"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex gap-4 pt-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPasswordModal(false)}
+                                        className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        disabled={saving}
+                                        className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30 disabled:opacity-50"
+                                    >
+                                        {saving ? 'Saving...' : 'Update Password'}
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 )}

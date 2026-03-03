@@ -241,12 +241,26 @@ function NewMember() {
     formData.append('paymentMethod', paymentMethod);
     formData.append('paymentStatus', paymentStatus);
 
+    // Compute planDays from settings plan duration + durationType
+    if (settings?.plans && settings.plans.length > 0) {
+      const selectedPlan = settings.plans.find(p => p.name === plan);
+      if (selectedPlan) {
+        let days = selectedPlan.duration;
+        const type = selectedPlan.durationType || 'months';
+        if (type === 'weeks') days = selectedPlan.duration * 7;
+        else if (type === 'months') days = selectedPlan.duration * 30;
+        formData.append('planDays', days);
+      }
+    }
+
     if (photoBlob) {
       formData.append('profileImage', photoBlob, 'profile.jpg');
     }
 
     try {
-      await api.post(`${backendUrl}/api/contacts/`, formData);
+      await api.post(`${backendUrl}/api/contacts/`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
       toast.success('Member enrolled successfully!');
       setTimeout(() => navigate('/members'), 1500);
     } catch (err) {
@@ -601,7 +615,7 @@ function NewMember() {
                     </div>
                     <div className="pl-2">
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Settlement</p>
-                      <p className="text-xl font-black text-gray-900 dark:text-white">₹{parseInt(amount) + (settings?.admissionFee || 0) - parseInt(discount || 0)}</p>
+                      <p className="text-xl font-black text-gray-900 dark:text-white">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</p>
                       <p className={`text-[9px] font-black px-2 py-0.5 rounded-full inline-block mt-1 ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                         {paymentStatus.toUpperCase()} ({paymentMethod.toUpperCase()})
                       </p>

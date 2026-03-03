@@ -292,17 +292,11 @@ const Dashboard = () => {
                                                                 Collect
                                                             </button>
                                                             {txn.phone && (
-                                                                <>
-                                                                    <a href={`https://wa.me/91${txn.phone}?text=Hi ${txn.memberName}, this is a reminder regarding your pending gym fee of ${formatCurrency(txn.amount)}. Please clear the dues.`}
-                                                                        target="_blank" rel="noopener noreferrer"
-                                                                        className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" title="Send WhatsApp">
-                                                                        <FaWhatsapp />
-                                                                    </a>
-                                                                    <a href={`tel:${txn.phone}`}
-                                                                        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" title="Call">
-                                                                        <FaPhone />
-                                                                    </a>
-                                                                </>
+                                                                <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, this is a reminder regarding your pending gym fee of ${formatCurrency(txn.amount)}. Please clear the dues.`}
+                                                                    target="_blank" rel="noopener noreferrer"
+                                                                    className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" title="Send WhatsApp">
+                                                                    <FaWhatsapp />
+                                                                </a>
                                                             )}
                                                         </>
                                                     )}
@@ -351,11 +345,8 @@ const Dashboard = () => {
                                             <>
                                                 <button onClick={() => setCollectingId(txn._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-medium">Collect</button>
                                                 {txn.phone && (
-                                                    <>
-                                                        <a href={`https://wa.me/91${txn.phone}?text=Hi ${txn.memberName}, reminder for pending fee of ${formatCurrency(txn.amount)}.`}
-                                                            target="_blank" rel="noopener noreferrer" className="p-2 bg-green-500 text-white rounded-lg"><FaWhatsapp size={14} /></a>
-                                                        <a href={`tel:${txn.phone}`} className="p-2 bg-blue-500 text-white rounded-lg"><FaPhone size={14} /></a>
-                                                    </>
+                                                    <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, reminder for pending fee of ${formatCurrency(txn.amount)}.`}
+                                                        target="_blank" rel="noopener noreferrer" className="p-2 bg-green-500 text-white rounded-lg"><FaWhatsapp size={14} /></a>
                                                 )}
                                             </>
                                         )}
