@@ -8,6 +8,13 @@ import { ThemeProvider } from './shared/context/ThemeContext';
 // Interceptors are now in shared/services/api.js — import to register them
 import './shared/services/api';
 
+// Suppress benign ResizeObserver errors from charting libraries causing UI breakdowns
+window.addEventListener('error', e => {
+  if (e.message === 'ResizeObserver loop completed with undelivered notifications.' || e.message === 'ResizeObserver loop limit exceeded') {
+    e.stopImmediatePropagation();
+  }
+});
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

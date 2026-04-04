@@ -132,6 +132,7 @@ export function AppLayout({
 
   // Role-based navigation with feature gating
   const navItems = [
+    { path: "/dashboard", label: "Dashboard", icon: FaChartPie, roles: ["gymadmin"] },
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
     { path: "/superadmin/plans", label: "SaaS Plans", icon: FaCrown, roles: ["superadmin"] },
     {
@@ -146,17 +147,7 @@ export function AppLayout({
       ]
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
-    {
-      label: "Analysis",
-      icon: FaChartPie,
-      roles: ["gymadmin"],
-      defaultPath: "/dashboard",
-      subItems: [
-        { path: "/dashboard", label: "Dashboard", icon: FaChartPie },
-        { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses" },
-      ]
-    },
-
+    { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin"] },
     {
       path: "/notifications",
       label: "Notifications",
@@ -656,8 +647,9 @@ export function AppLayout({
               active={isActive(path)}
               onClick={() => safeNavigate(path)}
               label={label}
-              icon={<Icon className="text-lg" />}
+              icon={<Icon className={path === "/register" ? "text-xl text-white" : "text-lg"} />}
               badge={badge}
+              isPrimary={path === "/register"}
             />
           ))}
         </div>
@@ -669,7 +661,21 @@ export function AppLayout({
   );
 }
 
-function BottomNavButton({ active, onClick, label, icon, badge }) {
+function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
+  if (isPrimary) {
+    return (
+      <div className="relative -top-5 flex flex-col items-center justify-center z-30">
+        <button
+          onClick={onClick}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-blue-600 shadow-lg shadow-blue-500/30 hover:bg-blue-700 transition-colors border-4 border-white dark:border-slate-800 active:scale-95"
+        >
+          {icon}
+        </button>
+        <span className="text-[10px] font-medium text-gray-500 dark:text-gray-400 mt-1 leading-none">{label}</span>
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={onClick}
