@@ -8,12 +8,19 @@ import { ThemeProvider } from './shared/context/ThemeContext';
 // Interceptors are now in shared/services/api.js — import to register them
 import './shared/services/api';
 
-// Suppress benign ResizeObserver errors from charting libraries causing UI breakdowns
-window.addEventListener('error', e => {
-  if (e.message === 'ResizeObserver loop completed with undelivered notifications.' || e.message === 'ResizeObserver loop limit exceeded') {
-    e.stopImmediatePropagation();
-  }
-});
+// Patch ResizeObserver to heavily debounce/RAF the callbacks and prevent the 'loop limit' UI overlay crash
+if (typeof window !== 'undefined' && window.ResizeObserver) {
+  const _ResizeObserver = window.ResizeObserver;
+  window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+    constructor(callback) {
+      super((entries, observer) => {
+        window.requestAnimationFrame(() => {
+          callback(entries, observer);
+        });
+      });
+    }
+  };
+}
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
