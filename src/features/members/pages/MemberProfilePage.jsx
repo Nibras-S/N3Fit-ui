@@ -26,8 +26,8 @@ function MemberProfile() {
         const fetchData = async () => {
             try {
                 const [memberRes, txnRes] = await Promise.all([
-                    api.get(`${backendUrl}/api/contacts/${id}`),
-                    api.get(`${backendUrl}/api/transactions?memberId=${id}`)
+                    api.get(`/contacts/${id}`),
+                    api.get(`/transactions?memberId=${id}`)
                 ]);
                 setMember(memberRes.data);
                 const txnData = txnRes.data;
@@ -48,7 +48,7 @@ function MemberProfile() {
 
     const handleDelete = async () => {
         try {
-            await api.delete(`${backendUrl}/api/contacts/${id}`);
+            await api.delete(`/contacts/${id}`);
             toast.success("Member deleted successfully");
             navigate('/manageUsers');
         } catch (error) {

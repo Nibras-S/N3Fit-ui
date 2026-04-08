@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import DataTable from '../../../shared/components/data/DataTable';
+import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
@@ -12,12 +12,12 @@ import { useAuth } from '../../auth/context/AuthContext';
 import {
     FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaSync,
     FaUserCheck, FaUserTimes, FaExclamationTriangle, FaWhatsapp,
-    FaFileImport, FaUserPlus, FaRedo
+    FaFileImport, FaUserPlus, FaRedo, FaTimesCircle
 } from 'react-icons/fa';
 
 const TAB_CONFIG = [
-    { key: 'active', label: 'Active', icon: FaUserCheck, status: 'Active' },
-    { key: 'inactive', label: 'Expired', icon: FaUserTimes, status: 'InActive' },
+    { key: 'active', label: 'Active Members', icon: FaUserCheck, status: 'Active' },
+    { key: 'inactive', label: 'Expired Members', icon: FaUserTimes, status: 'InActive' },
     { key: 'all', label: 'All Members', icon: FaUsers, status: 'all' },
 ];
 
@@ -61,6 +61,8 @@ const MembersPage = () => {
 
     // ── Expiring Soon count (for warning FAB) ───────────────────
     const [pendingCount, setPendingCount] = useState(0);
+    // ── Global member counts (tab-independent, for stats row) ───
+    const [allStats, setAllStats] = useState({ total: 0, male: 0, female: 0 });
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -98,7 +100,7 @@ const MembersPage = () => {
             };
             if (tabCfg.key === 'all') params.includeExpired = true;
 
-            const response = await api.get(`${backendUrl}/api/contacts/`, { params });
+            const response = await api.get(`/contacts/`, { params });
             // API returns { success, data: { data: [...], pagination: {...} } }
             const payload = response.data?.data || response.data || {};
             const data = payload.data || payload || [];
@@ -120,7 +122,7 @@ const MembersPage = () => {
 
     // ── Fetch settings for plans ────────────────────────────────
     useEffect(() => {
-        api.get(`${backendUrl}/api/settings`)
+        api.get(`/settings`)
             .then(res => {
                 const settingsData = res.data?.data ?? res.data;
                 setSettings(settingsData);
@@ -130,7 +132,7 @@ const MembersPage = () => {
 
     // ── Fetch expiring soon count ───────────────────────────────
     useEffect(() => {
-        api.get(`${backendUrl}/api/reminders/with-status`)
+        api.get(`/reminders/with-status`)
             .then((res) => {
                 const filtered = res.data
                     .filter((u) => u.dews <= 4 && u.dews >= 0)
@@ -140,12 +142,27 @@ const MembersPage = () => {
             .catch((err) => console.error('Error fetching pending:', err));
     }, [backendUrl]);
 
-    // ── Stats (from pagination meta) ────────────────────────────
+    // ── Stats: from current page pagination meta ──────────────────
     const stats = useMemo(() => ({
-        total: totalRecords,
-        male: paginationMeta.male || 0,
-        female: paginationMeta.female || 0,
-    }), [totalRecords, paginationMeta]);
+        total: paginationMeta.total ?? totalRecords,
+        male: paginationMeta.male ?? 0,
+        female: paginationMeta.female ?? 0,
+    }), [paginationMeta, totalRecords]);
+
+    // ── Fetch global stats (all-time, not filtered by gender/search) ──
+    useEffect(() => {
+        const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
+        api.get('/contacts/', { params: { status: tabCfg.status, page: 1, limit: 1 } })
+            .then(res => {
+                const p = res.data?.data?.pagination || res.data?.pagination || {};
+                setAllStats({
+                    total: p.total || 0,
+                    male: p.male || 0,
+                    female: p.female || 0,
+                });
+            })
+            .catch(() => { });
+    }, [activeTab]);
 
     // ── Sort ────────────────────────────────────────────────────
     const handleSort = (key) => setSortConfig(prev => ({
@@ -157,7 +174,7 @@ const MembersPage = () => {
     const handleDeleteClick = async () => {
         const { id, name } = deleteModal;
         try {
-            await api.delete(`${backendUrl}/api/contacts/${id}`);
+            await api.delete(`/contacts/${id}`);
             setMembers(prev => prev.filter(u => u._id !== id));
             toast.success('Member deleted');
             setDeleteModal({ isOpen: false, id: null, name: '' });
@@ -189,7 +206,7 @@ const MembersPage = () => {
         }
 
         try {
-            await api.put(`${backendUrl}/api/contacts/${memberId}`, { ...renewForm, _isRenewal: true });
+            await api.put(`/contacts/${memberId}`, { ...renewForm, _isRenewal: true });
             toast.success('Membership renewed successfully');
             setRenewingMemberId(null);
             fetchMembers(); // refresh
@@ -356,94 +373,228 @@ const MembersPage = () => {
     // ── Selected Renewing Member for Modal ──────────────────────
     const renewingMember = members.find(m => m._id === renewingMemberId);
 
-    // ── Tab title for header ────────────────────────────────────
     const currentTab = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
+
+    // ── Empty state (no results after search) ──────────────────
+    const EmptySearchState = () => (
+        <div className="flex flex-col items-center justify-center py-24 px-6 relative overflow-hidden">
+            {/* Concentric rings background */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60 dark:opacity-40">
+                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-slate-700 shadow-sm" />
+                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-slate-700" />
+            </div>
+
+            {/* Scattered Avatars on the rings */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                {/* Inner Ring Avatars */}
+                <img src="https://i.pravatar.cc/150?img=1" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 translate-x-[80px] -translate-y-[80px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=2" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[90px] translate-y-[40px]" alt="avatar" />
+
+                {/* Middle Ring Avatars */}
+                <img src="https://i.pravatar.cc/150?img=3" className="absolute w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 translate-x-[150px] translate-y-[60px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=4" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[160px] -translate-y-[100px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=5" className="absolute w-9 h-9 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[40px] translate-y-[160px]" alt="avatar" />
+
+                {/* Outer Ring Avatars */}
+                <img src="https://i.pravatar.cc/150?img=6" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 translate-x-[220px] -translate-y-[150px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=7" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[240px] translate-y-[120px]" alt="avatar" />
+            </div>
+
+            {/* Center Icon */}
+            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 flex items-center justify-center mb-6 shadow-sm z-10">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center">
+                    <FaSearch className="text-gray-400" size={18} />
+                </div>
+            </div>
+
+            {/* Text */}
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1.5 z-10">No users found</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 z-10 w-full max-w-sm">
+                Your search for <span className="font-semibold text-gray-700 dark:text-gray-300">"{searchTerm}"</span> did not match any members.
+            </p>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3 z-10">
+                <button
+                    onClick={() => setSearchTerm('')}
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
+                >
+                    Clear search
+                </button>
+                <button
+                    onClick={() => navigate('/register')}
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all shadow-sm flex items-center gap-2 text-sm"
+                >
+                    <FaUserPlus size={12} /> Add member
+                </button>
+            </div>
+        </div>
+    );
+
+    // Empty state (no members at all in tab)
+    const EmptyTabState = () => (
+        <div className="flex flex-col items-center justify-center py-20 px-6">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-700 flex items-center justify-center mb-4">
+                {activeTab === 'inactive' ? <FaUserTimes className="text-gray-400" size={22} /> : <FaUsers className="text-gray-400" size={22} />}
+            </div>
+            <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">No {currentTab.label.toLowerCase()}</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-5">There are no members in this category yet.</p>
+            <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all flex items-center gap-2">
+                <FaUserPlus size={12} /> Add member
+            </button>
+        </div>
+    );
 
     return (
         <AppLayout showGenderSwitch={false}>
             <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
 
-            {/* Page Header */}
-            <PageHeader
-                title={currentTab.label}
-                gender={genderFilter}
-                stats={[
-                    { label: 'Total', value: stats.total, icon: FaUsers },
-                    { label: 'Male', value: stats.male, icon: FaMale },
-                    { label: 'Female', value: stats.female, icon: FaFemale },
-                ]}
-            />
+            {/* ── Desktop Tab Bar ─────────────────────────────── */}
+            <div className="hidden lg:block mb-6">
+                <div className="flex items-end justify-between border-b border-gray-200 dark:border-slate-700">
+                    {/* Tabs */}
+                    <div className="flex gap-1">
+                        {TAB_CONFIG.map(tab => {
+                            const Icon = tab.icon;
+                            const isActive = activeTab === tab.key;
+                            return (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all ${isActive
+                                        ? 'border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:border-gray-300'
+                                        }`}
+                                >
+                                    <Icon size={14} />
+                                    {tab.label}
+                                    {isActive && (
+                                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                            {allStats.total}
+                                        </span>
+                                    )}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {/* Right: stats pills */}
+                    <div className="flex items-center gap-4 pb-2 text-sm text-gray-500 dark:text-gray-400">
+                        <span className="flex items-center gap-1.5"><FaUsers size={12} className="text-blue-400" /> {allStats.total} total</span>
+                        <span className="flex items-center gap-1.5"><FaMale size={12} className="text-blue-400" /> {allStats.male} male</span>
+                        <span className="flex items-center gap-1.5"><FaFemale size={12} className="text-pink-400" /> {allStats.female} female</span>
+                    </div>
+                </div>
+            </div>
 
+            {/* ── Mobile: simple tab pills ────────────────────── */}
+            <div className="flex lg:hidden gap-2 mb-4 overflow-x-auto pb-1">
+                {TAB_CONFIG.map(tab => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.key;
+                    return (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
+                                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700'
+                                }`}
+                        >
+                            <Icon size={11} />
+                            {tab.label}
+                            {isActive && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20">{allStats.total}</span>}
+                        </button>
+                    );
+                })}
+            </div>
 
+            {/* ── Toolbar & Table Card (Combined Full Size) ── */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col mb-4">
 
-
-            {/* Toolbar */}
-            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-700 mb-6 shadow-sm">
-                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center">
-                    <div className="relative w-full sm:w-72">
-                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                {/* Toolbar Header section */}
+                <div className="flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+                    {/* Search */}
+                    <div className="relative flex-1 min-w-48 max-w-sm">
+                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
                         <input
                             type="text"
                             placeholder="Search by name or phone..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                         />
-                        {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>}
+                        {searchTerm && (
+                            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <FaTimesCircle size={14} />
+                            </button>
+                        )}
                     </div>
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+
+                    {/* Right controls */}
+                    <div className="flex items-center gap-2 shrink-0 ml-auto flex-wrap">
                         {activeTab === 'all' && hasFeature('memberImport') && (
                             <button
                                 onClick={() => setIsImportModalOpen(true)}
                                 className="flex items-center gap-2 px-3 py-2 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-lg text-sm font-bold border border-green-100 dark:border-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/40 transition-all"
                             >
-                                <FaFileImport size={14} />
-                                <span className="hidden sm:inline">Import CSV</span>
+                                <FaFileImport size={13} /><span className="hidden sm:inline">Import</span>
                             </button>
                         )}
                         <button
-                            onClick={fetchMembers}
-                            disabled={loading}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent hover:border-blue-100 dark:hover:border-blue-900/30"
+                            onClick={fetchMembers} disabled={loading}
+                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
                             title="Refresh"
                         >
-                            <FaSync className={loading ? 'animate-spin' : ''} />
+                            <FaSync size={13} className={loading ? 'animate-spin' : ''} />
                         </button>
-                        <div className="inline-flex bg-gray-100 dark:bg-slate-700 rounded-lg p-1">
-                            {['all', 'Male', 'Female'].map(tab => (
+                        {/* Gender filter */}
+                        <div className="inline-flex bg-gray-100 dark:bg-slate-700/50 rounded-lg p-1 border border-gray-100 dark:border-slate-700">
+                            {['all', 'Male', 'Female'].map(f => (
                                 <button
-                                    key={tab}
-                                    onClick={() => setGenderFilter(tab)}
-                                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all ${genderFilter === tab ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'}`}
+                                    key={f}
+                                    onClick={() => setGenderFilter(f)}
+                                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${genderFilter === f
+                                        ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                                        : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
+                                        }`}
                                 >
-                                    {tab === 'all' ? 'All' : tab}
+                                    {f === 'all' ? 'All' : f}
                                 </button>
                             ))}
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Data Table */}
-            <DataTable
-                data={members}
-                columns={columns}
-                loading={loading}
-                emptyMessage={`No ${currentTab.label.toLowerCase()} members found`}
-                emptyDescription={searchTerm ? 'Try a different search' : 'No members in this category'}
-                sortConfig={sortConfig}
-                onSort={handleSort}
-                renderActions={renderActions}
-                renderMobileCard={renderMobileCard}
-                hoverColor={activeTab === 'expired' ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : 'hover:bg-blue-50 dark:hover:bg-blue-900/10'}
-                gender={genderFilter}
-                serverSide={true}
-                count={totalRecords}
-                page={page}
-                onPageChange={setPage}
-                onRowsPerPageChange={setLimit}
-                rowsPerPage={limit}
-            />
+                {/* Table or Empty State (integrated into the card) */}
+                {!loading && members.length === 0 ? (
+                    <div className="w-full">
+                        {searchTerm ? <EmptySearchState /> : <EmptyTabState />}
+                    </div>
+                ) : (
+                    <DataTable
+                        data={members}
+                        columns={columns}
+                        loading={loading}
+                        emptyMessage={`No ${currentTab.label.toLowerCase()} found`}
+                        emptyDescription={searchTerm ? 'Try a different search' : 'No members in this category'}
+                        sortConfig={sortConfig}
+                        onSort={handleSort}
+                        renderActions={renderActions}
+                        renderMobileCard={renderMobileCard}
+                        hoverColor={activeTab === 'inactive' ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : 'hover:bg-blue-50 dark:hover:bg-blue-900/10'}
+                        gender={genderFilter}
+                        serverSide={true}
+                        count={totalRecords}
+                        page={page}
+                        onPageChange={setPage}
+                        onRowsPerPageChange={setLimit}
+                        rowsPerPage={limit}
+                        className="rounded-none border-none shadow-none" // removes inner bounding box so it sits flush
+                    />
+                )}
+            </div>
 
             {/* Expiring Soon FAB */}
             <div className="fixed bottom-20 right-4 z-10 md:bottom-6 md:right-6">
@@ -498,11 +649,9 @@ const MembersPage = () => {
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
-                                    <input
-                                        type="date"
+                                    <DatePicker
                                         value={renewForm.date}
                                         onChange={(e) => setRenewForm({ ...renewForm, date: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                     />
                                 </div>
                                 <div>

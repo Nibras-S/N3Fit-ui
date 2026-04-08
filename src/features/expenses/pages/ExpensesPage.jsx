@@ -39,8 +39,8 @@ const Expenses = () => {
         setLoading(true);
         try {
             const [expensesRes, summaryRes] = await Promise.all([
-                api.get(`${backendUrl}/api/expenses`),
-                api.get(`${backendUrl}/api/expenses/summary`)
+                api.get(`/expenses`),
+                api.get(`/expenses/summary`)
             ]);
             setExpenses(expensesRes.data);
             setSummary(summaryRes.data);
@@ -57,7 +57,7 @@ const Expenses = () => {
 
     const handleDelete = async () => {
         try {
-            await api.delete(`${backendUrl}/api/expenses/${deleteModal.id}`);
+            await api.delete(`/expenses/${deleteModal.id}`);
             toast.success('Expense deleted');
             fetchData();
             setDeleteModal({ isOpen: false, id: null });

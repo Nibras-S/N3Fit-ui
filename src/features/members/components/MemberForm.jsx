@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
+import { DatePicker } from '../../../shared/components/ui/DatePicker';
 
 function NewMember() {
   const [step, setStep] = useState(1);
@@ -48,7 +49,7 @@ function NewMember() {
   };
 
   useEffect(() => {
-    api.get(`${backendUrl}/api/settings`)
+    api.get(`/settings`)
       .then(res => {
         // Handle both new { success, data: {...} } and old direct object shapes
         const data = res.data?.data ?? res.data;
@@ -258,7 +259,7 @@ function NewMember() {
     }
 
     try {
-      await api.post(`${backendUrl}/api/contacts/`, formData, {
+      await api.post(`/contacts/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       toast.success('Member enrolled successfully!');
@@ -386,11 +387,10 @@ function NewMember() {
                     </div>
                     <div>
                       <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">DOB</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={dob}
                         onChange={(e) => setDob(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm font-medium"
+                        className="!bg-gray-50 dark:!bg-slate-900/50 !border-gray-100 dark:!border-slate-700 !rounded-xl !py-2.5 !px-10 font-medium"
                       />
                     </div>
                   </div>
@@ -480,11 +480,10 @@ function NewMember() {
 
                     <div>
                       <label className="text-[9px] font-black text-gray-400 uppercase mb-1 block">Start Date</label>
-                      <input
-                        type="date"
+                      <DatePicker
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl text-sm font-medium outline-none"
+                        className="!bg-gray-50 dark:!bg-slate-900/50 !border-gray-100 dark:!border-slate-700 !rounded-xl !py-2.5 !px-10 font-medium"
                       />
                     </div>
                   </div>

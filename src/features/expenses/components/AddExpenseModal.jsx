@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaStickyNote, FaFileInvoice, FaPaperclip } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
+import { DatePicker } from '../../../shared/components/ui/DatePicker';
 
 const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
     const [formData, setFormData] = useState({
@@ -70,12 +71,12 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
 
         try {
             if (expense) {
-                await api.put(`${backendUrl}/api/expenses/${expense._id}`, data, {
+                await api.put(`/expenses/${expense._id}`, data, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 toast.success('Expense updated');
             } else {
-                await api.post(`${backendUrl}/api/expenses`, data, {
+                await api.post(`/expenses`, data, {
                     headers: { 'Content-Type': 'multipart/form-data' }
                 });
                 toast.success('Expense added');
@@ -149,11 +150,10 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
                                 <FaCalendarAlt className="text-purple-500 text-xs" /> Date
                             </label>
-                            <input
-                                type="date"
+                            <DatePicker
                                 value={formData.date}
                                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                className="!bg-gray-50 dark:!bg-slate-900 border-gray-200 dark:border-slate-700"
                                 required
                             />
                         </div>

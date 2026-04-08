@@ -57,18 +57,10 @@ export function AppLayout({
   } = useNotifications();
 
   const isActive = (path) => {
-    // Support query param matching: '/members?tab=active' matches when location is '/members' with tab=active
-    if (path.includes('?')) {
-      const [pathPart, queryPart] = path.split('?');
-      if (location.pathname !== pathPart) return false;
-      const params = new URLSearchParams(queryPart);
-      const searchParams = new URLSearchParams(location.search);
-      for (const [key, value] of params) {
-        if (searchParams.get(key) !== value) return false;
-      }
-      return true;
-    }
-    return location.pathname === path;
+    const [pathPart] = path.split('?');
+    // For /members — highlight on any /members sub-path regardless of tab param
+    if (pathPart === '/members') return location.pathname === '/members' || location.pathname.startsWith('/members');
+    return location.pathname === pathPart;
   };
 
   const [showWarningModal, setShowWarningModal] = useState(false);
@@ -138,13 +130,8 @@ export function AppLayout({
     {
       label: "Members",
       icon: FaUsers,
+      path: "/members?tab=active",
       roles: ["gymadmin", "staff"],
-      defaultPath: "/members?tab=active",
-      subItems: [
-        { path: "/members?tab=active", label: "Active", icon: FaUserCheck },
-        { path: "/members?tab=inactive", label: "Expired", icon: FaUserTimes },
-        { path: "/members?tab=all", label: "All Members", icon: FaUsers },
-      ]
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin"] },
@@ -257,14 +244,14 @@ export function AppLayout({
                         toggleExpand(label);
                         if (item.defaultPath) safeNavigate(item.defaultPath);
                       }}
-                      className={`w-full text-left px-3 py-2 rounded-lg flex items-center justify-between transition-all text-sm ${isItemActive
-                        ? "text-blue-600 dark:text-blue-400 font-bold"
-                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white"
+                      className={`w-full text-left px-3 py-3 flex items-center justify-between transition-colors text-sm font-medium rounded-md ${isItemActive
+                        ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
+                        : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
                         }`}
                     >
                       <div className="flex items-center gap-3">
-                        <Icon className="text-base shrink-0" />
-                        <span className="font-medium">{label}</span>
+                        <Icon className={`text-xl shrink-0 ${isItemActive ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
+                        <span>{label}</span>
                       </div>
                       <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                     </button>
@@ -282,9 +269,9 @@ export function AppLayout({
                               <button
                                 key={sub.path}
                                 onClick={() => safeNavigate(sub.path)}
-                                className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 transition-colors text-xs ${isActive(sub.path)
-                                  ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
-                                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                                className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(sub.path)
+                                  ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
+                                  : "text-gray-600 dark:text-gray-400 active:bg-gray-50 dark:active:bg-slate-800/50"
                                   }`}
                               >
                                 {sub.label}
@@ -302,15 +289,15 @@ export function AppLayout({
                 <button
                   key={path}
                   onClick={() => safeNavigate(path)}
-                  className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 transition-colors text-sm ${isActive(path)
-                    ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
-                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50 hover:text-gray-900 dark:hover:text-white"
+                  className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(path)
+                    ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
+                    : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
                     }`}
                 >
-                  <Icon className="text-base shrink-0" />
-                  <span className="font-medium flex-1">{label}</span>
+                  <Icon className={`text-xl shrink-0 ${isActive(path) ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
+                  <span className="flex-1">{label}</span>
                   {badge && (
-                    <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full ml-auto">
+                    <span className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full ml-auto">
                       {badge}
                     </span>
                   )}
@@ -319,8 +306,6 @@ export function AppLayout({
             })}
           </nav>
 
-          {/* Install PWA Banner */}
-          <InstallPWA />
 
           {/* Profile Section with Modal */}
           <div className="pt-4 border-t border-gray-100 dark:border-slate-700 mt-auto relative">
@@ -637,6 +622,9 @@ export function AppLayout({
           )}
         </AnimatePresence>
       </main>
+
+      {/* PWA Install Floating Modal — bottom-right, global */}
+      <InstallPWA />
 
       {/* Mobile Bottom Navigation */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 safe-area-pb">

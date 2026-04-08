@@ -20,7 +20,7 @@ const TransactionsPage = () => {
         const fetchTransactions = async () => {
             setLoading(true);
             try {
-                const response = await api.get(`${backendUrl}/api/transactions`);
+                const response = await api.get(`/transactions`);
                 setTransactions(Array.isArray(response.data) ? response.data : []);
             } catch (error) {
                 toast.error('Failed to load transactions');

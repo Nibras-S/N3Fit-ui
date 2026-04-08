@@ -23,7 +23,7 @@ const SuperAdminSettings = () => {
     const fetchDeletedGyms = useCallback(async () => {
         setLoading(true);
         try {
-            const res = await api.get("/api/superadmin/gyms/deleted");
+            const res = await api.get('/superadmin/gyms/deleted');
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.gyms) ? res.data.gyms
                     : Array.isArray(res.data) ? res.data : [];
@@ -42,7 +42,7 @@ const SuperAdminSettings = () => {
     const handleRestore = async () => {
         if (!gymToRestore) return;
         try {
-            await api.put(`/api/superadmin/gyms/${gymToRestore._id}/restore`);
+            await api.put(`/superadmin/gyms/${gymToRestore._id}/restore`);
             toast.success(`${gymToRestore.name} restored successfully`);
             fetchDeletedGyms();
         } catch (err) {

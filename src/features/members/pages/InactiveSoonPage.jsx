@@ -56,7 +56,7 @@ const InactiveSoon = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`${backendUrl}/api/reminders/with-status`);
+      const res = await api.get(`/reminders/with-status`);
       const filtered = res.data
         .filter((user) => user.dews <= 4 && user.dews >= 0)
         .sort((a, b) => a.dews - b.dews);
@@ -104,7 +104,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
 
     try {
       // Log the reminder
-      await api.post(`${backendUrl}/api/reminders/send/${_id}`);
+      await api.post(`/reminders/send/${_id}`);
 
       // Open WhatsApp with pre-filled message
       const digits = phone.replace(/[^\d]/g, '');

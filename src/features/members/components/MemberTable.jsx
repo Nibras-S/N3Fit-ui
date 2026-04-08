@@ -57,7 +57,7 @@ const AllMembers = () => {
                 includeExpired: true
             };
 
-            const response = await api.get(`${backendUrl}/api/contacts/`, { params });
+            const response = await api.get(`/contacts/`, { params });
 
             // Response is auto-unwrapped to: { data: [], pagination: {} }
             const data = response.data?.data || [];
@@ -94,7 +94,7 @@ const AllMembers = () => {
     const handleDeleteClick = async () => {
         const { id, name } = deleteModal;
         try {
-            await api.delete(`${backendUrl}/api/contacts/${id}`);
+            await api.delete(`/contacts/${id}`);
             setMembers(prev => prev.filter(u => u._id !== id));
             toast.success('Member deleted');
         } catch { toast.error('Failed to delete'); }

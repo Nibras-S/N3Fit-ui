@@ -189,7 +189,7 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                 return obj;
             }).filter(c => c.name && c.phone);
 
-            const response = await api.post(`${backendUrl}/api/contacts/import`, {
+            const response = await api.post(`/contacts/import`, {
                 contacts,
                 dateFormat
             });

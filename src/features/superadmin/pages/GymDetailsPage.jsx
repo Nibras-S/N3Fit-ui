@@ -4,6 +4,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
+import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import {
     FaArrowLeft, FaSave, FaBuilding, FaEnvelope, FaPhone,
     FaMapMarkerAlt, FaCalendarAlt, FaCrown, FaCheckCircle,
@@ -57,8 +58,8 @@ const GymDetails = () => {
         setLoading(true);
         try {
             const [gymRes, plansRes] = await Promise.all([
-                api.get(`/api/superadmin/gyms/${id}`),
-                api.get("/api/superadmin/plans")
+                api.get(`/superadmin/gyms/${id}`),
+                api.get('/superadmin/plans')
             ]);
 
             setGym(gymRes.data);
@@ -95,7 +96,7 @@ const GymDetails = () => {
         e.preventDefault();
         setUpdating(true);
         try {
-            await api.put(`/api/superadmin/gyms/${id}`, form);
+            await api.put(`/superadmin/gyms/${id}`, form);
             toast.success("Fit Club updated successfully!");
             setIsEditing(false); // Back to view mode
             fetchData();
@@ -110,7 +111,7 @@ const GymDetails = () => {
         const updatedFeatures = { ...gymFeatures, [key]: !gymFeatures[key] };
         setUpdatingFeatures(true);
         try {
-            await api.put(`/api/superadmin/gyms/${id}/features`, updatedFeatures);
+            await api.put(`/superadmin/gyms/${id}/features`, updatedFeatures);
             setGymFeatures(updatedFeatures);
             toast.success("Feature permissions updated");
         } catch (err) {
@@ -122,7 +123,7 @@ const GymDetails = () => {
 
     const handleDelete = async () => {
         try {
-            await api.delete(`/api/superadmin/gyms/${id}`);
+            await api.delete(`/superadmin/gyms/${id}`);
             toast.success("Fit Club moved to Recycling Bin");
             navigate("/superadmin");
         } catch (err) {
@@ -333,13 +334,11 @@ const GymDetails = () => {
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Expiry Date</label>
                                     <div className="relative">
-                                        <FaCalendarAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
                                         {isEditing ? (
-                                            <input
-                                                type="date"
-                                                value={form.subscriptionExpiry}
+                                            <DatePicker
+                                                value={form.subscriptionExpiry || ''}
                                                 onChange={(e) => setForm({ ...form, subscriptionExpiry: e.target.value })}
-                                                className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                                className="!bg-gray-50 dark:!bg-slate-900 !rounded-2xl !py-3 !pl-10 !pr-5 !border-gray-200 dark:!border-slate-700"
                                             />
                                         ) : (
                                             <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">

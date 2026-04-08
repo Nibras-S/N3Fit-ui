@@ -34,7 +34,7 @@ const StaffManagement = () => {
 
     const fetchStaff = useCallback(async () => {
         try {
-            const res = await api.get("/api/gym/staff");
+            const res = await api.get("/gym/staff");
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.staff) ? res.data.staff
                     : Array.isArray(res.data) ? res.data : [];
@@ -83,13 +83,13 @@ const StaffManagement = () => {
         setSubmitting(true);
         try {
             if (editingStaff) {
-                await api.put(`/api/gym/staff/${editingStaff._id}`, {
+                await api.put(`/gym/staff/${editingStaff._id}`, {
                     name: formData.name,
                     permissions: formData.permissions,
                 });
                 toast.success("Staff updated!");
             } else {
-                await api.post("/api/auth/register", {
+                await api.post("/auth/register", {
                     name: formData.name,
                     email: formData.email,
                     password: formData.password,
@@ -110,7 +110,7 @@ const StaffManagement = () => {
     // Toggle active
     const toggleActive = async (member) => {
         try {
-            await api.put(`/api/gym/staff/${member._id}`, { isActive: !member.isActive });
+            await api.put(`/gym/staff/${member._id}`, { isActive: !member.isActive });
             toast.success(member.isActive ? "Staff deactivated" : "Staff activated");
             fetchStaff();
         } catch (err) {
@@ -128,7 +128,7 @@ const StaffManagement = () => {
         if (!confirmDeleteId) return;
         try {
             setDeletingId(confirmDeleteId);
-            await api.delete(`/api/gym/staff/${confirmDeleteId}`);
+            await api.delete(`/gym/staff/${confirmDeleteId}`);
             toast.success("Staff removed");
             fetchStaff();
         } catch (err) {

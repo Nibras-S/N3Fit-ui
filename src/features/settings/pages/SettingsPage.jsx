@@ -6,9 +6,8 @@ import {
     FaSave, FaCog, FaMoneyBillWave, FaSun, FaMoon,
     FaBuilding, FaCamera, FaEnvelope, FaPhone, FaMapMarkerAlt,
     FaBarcode, FaCrown, FaCalendarAlt, FaUser, FaEye, FaEyeSlash,
-    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaBell, FaDownload, FaUsers, FaCheckCircle, FaTimes
+    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaUsers, FaCheckCircle, FaTimes
 } from 'react-icons/fa';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import { useTheme } from '../../../shared/context/ThemeContext';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -35,7 +34,7 @@ const Settings = () => {
     const [saving, setSaving] = useState(false);
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const { theme, toggleTheme } = useTheme();
-    const { api, user, login, logout, refreshUser } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
     const fileInputRef = React.useRef(null);
 
     const [isEditingPricing, setIsEditingPricing] = useState(false);
@@ -70,14 +69,15 @@ const Settings = () => {
         if (user) {
             setProfileForm({ name: user.name || "", email: user.email || "" });
         }
-    }, [backendUrl, user]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
 
     const fetchAllData = async () => {
         try {
             setLoading(true);
             const [settingsRes, gymRes] = await Promise.all([
-                api.get("/api/settings"),
-                api.get("/api/gym/profile")
+                api.get("/settings"),
+                api.get("/gym/profile")
             ]);
 
             // Handle both new { success, data: {...} } and old direct object shapes
@@ -108,20 +108,12 @@ const Settings = () => {
         }
     };
 
-    const handlePriceChange = (duration, price) => {
-        setSettings(prev => ({
-            ...prev,
-            subscriptionPrices: {
-                ...prev.subscriptionPrices,
-                [duration]: parseInt(price) || 0
-            }
-        }));
-    };
+
 
     const saveSettings = async () => {
         try {
             setSaving(true);
-            await api.put("/api/settings", settings);
+            await api.put("/settings", settings);
             toast.success("Pricing updated successfully!");
             setIsEditingPricing(false);
         } catch (error) {
@@ -136,7 +128,7 @@ const Settings = () => {
         if (e) e.preventDefault();
         setSaving(true);
         try {
-            const res = await api.put("/api/gym/profile", gymForm);
+            const res = await api.put("/gym/profile", gymForm);
             // Handle both new { success, data: {...} } and old direct object shapes
             const gymData = res.data?.data ?? res.data;
             if (gymData && gymData._id) setGym(gymData);
@@ -160,7 +152,7 @@ const Settings = () => {
         try {
             const formData = new FormData();
             formData.append("logo", file);
-            const res = await api.post("/api/gym/logo", formData, {
+            const res = await api.post("/gym/logo", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             setGym(prev => ({ ...prev, logo: res.data.logo }));
@@ -176,7 +168,7 @@ const Settings = () => {
         if (e) e.preventDefault();
         setSaving(true);
         try {
-            await api.put("/api/auth/profile", {
+            await api.put("/auth/profile", {
                 name: profileForm.name,
                 email: profileForm.email,
             });
@@ -202,7 +194,7 @@ const Settings = () => {
 
         setSaving(true);
         try {
-            await api.put("/api/auth/profile", {
+            await api.put("/auth/profile", {
                 password: passwordData.newPassword
             });
             toast.success("Password updated successfully!");
@@ -576,7 +568,7 @@ const Settings = () => {
                                                 const formData = new FormData();
                                                 formData.append("profileImage", file);
                                                 try {
-                                                    await api.post("/api/auth/profile/photo", formData, {
+                                                    await api.post("/auth/profile/photo", formData, {
                                                         headers: { "Content-Type": "multipart/form-data" }
                                                     });
                                                     await refreshUser();

@@ -17,7 +17,7 @@ export const NotificationProvider = ({ children }) => {
         if (!user || user.role === 'superadmin') return;
         setLoading(true);
         try {
-            const res = await api.get('/api/notifications/my');
+            const res = await api.get('/notifications/my');
             // Handle both new { success, data: [] } and old { success, notifications: [] } shapes
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.notifications) ? res.data.notifications
@@ -35,7 +35,7 @@ export const NotificationProvider = ({ children }) => {
     const checkWarning = async () => {
         if (!user || user.role === 'superadmin') return;
         try {
-            const res = await api.get('/api/notifications/active-warning');
+            const res = await api.get('/notifications/active-warning');
             // Handle both new { success, data: {...} } and old direct object shapes
             const warning = res.data?.data ?? res.data?.warning ?? (res.data?.success === undefined ? res.data : null);
             if (warning && warning._id) {
@@ -48,7 +48,7 @@ export const NotificationProvider = ({ children }) => {
 
     const markAsRead = async (id) => {
         try {
-            await api.patch(`/api/notifications/${id}/read`);
+            await api.patch(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
 
             // Clear active warning if this was it
@@ -64,7 +64,7 @@ export const NotificationProvider = ({ children }) => {
         try {
             const unread = notifications.filter(n => !n.isRead);
             if (unread.length === 0) return;
-            await Promise.all(unread.map(n => api.patch(`/api/notifications/${n._id}/read`)));
+            await Promise.all(unread.map(n => api.patch(`/notifications/${n._id}/read`)));
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             setActiveWarning(null);
         } catch (err) {

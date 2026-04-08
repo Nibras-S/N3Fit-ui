@@ -34,8 +34,8 @@ const Dashboard = () => {
     const fetchStats = async () => {
         try {
             const [res, expenseRes] = await Promise.all([
-                api.get(`${backendUrl}/api/transactions/stats`),
-                api.get(`${backendUrl}/api/expenses/summary`)
+                api.get(`/transactions/stats`),
+                api.get(`/expenses/summary`)
             ]);
             setStats({ ...res.data, expenses: expenseRes.data });
         } catch (error) {
@@ -52,7 +52,7 @@ const Dashboard = () => {
     // Handle collect payment
     const handleCollectPayment = async (txnId) => {
         try {
-            await api.put(`${backendUrl}/api/transactions/${txnId}/collect`, {
+            await api.put(`/transactions/${txnId}/collect`, {
                 paymentMethod: collectMethod
             });
             setCollectingId(null);

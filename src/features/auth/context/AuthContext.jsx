@@ -5,7 +5,6 @@ const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [token, setToken] = useState(localStorage.getItem('n3gym_token'));
     const [loading, setLoading] = useState(true);
     const [gymFeatures, setGymFeatures] = useState({
         profilePhoto: true,
@@ -16,64 +15,78 @@ export const AuthProvider = ({ children }) => {
         memberImport: false,
     });
 
-    // Load user on mount
+    // Load user on mount — cookie is sent automatically by the browser
     useEffect(() => {
         const loadUser = async () => {
-            if (!token) {
-                setLoading(false);
-                return;
-            }
             try {
-                const res = await api.get('/api/auth/me');
-                // After auto-unwrap interceptor, res.data IS the user object directly
+                // Fix 3: paths are now relative to baseURL (/api/v1)
+                // /auth/me → http://localhost:5000/api/v1/auth/me
+                const res = await api.get('/auth/me');
                 const userData = res.data;
                 if (userData?.role || userData?.email) {
                     setUser(userData);
-                    // Fetch gym features
-                    try {
-                        const gymRes = await api.get('/api/gym/profile');
-                        const gymData = gymRes.data;
-                        if (gymData?.features) {
-                            setGymFeatures(prev => ({ ...prev, ...gymData.features }));
+                    // Load gym features from the me endpoint (already embedded in response)
+                    if (userData?.gym?.features) {
+                        setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
+                    } else {
+                        // Fallback: fetch gym profile separately
+                        try {
+                            const gymRes = await api.get('/gym/profile');
+                            if (gymRes.data?.features) {
+                                setGymFeatures(prev => ({ ...prev, ...gymRes.data.features }));
+                            }
+                        } catch (_) {
+                            // non-critical, use defaults
                         }
-                    } catch (err) {
-                        console.error('Failed to load gym features:', err);
                     }
                 }
             } catch (err) {
-                console.error('Auth check failed:', err);
-                localStorage.removeItem('n3gym_token');
-                setToken(null);
+                // 401 means not logged in — clear user state silently
                 setUser(null);
             } finally {
                 setLoading(false);
             }
         };
         loadUser();
-    }, [token]);
+    }, []);
 
+    /**
+     * Login — sends credentials, server sets httpOnly cookie.
+     * No token is stored in localStorage or memory.
+     */
     const login = async (email, password, gymCode) => {
         const payload = { email, password };
         if (gymCode) payload.gymCode = gymCode;
-        const res = await api.post('/api/auth/login', payload);
-        // After auto-unwrap interceptor, res.data IS { token, user } directly
+
+        // Fix 3 + path strip: /auth/login not /api/auth/login
+        const res = await api.post('/auth/login', payload);
         const resData = res.data;
-        if (resData?.token && resData?.user) {
-            localStorage.setItem('n3gym_token', resData.token);
-            setToken(resData.token);
-            setUser(resData.user);
-            return resData.user;
+
+        // Server now returns { user: {...} } — no token in body (it's in the cookie)
+        const userData = resData?.user || resData;
+        if (userData?.role || userData?.email) {
+            setUser(userData);
+            // Load gym features
+            if (userData?.gym?.features) {
+                setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
+            }
+            return userData;
         }
-        throw new Error('Login failed');
+        throw new Error('Login failed. Please try again.');
     };
 
+    /**
+     * Refresh current user profile from server.
+     */
     const refreshUser = useCallback(async () => {
         try {
-            const res = await api.get('/api/auth/me');
-            // After auto-unwrap, res.data IS the user object
+            const res = await api.get('/auth/me');
             const userData = res.data;
             if (userData?.role || userData?.email) {
                 setUser(userData);
+                if (userData?.gym?.features) {
+                    setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
+                }
                 return userData;
             }
         } catch (err) {
@@ -81,24 +94,28 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const logout = useCallback(() => {
-        localStorage.removeItem('n3gym_token');
-        setToken(null);
+    /**
+     * Logout — calls server to clear the httpOnly cookie.
+     * This is the only reliable way to invalidate a cookie-based session.
+     */
+    const logout = useCallback(async () => {
+        try {
+            await api.post('/auth/logout');
+        } catch (_) {
+            // ignore — we clear local state regardless
+        }
         setUser(null);
     }, []);
 
     /**
-     * Check if a feature is enabled for the current gym.
-     * Superadmins always have all features enabled.
+     * Check if a feature toggle is enabled for the current gym.
      */
     const hasFeature = useCallback((featureName) => {
-        // Respect the toggle even for superadmins so they can test/manage correctly
         return gymFeatures[featureName] !== false;
     }, [gymFeatures]);
 
     const value = {
         user,
-        token,
         loading,
         login,
         refreshUser,
@@ -107,9 +124,9 @@ export const AuthProvider = ({ children }) => {
         isSuperAdmin: user?.role === 'superadmin',
         isGymAdmin: user?.role === 'gymadmin',
         isStaff: user?.role === 'staff',
-        api, // Pre-configured axios instance
         gymFeatures,
         hasFeature,
+        api, // Pre-configured axios instance
     };
 
     return (

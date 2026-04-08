@@ -16,7 +16,7 @@ const Invoice = () => {
     useEffect(() => {
         const fetchInvoice = async () => {
             try {
-                const res = await api.get(`/api/transactions/${id}`);
+                const res = await api.get(`/transactions/${id}`);
                 // Handle both new { success, data: {...} } and old direct object shapes
                 const txData = res.data?.data ?? res.data;
                 setTransaction(txData);

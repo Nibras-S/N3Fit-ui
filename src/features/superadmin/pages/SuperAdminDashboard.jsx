@@ -35,9 +35,9 @@ const SuperAdminDashboard = () => {
     const fetchAll = useCallback(async () => {
         try {
             const [analyticsRes, gymsRes, plansRes] = await Promise.all([
-                api.get("/api/superadmin/analytics"),
-                api.get("/api/superadmin/gyms"),
-                api.get("/api/superadmin/plans"),
+                api.get('/superadmin/analytics'),
+                api.get('/superadmin/gyms'),
+                api.get('/superadmin/plans'),
             ]);
             setAnalytics(analyticsRes.data);
             setGyms(gymsRes.data);
@@ -61,7 +61,7 @@ const SuperAdminDashboard = () => {
     // Toggle gym active
     const toggleGym = async (gym) => {
         try {
-            await api.put(`/api/superadmin/gyms/${gym._id}`, { isActive: !gym.isActive });
+            await api.put(`/superadmin/gyms/${gym._id}`, { isActive: !gym.isActive });
             toast.success(gym.isActive ? `${gym.name} deactivated` : `${gym.name} activated`);
             fetchAll();
         } catch (err) {
@@ -74,7 +74,7 @@ const SuperAdminDashboard = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await api.post("/api/superadmin/gyms", form);
+            await api.post('/superadmin/gyms', form);
             toast.success("Gym created successfully!");
             setModalOpen(false);
             setForm({ name: "", contactEmail: "", contactPhone: "", address: "", adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: "" });
@@ -91,7 +91,7 @@ const SuperAdminDashboard = () => {
     const handleDelete = async () => {
         if (!gymToDelete) return;
         try {
-            await api.delete(`/api/superadmin/gyms/${gymToDelete._id}`);
+            await api.delete(`/superadmin/gyms/${gymToDelete._id}`);
             toast.success(`${gymToDelete.name} deleted successfully`);
             fetchAll();
         } catch (err) {

@@ -43,7 +43,7 @@ const Announcement = () => {
     const fetchGyms = async () => {
         setFetchingGyms(true);
         try {
-            const res = await api.get('/api/superadmin/gyms');
+            const res = await api.get('/superadmin/gyms');
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.gyms) ? res.data.gyms
                     : Array.isArray(res.data) ? res.data : [];
@@ -57,7 +57,7 @@ const Announcement = () => {
 
     const fetchContacts = async () => {
         try {
-            const res = await api.get('/api/contacts/');
+            const res = await api.get('/contacts/');
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.contacts) ? res.data.contacts
                     : Array.isArray(res.data) ? res.data : [];
@@ -158,7 +158,7 @@ const Announcement = () => {
                 // Debug log before sending
                 console.log("Sending payload to backend with image:", !!form.image);
 
-                const res = await api.post('/api/whatsapp/announcement', {
+                const res = await api.post('/whatsapp/announcement', {
                     ...form,
                     selectedMembers: form.audience === 'selected' ? selectedMembers : []
                 });
@@ -173,7 +173,7 @@ const Announcement = () => {
                     setLoading(false);
                     return;
                 }
-                const res = await api.post('/api/notifications', {
+                const res = await api.post('/notifications', {
                     message: form.caption,
                     type: form.type,
                     targetGyms: form.audience === 'all' ? ['all'] : selectedGyms

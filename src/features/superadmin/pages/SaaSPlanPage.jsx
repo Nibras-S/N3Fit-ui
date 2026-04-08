@@ -23,7 +23,7 @@ const SaaSPlanManagement = () => {
 
     const fetchPlans = useCallback(async () => {
         try {
-            const res = await api.get("/api/superadmin/plans");
+            const res = await api.get('/superadmin/plans');
             const data = Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.plans) ? res.data.plans
                     : Array.isArray(res.data) ? res.data : [];
@@ -68,10 +68,10 @@ const SaaSPlanManagement = () => {
                 features: form.features ? form.features.split(",").map(f => f.trim()).filter(Boolean) : []
             };
             if (editing) {
-                await api.put(`/api/superadmin/plans/${editing._id}`, payload);
+                await api.put(`/superadmin/plans/${editing._id}`, payload);
                 toast.success("Plan updated!");
             } else {
-                await api.post("/api/superadmin/plans", payload);
+                await api.post('/superadmin/plans', payload);
                 toast.success("Plan created!");
             }
             setModalOpen(false);
