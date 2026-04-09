@@ -72,8 +72,8 @@ export default function AppRoutes() {
                 <Route path="/expenses" element={<ExpensesPage />} />
             </Route>
 
-            {/* ── Analytics (Admin/Superadmin) ────────────────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'superadmin']} />}>
+            {/* ── Analytics (Admin / Staff / Superadmin) ──────────── */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
                 <Route path="/reports" element={<ReportsPage />} />
             </Route>
 

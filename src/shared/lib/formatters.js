@@ -1,4 +1,15 @@
 /**
+ * Display formatters.
+ *
+ * The date helpers always render in IST regardless of the user's browser
+ * timezone — see ./timezone.js for the math. Phone formatting goes through
+ * ./phone.js so it always agrees with the backend's `91XXXXXXXXXX` storage.
+ */
+
+import { formatDateIST, formatDateTimeIST } from './timezone';
+import { formatPhoneForDisplay } from './phone';
+
+/**
  * Format a number as Indian Rupee currency.
  * @param {number} value
  * @returns {string} e.g. "₹1,23,456"
@@ -13,31 +24,26 @@ export function formatCurrency(value) {
 }
 
 /**
- * Format a date string to "DD MMM YYYY" (e.g. "17 Feb 2026").
- * @param {string|Date} dateInput
- * @returns {string}
+ * Format a date for display in IST.
+ * Replaces the old browser-local formatter so users outside India see the
+ * same day the backend computed.
  */
 export function formatDate(dateInput) {
-    if (!dateInput) return '—';
-    const d = new Date(dateInput);
-    if (isNaN(d.getTime())) return '—';
-    return d.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-    });
+    return formatDateIST(dateInput);
+}
+
+/** Date + time variant for receipts. */
+export function formatDateTime(dateInput) {
+    return formatDateTimeIST(dateInput);
 }
 
 /**
- * Format a 10-digit phone number for display.
- * @param {string} phone
- * @returns {string} e.g. "98765 43210"
+ * Format a phone number for display. Accepts the canonical
+ * `91XXXXXXXXXX` storage form and renders it as `+91 98765 43210`.
  */
 export function formatPhone(phone) {
-    if (!phone) return '—';
-    const cleaned = String(phone).replace(/\D/g, '');
-    if (cleaned.length === 10) {
-        return `${cleaned.slice(0, 5)} ${cleaned.slice(5)}`;
-    }
-    return phone;
+    return formatPhoneForDisplay(phone);
 }
+
+// Re-export the IST formatter directly for callers that want the explicit name.
+export { formatDateIST, formatDateTimeIST };

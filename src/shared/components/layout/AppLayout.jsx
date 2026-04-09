@@ -3,6 +3,7 @@ import n3Logo from '../../../assets/n3Logo.png';
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
+import { useFormState } from "../../context/FormStateContext";
 import { useAuth } from "../../../features/auth/context/AuthContext";
 import { useNotifications } from "../../../features/notifications/context/NotificationContext";
 import {
@@ -27,7 +28,9 @@ import {
   FaMoon,
   FaSun,
   FaDownload,
-  FaChartLine
+  FaChartLine,
+  FaAngleDoubleLeft,
+  FaAngleDoubleRight
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -46,7 +49,27 @@ export function AppLayout({
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+
+  // Sidebar collapsed state — persisted across sessions in localStorage.
+  // Click the logo (or the small chevron) to toggle. In collapsed mode the
+  // sidebar shrinks to icon-only at lg:w-16.
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('n3_sidebar_collapsed') === '1';
+    } catch (_) {
+      return false;
+    }
+  });
+  const toggleSidebar = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try { localStorage.setItem('n3_sidebar_collapsed', next ? '1' : '0'); } catch (_) { }
+      return next;
+    });
+  };
+
   const { theme, toggleTheme } = useTheme();
+  const { isDirty, setDirty } = useFormState();
   const { user, logout, hasFeature, api } = useAuth();
   const {
     notifications,
@@ -88,13 +111,13 @@ export function AppLayout({
    * Safe navigation that checks for unsaved registration data.
    */
   const safeNavigate = (path) => {
-    if (window.isRegistrationDirty) {
+    if (isDirty) {
       setConfirmState({
         isOpen: true,
         title: "Unsaved Changes",
         message: "You have unsaved information. Are you sure you want to leave?",
         onConfirm: () => {
-          window.isRegistrationDirty = false;
+          setDirty(false);
           navigate(path);
         },
         type: "danger"
@@ -105,13 +128,13 @@ export function AppLayout({
   };
 
   const handleLogout = () => {
-    if (window.isRegistrationDirty) {
+    if (isDirty) {
       setConfirmState({
         isOpen: true,
         title: "Confirm Logout",
         message: "You have unsaved changes. Are you sure you want to logout?",
         onConfirm: () => {
-          window.isRegistrationDirty = false;
+          setDirty(false);
           logout();
           navigate("/login");
         },
@@ -136,7 +159,7 @@ export function AppLayout({
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin"] },
-    { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "superadmin"] },
+    { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "staff", "superadmin"] },
     {
       path: "/notifications",
       label: "Notifications",
@@ -208,10 +231,22 @@ export function AppLayout({
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 font-sans flex flex-col lg:flex-row transition-colors duration-200">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 shrink-0 transition-colors duration-200">
-        <div className="p-5 flex flex-col h-full">
-          {/* Logo / Gym Name */}
-          <div className="flex items-center gap-3 mb-8 px-2">
+      <aside
+        className={`hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 shrink-0 transition-all duration-200 ${
+          sidebarCollapsed ? "lg:w-20" : "lg:w-60"
+        }`}
+      >
+        <div className={`flex flex-col h-full ${sidebarCollapsed ? "p-3" : "p-5"}`}>
+          {/* Logo / Gym Name — clickable to collapse / expand */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            className={`group relative flex items-center mb-8 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${
+              sidebarCollapsed ? "justify-center px-1 py-2" : "gap-3 px-2 py-2"
+            }`}
+          >
             {gymLogo ? (
               <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
@@ -221,18 +256,35 @@ export function AppLayout({
                 <img src={n3Logo} alt="Fit" className="w-full h-full object-contain" />
               </div>
             )}
-            <div className="min-w-0">
-              <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate">{gymName}</h1>
-              <p className="text-xs text-gray-500 dark:text-gray-400">{userRole}</p>
-            </div>
-          </div>
+            {!sidebarCollapsed && (
+              <div className="min-w-0 flex-1 text-left">
+                <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate">{gymName}</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{userRole}</p>
+              </div>
+            )}
+            {!sidebarCollapsed && (
+              <FaAngleDoubleLeft className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 text-sm shrink-0" />
+            )}
+          </button>
 
-          {/* Spacer to push content down if needed */}
-          <div className="mb-6 px-2"></div>
+          {/* Floating expand button when collapsed (like the reference image) */}
+          {sidebarCollapsed && (
+            <button
+              type="button"
+              onClick={toggleSidebar}
+              aria-label="Expand sidebar"
+              title="Expand sidebar"
+              className="absolute top-7 -right-3 z-10 w-6 h-6 rounded-full bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-md flex items-center justify-center text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              <FaAngleDoubleRight className="text-[10px]" />
+            </button>
+          )}
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-2">
-            <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-2">Menu</p>
+          <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+            {!sidebarCollapsed && (
+              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-2">Menu</p>
+            )}
             {navItems.map((item) => {
               const { path, label, icon: Icon, subItems, badge } = item;
               const isItemActive = path ? isActive(path) : subItems?.some(sub => isActive(sub.path));
@@ -246,43 +298,48 @@ export function AppLayout({
                         toggleExpand(label);
                         if (item.defaultPath) safeNavigate(item.defaultPath);
                       }}
-                      className={`w-full text-left px-3 py-3 flex items-center justify-between transition-colors text-sm font-medium rounded-md ${isItemActive
+                      title={sidebarCollapsed ? label : undefined}
+                      className={`w-full text-left ${sidebarCollapsed ? "px-2 py-3 justify-center" : "px-3 py-3 justify-between"} flex items-center transition-colors text-sm font-medium rounded-md ${isItemActive
                         ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
                         : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
                         }`}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className={`flex items-center ${sidebarCollapsed ? "" : "gap-3"}`}>
                         <Icon className={`text-xl shrink-0 ${isItemActive ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
-                        <span>{label}</span>
+                        {!sidebarCollapsed && <span>{label}</span>}
                       </div>
-                      <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
-                    </button>
-                    <AnimatePresence initial={false}>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="ml-4 pl-4 border-l-2 border-gray-100 dark:border-slate-700 space-y-1 mt-1">
-                            {subItems.map((sub) => (
-                              <button
-                                key={sub.path}
-                                onClick={() => safeNavigate(sub.path)}
-                                className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(sub.path)
-                                  ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
-                                  : "text-gray-600 dark:text-gray-400 active:bg-gray-50 dark:active:bg-slate-800/50"
-                                  }`}
-                              >
-                                {sub.label}
-                              </button>
-                            ))}
-                          </div>
-                        </motion.div>
+                      {!sidebarCollapsed && (
+                        <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                       )}
-                    </AnimatePresence>
+                    </button>
+                    {!sidebarCollapsed && (
+                      <AnimatePresence initial={false}>
+                        {isExpanded && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: "auto", opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="ml-4 pl-4 border-l-2 border-gray-100 dark:border-slate-700 space-y-1 mt-1">
+                              {subItems.map((sub) => (
+                                <button
+                                  key={sub.path}
+                                  onClick={() => safeNavigate(sub.path)}
+                                  className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(sub.path)
+                                    ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
+                                    : "text-gray-600 dark:text-gray-400 active:bg-gray-50 dark:active:bg-slate-800/50"
+                                    }`}
+                                >
+                                  {sub.label}
+                                </button>
+                              ))}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    )}
                   </div>
                 );
               }
@@ -291,15 +348,21 @@ export function AppLayout({
                 <button
                   key={path}
                   onClick={() => safeNavigate(path)}
-                  className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(path)
+                  title={sidebarCollapsed ? label : undefined}
+                  className={`relative w-full text-left ${sidebarCollapsed ? "px-2 py-3 justify-center" : "px-3 py-3 gap-3"} flex items-center transition-colors text-sm font-medium rounded-md ${isActive(path)
                     ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
                     : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
                     }`}
                 >
                   <Icon className={`text-xl shrink-0 ${isActive(path) ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
-                  <span className="flex-1">{label}</span>
-                  {badge && (
+                  {!sidebarCollapsed && <span className="flex-1">{label}</span>}
+                  {!sidebarCollapsed && badge && (
                     <span className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full ml-auto">
+                      {badge}
+                    </span>
+                  )}
+                  {sidebarCollapsed && badge && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
                       {badge}
                     </span>
                   )}
@@ -376,7 +439,8 @@ export function AppLayout({
 
             <button
               onClick={() => setProfileModalOpen(!profileModalOpen)}
-              className={`w-full flex items-center gap-3 px-2 py-2 rounded-xl transition-all duration-200 group ${profileModalOpen
+              title={sidebarCollapsed ? userName : undefined}
+              className={`w-full flex items-center ${sidebarCollapsed ? "justify-center" : "gap-3"} px-2 py-2 rounded-xl transition-all duration-200 group ${profileModalOpen
                 ? "bg-blue-50 dark:bg-blue-900/20"
                 : "hover:bg-gray-50 dark:hover:bg-slate-700/50"
                 }`}
@@ -388,23 +452,29 @@ export function AppLayout({
                   userInitial
                 )}
               </div>
-              <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
-                <p className="text-sm font-bold text-gray-900 dark:text-white truncate leading-tight mb-0.5">{userName}</p>
-                <div className="flex items-center gap-1.5 overflow-hidden">
-                  <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></div>
-                  <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-medium uppercase tracking-wider leading-none">{gymName}</p>
-                </div>
-                {gymCode && (
-                  <span className="text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">{gymCode}</span>
-                )}
-              </div>
-              <div className={`transition-transform duration-200 ${profileModalOpen ? 'rotate-180' : ''}`}>
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                </svg>
-              </div>
+              {!sidebarCollapsed && (
+                <>
+                  <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
+                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate leading-tight mb-0.5">{userName}</p>
+                    <div className="flex items-center gap-1.5 overflow-hidden">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></div>
+                      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-medium uppercase tracking-wider leading-none">{gymName}</p>
+                    </div>
+                    {gymCode && (
+                      <span className="text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">{gymCode}</span>
+                    )}
+                  </div>
+                  <div className={`transition-transform duration-200 ${profileModalOpen ? 'rotate-180' : ''}`}>
+                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                  </div>
+                </>
+              )}
             </button>
-            <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 mt-4 opacity-50">Powered by Fit</p>
+            {!sidebarCollapsed && (
+              <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 mt-4 opacity-50">Powered by Fit</p>
+            )}
           </div>
         </div>
       </aside>

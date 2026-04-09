@@ -73,60 +73,62 @@ export const NotificationProvider = ({ children }) => {
     };
 
     useEffect(() => {
+        // Always tear down any existing socket before deciding what to do.
+        // Prevents accumulating connections when `user` changes (e.g. login,
+        // role swap, profile refresh).
+        if (socket.current) {
+            socket.current.removeAllListeners();
+            socket.current.disconnect();
+            socket.current = null;
+        }
+
         // Only run for non-superadmin users
-        if (user && user.role !== 'superadmin') {
-            fetchNotifications();
-            checkWarning();
-
-            const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-            socket.current = io(backendUrl, {
-                withCredentials: true,
-                transports: ['websocket', 'polling']
-            });
-
-            socket.current.on('connect', () => {
-                if (user.gymId) {
-                    socket.current.emit('join_gym', user.gymId);
-                }
-            });
-
-            socket.current.on('new_notification', (notif) => {
-                setNotifications(prev => {
-                    if (prev.some(n => n._id === notif._id)) return prev;
-                    return [notif, ...prev];
-                });
-
-                if (notif.type === 'warning') {
-                    setActiveWarning(notif);
-                }
-
-                toast.success('New notification received!', {
-                    icon: '🔔',
-                    duration: 4000
-                });
-            });
-
-            socket.current.on('notification_read', ({ notificationId, userId }) => {
-                if (userId === user._id) {
-                    setNotifications(prev => prev.map(n =>
-                        n._id === notificationId ? { ...n, isRead: true } : n
-                    ));
-                }
-            });
-
-            return () => {
-                if (socket.current) socket.current.disconnect();
-            };
-        } else {
-            // Reset state for superadmin or logged out users
+        if (!user || user.role === 'superadmin') {
             setNotifications([]);
             setUnreadCount(0);
             setActiveWarning(null);
-            if (socket.current) {
-                socket.current.disconnect();
-                socket.current = null;
-            }
+            return undefined;
         }
+
+        fetchNotifications();
+        checkWarning();
+
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+        const sock = io(backendUrl, {
+            withCredentials: true,
+            transports: ['websocket', 'polling'],
+        });
+        socket.current = sock;
+
+        sock.on('connect', () => {
+            if (user.gymId) sock.emit('join_gym', user.gymId);
+        });
+
+        sock.on('new_notification', (notif) => {
+            setNotifications((prev) => {
+                if (prev.some((n) => n._id === notif._id)) return prev;
+                return [notif, ...prev];
+            });
+
+            if (notif.type === 'warning') setActiveWarning(notif);
+
+            toast.success('New notification received!', { icon: '🔔', duration: 4000 });
+        });
+
+        sock.on('notification_read', ({ notificationId, userId }) => {
+            if (userId === user._id) {
+                setNotifications((prev) => prev.map((n) =>
+                    n._id === notificationId ? { ...n, isRead: true } : n,
+                ));
+            }
+        });
+
+        return () => {
+            sock.removeAllListeners();
+            sock.disconnect();
+            if (socket.current === sock) socket.current = null;
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     useEffect(() => {

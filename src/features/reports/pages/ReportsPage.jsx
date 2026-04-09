@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     FaChartPie, FaWallet, FaArrowUp, FaArrowDown,
-    FaCalendarAlt, FaUsers, FaUserPlus, FaUserMinus
+    FaUsers, FaSearch, FaSync
 } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ import {
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
     AreaChart, Area
 } from 'recharts';
+import AppLayout from '../../../shared/components/layout/AppLayout';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'];
 
@@ -83,36 +84,100 @@ const ReportsPage = () => {
 
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 
+    // True when the API returned data but every meaningful field is zero —
+    // we use this to swap the chart area for a Members-style empty state
+    // instead of showing four blank graphs.
+    const isEmpty = !loading
+        && (data.kpi.totalIncome || 0) === 0
+        && (data.kpi.totalExpense || 0) === 0
+        && (data.financialChart || []).length === 0;
+
+    /**
+     * Empty state — modeled after MembersPage.EmptySearchState so the
+     * Reports page feels at home with the rest of the app.
+     */
+    const ReportsEmptyState = () => (
+        <div className="flex flex-col items-center justify-center py-24 px-6 relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
+            {/* Concentric rings background */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60 dark:opacity-40">
+                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-slate-700 shadow-sm" />
+                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-slate-700" />
+            </div>
+
+            {/* Center icon */}
+            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 flex items-center justify-center mb-6 shadow-sm z-10">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center">
+                    <FaChartPie className="text-gray-400" size={20} />
+                </div>
+            </div>
+
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1.5 z-10">No data for this period</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-8 z-10 w-full max-w-sm">
+                There are no transactions or expenses in the selected range. Try a different preset, or come back after recording some activity.
+            </p>
+
+            <div className="flex items-center gap-3 z-10">
+                <button
+                    onClick={() => handlePresetChange('all_time')}
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
+                >
+                    Show all time
+                </button>
+                <button
+                    onClick={fetchReports}
+                    className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all shadow-sm flex items-center gap-2 text-sm"
+                >
+                    <FaSync size={12} /> Refresh
+                </button>
+            </div>
+        </div>
+    );
+
     if (loading && !data.financialChart.length) {
         return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            </div>
+            <AppLayout showGenderSwitch={false}>
+                <div className="flex items-center justify-center min-h-[60vh]">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+            </AppLayout>
         );
     }
 
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header & Filters */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                        <FaChartPie className="text-blue-500" />
-                        Comprehensive Reports
-                    </h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Financial & Member Analytics Dashboard</p>
-                </div>
+        <AppLayout showGenderSwitch={false}>
+            <div className="max-w-7xl mx-auto space-y-6">
+            {/* Header & Filters — matches the Members toolbar look */}
+            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-6 py-4">
+                    <div>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+                            <FaChartPie className="text-blue-500" />
+                            Comprehensive Reports
+                        </h1>
+                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Financial &amp; Member Analytics Dashboard</p>
+                    </div>
 
-                <div className="flex flex-wrap items-center gap-2">
-                    <select
-                        onChange={(e) => handlePresetChange(e.target.value)}
-                        className="px-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-xl text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none"
-                    >
-                        <option value="all_time">All Time</option>
-                        <option value="this_month">This Month</option>
-                        <option value="last_month">Last Month</option>
-                        <option value="this_year">This Year</option>
-                    </select>
+                    <div className="flex items-center gap-2 shrink-0">
+                        <button
+                            onClick={fetchReports}
+                            disabled={loading}
+                            title="Refresh"
+                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
+                        >
+                            <FaSync size={13} className={loading ? 'animate-spin' : ''} />
+                        </button>
+                        <select
+                            onChange={(e) => handlePresetChange(e.target.value)}
+                            className="px-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-gray-900 dark:text-white"
+                        >
+                            <option value="all_time">All Time</option>
+                            <option value="this_month">This Month</option>
+                            <option value="last_month">Last Month</option>
+                            <option value="this_year">This Year</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -173,6 +238,10 @@ const ReportsPage = () => {
                 </div>
             </div>
 
+            {isEmpty ? (
+                <ReportsEmptyState />
+            ) : (
+                <>
             {/* Charts Row 1 */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
@@ -281,8 +350,11 @@ const ReportsPage = () => {
                     </div>
                 </div>
 
+                </div>
+                </>
+            )}
             </div>
-        </div>
+        </AppLayout>
     );
 };
 

@@ -24,3 +24,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Local debug / scratch scripts (must never be committed)
+axios-test*.js
+fix-api-paths.js
+*-error.log
+install_error.log
+start_error.log

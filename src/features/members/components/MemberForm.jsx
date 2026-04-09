@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import api from '../../../shared/services/api';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useFormState } from '../../../shared/context/FormStateContext';
 import {
   FaUser, FaCamera, FaUpload, FaChevronRight, FaChevronLeft,
   FaCheckCircle, FaTrash, FaIdCard, FaHistory, FaCrown, FaCalendarAlt,
@@ -13,6 +14,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 
 function NewMember() {
+  const { setDirty } = useFormState();
   const [step, setStep] = useState(1);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -96,33 +98,26 @@ function NewMember() {
   const modalCanvasRef = useRef(null);
   const streamRef = useRef(null);
 
-  // Browser Tab Closure Protection & Cleanup
+  // Track unsaved-changes state via shared context (replaces window.isRegistrationDirty).
+  // The FormStateProvider already installs a beforeunload handler when isDirty=true.
   useEffect(() => {
     const isDirty = name.trim() !== "" ||
-      (phone !== "" && phone !== "") ||
+      phone !== "" ||
       photoBlob !== null ||
       gender !== "" ||
       dob !== "" ||
       discount !== 0;
 
-    window.isRegistrationDirty = isDirty;
+    setDirty(isDirty);
 
-    const handleBeforeUnload = (e) => {
-      if (isDirty) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      window.isRegistrationDirty = false;
+      setDirty(false);
       // Ensure camera stops on unmount
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [name, phone, photoBlob]);
+  }, [name, phone, photoBlob, gender, dob, discount, setDirty]);
 
   // Camera Logic
   const startCamera = async () => {

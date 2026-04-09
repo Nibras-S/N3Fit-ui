@@ -19,6 +19,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
     const [stats, setStats] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [todayModalOpen, setTodayModalOpen] = useState(false);
 
     useEffect(() => {
         if (user && user.role === 'staff') {
@@ -101,12 +102,17 @@ const Dashboard = () => {
                 </div>
 
                 {/* ========== DAILY REPORT SECTION ========== */}
-                <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 rounded-2xl text-white shadow-lg">
+                <button
+                    type="button"
+                    onClick={() => setTodayModalOpen(true)}
+                    className="w-full text-left bg-gradient-to-r from-blue-600 to-indigo-700 p-6 rounded-2xl text-white shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-indigo-800 transition-all"
+                >
                     <div className="flex items-center gap-2 mb-4">
                         <FaCalendarAlt />
                         <h2 className="text-lg font-bold">Today's Daily Report</h2>
+                        <span className="text-[10px] uppercase tracking-wider bg-white/15 px-2 py-0.5 rounded-full ml-2">click for breakdown</span>
                         <span className="text-sm opacity-75 ml-auto">
-                            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' })}
+                            {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                         </span>
                     </div>
 
@@ -167,7 +173,7 @@ const Dashboard = () => {
                             </p>
                         </div>
                     </div>
-                </div>
+                </button>
 
                 {/* Stats Cards Row */}
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
@@ -510,6 +516,115 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
+
+            {/* ========== TODAY'S BREAKDOWN MODAL ========== */}
+            {todayModalOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    onClick={() => setTodayModalOpen(false)}
+                >
+                    <div
+                        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Header */}
+                        <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-indigo-700 text-white p-6 rounded-t-2xl">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h2 className="text-xl font-bold flex items-center gap-2">
+                                        <FaCalendarAlt /> Today's Income Breakdown
+                                    </h2>
+                                    <p className="text-xs opacity-80 mt-1">
+                                        {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => setTodayModalOpen(false)}
+                                    className="text-white/80 hover:text-white text-2xl leading-none"
+                                    aria-label="Close"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="mt-4 grid grid-cols-2 gap-3">
+                                <div className="bg-white/10 backdrop-blur rounded-xl p-3">
+                                    <p className="text-xs uppercase opacity-75">Booked</p>
+                                    <p className="text-2xl font-black">{formatCurrency(stats?.income?.daily)}</p>
+                                    <p className="text-xs opacity-75">{stats?.income?.dailyCount || 0} txns</p>
+                                </div>
+                                <div className="bg-green-500/20 backdrop-blur rounded-xl p-3 border border-green-400/30">
+                                    <p className="text-xs uppercase opacity-75">✓ Actual</p>
+                                    <p className="text-2xl font-black text-green-200">{formatCurrency(stats?.income?.dailyActual)}</p>
+                                    <p className="text-xs opacity-75">paid only</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Body */}
+                        <div className="p-6 space-y-6">
+                            {/* By Method */}
+                            <div>
+                                <h3 className="font-bold text-gray-800 dark:text-white text-sm uppercase tracking-wider mb-3">By Payment Method</h3>
+                                {dailyByMethod.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {dailyByMethod.map((m) => (
+                                            <div
+                                                key={m._id || 'unknown'}
+                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-slate-700"
+                                                style={{ backgroundColor: `${METHOD_COLORS[m._id] || '#94a3b8'}10` }}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: METHOD_COLORS[m._id] || '#94a3b8' }}></div>
+                                                    <span className="font-medium text-gray-700 dark:text-gray-200">{m._id || 'Unknown'}</span>
+                                                    <span className="text-xs text-gray-400">({m.count})</span>
+                                                </div>
+                                                <span className="font-bold text-gray-800 dark:text-white">{formatCurrency(m.total)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-400 italic text-center py-4">No payments recorded today</p>
+                                )}
+                            </div>
+
+                            {/* By Status */}
+                            <div>
+                                <h3 className="font-bold text-gray-800 dark:text-white text-sm uppercase tracking-wider mb-3">By Status</h3>
+                                {dailyByStatus.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {dailyByStatus.map((s) => (
+                                            <div
+                                                key={s._id || 'unknown'}
+                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-slate-700"
+                                                style={{ backgroundColor: `${STATUS_COLORS[s._id] || '#94a3b8'}10` }}
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: STATUS_COLORS[s._id] || '#94a3b8' }}></div>
+                                                    <span className="font-medium text-gray-700 dark:text-gray-200">{s._id || 'Unknown'}</span>
+                                                    <span className="text-xs text-gray-400">({s.count})</span>
+                                                </div>
+                                                <span className="font-bold text-gray-800 dark:text-white">{formatCurrency(s.total)}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-400 italic text-center py-4">No status data for today</p>
+                                )}
+                            </div>
+
+                            {/* Footer link */}
+                            <div className="pt-4 border-t border-gray-100 dark:border-slate-700">
+                                <button
+                                    onClick={() => { setTodayModalOpen(false); navigate('/transactions'); }}
+                                    className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition-colors"
+                                >
+                                    View All Transactions →
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 };

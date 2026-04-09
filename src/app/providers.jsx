@@ -1,5 +1,7 @@
 import { AuthProvider } from '../features/auth/context/AuthContext';
 import { NotificationProvider } from '../features/notifications/context/NotificationContext';
+import ErrorBoundary from '../shared/components/feedback/ErrorBoundary';
+import { FormStateProvider } from '../shared/context/FormStateContext';
 
 /**
  * Compose all application-level providers in one place.
@@ -9,10 +11,14 @@ import { NotificationProvider } from '../features/notifications/context/Notifica
  */
 export default function Providers({ children }) {
     return (
-        <AuthProvider>
-            <NotificationProvider>
-                {children}
-            </NotificationProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+            <AuthProvider>
+                <NotificationProvider>
+                    <FormStateProvider>
+                        {children}
+                    </FormStateProvider>
+                </NotificationProvider>
+            </AuthProvider>
+        </ErrorBoundary>
     );
 }
