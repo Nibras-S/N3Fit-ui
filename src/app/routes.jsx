@@ -15,6 +15,7 @@ import InactiveSoonPage from '../features/members/pages/InactiveSoonPage';
 import DashboardPage from '../features/dashboard/pages/DashboardPage';
 import ExpensesPage from '../features/expenses/pages/ExpensesPage';
 import TransactionsPage from '../features/transactions/pages/TransactionsPage';
+import ReportsPage from '../features/reports/pages/ReportsPage';
 
 // Staff, Settings, Notifications, Whatsapp
 import StaffPage from '../features/staff/pages/StaffPage';
@@ -69,6 +70,11 @@ export default function AppRoutes() {
                 <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
+            </Route>
+
+            {/* ── Analytics (Admin/Superadmin) ────────────────────── */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'superadmin']} />}>
+                <Route path="/reports" element={<ReportsPage />} />
             </Route>
 
             {/* ── Super Admin ─────────────────────────────────────── */}

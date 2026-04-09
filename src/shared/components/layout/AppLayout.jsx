@@ -26,7 +26,8 @@ import {
   FaCircle,
   FaMoon,
   FaSun,
-  FaDownload
+  FaDownload,
+  FaChartLine
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -135,6 +136,7 @@ export function AppLayout({
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin"] },
+    { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "superadmin"] },
     {
       path: "/notifications",
       label: "Notifications",

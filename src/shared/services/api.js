@@ -16,7 +16,7 @@ import { showToast } from '../lib/toast';
  */
 
 const api = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || '/api/v1',
+    baseURL: (process.env.REACT_APP_API_BASE_URL || 'http://localhost:4000/api/v1').replace(/\/api$/, ''),
     timeout: 15000,          // 15 s — avoids hung requests
     withCredentials: true,   // send httpOnly cookie on every request
     headers: { 'Content-Type': 'application/json' },

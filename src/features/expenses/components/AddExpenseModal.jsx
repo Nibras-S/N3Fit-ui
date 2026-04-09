@@ -3,6 +3,7 @@ import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaSti
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
+import { FileUpload } from '../../../shared/components/ui/file-upload/file-upload-base';
 
 const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
     const [formData, setFormData] = useState({
@@ -13,10 +14,53 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
         vendor: '',
         note: ''
     });
-    const [receiptFile, setReceiptFile] = useState(null);
+    const [uploadedFiles, setUploadedFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const fileInputRef = useRef(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+    const uploadFile = (file, onProgress) => {
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            onProgress(progress);
+            if (progress >= 100) {
+                clearInterval(interval);
+            }
+        }, 50);
+    };
+
+    const handleDropFiles = (files) => {
+        const newFiles = Array.from(files).slice(0, 1);
+        const newFilesWithIds = newFiles.map((file) => ({
+            id: Math.random().toString(),
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            progress: 0,
+            fileObject: file,
+        }));
+
+        setUploadedFiles(newFilesWithIds);
+
+        newFilesWithIds.forEach(({ id, fileObject }) => {
+            uploadFile(fileObject, (progress) => {
+                setUploadedFiles((prev) => prev.map((uploadedFile) => (uploadedFile.id === id ? { ...uploadedFile, progress } : uploadedFile)));
+            });
+        });
+    };
+
+    const handleDeleteFile = (id) => {
+        setUploadedFiles((prev) => prev.filter((file) => file.id !== id));
+    };
+
+    const handleRetryFile = (id) => {
+        const file = uploadedFiles.find((f) => f.id === id);
+        if (!file) return;
+
+        uploadFile(file.fileObject, (progress) => {
+            setUploadedFiles((prev) => prev.map((uploadedFile) => (uploadedFile.id === id ? { ...uploadedFile, progress, failed: false } : uploadedFile)));
+        });
+    };
 
     useEffect(() => {
         if (expense) {
@@ -28,6 +72,19 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                 vendor: expense.vendor || '',
                 note: expense.note || ''
             });
+            if (expense.receiptUrl) {
+                setUploadedFiles([{
+                    id: 'existing-receipt',
+                    name: expense.receiptUrl.split('/').pop(),
+                    size: 0,
+                    type: 'unknown',
+                    progress: 100,
+                    fileObject: null,
+                    isExisting: true
+                }]);
+            } else {
+                setUploadedFiles([]);
+            }
         } else {
             setFormData({
                 category: '',
@@ -37,8 +94,8 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                 vendor: '',
                 note: ''
             });
+            setUploadedFiles([]);
         }
-        setReceiptFile(null);
     }, [expense, isOpen]);
 
     const categories = [
@@ -46,16 +103,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
         "Maintenance", "Marketing", "Cleaning", "Internet", "Software", "Others"
     ];
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error("File size should be less than 5MB");
-                return;
-            }
-            setReceiptFile(file);
-        }
-    };
+    // Removed old handleFileChange logic
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -65,8 +113,8 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
         Object.keys(formData).forEach(key => {
             data.append(key, formData[key]);
         });
-        if (receiptFile) {
-            data.append('receipt', receiptFile);
+        if (uploadedFiles.length > 0 && uploadedFiles[0].fileObject) {
+            data.append('receipt', uploadedFiles[0].fileObject);
         }
 
         try {
@@ -196,23 +244,23 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
                             <FaPaperclip className="text-red-500 text-xs" /> Attachment (Receipt/PDF)
                         </label>
-                        <div
-                            onClick={() => fileInputRef.current.click()}
-                            className="w-full px-4 py-3 rounded-xl bg-gray-50 dark:bg-slate-900 border border-dashed border-gray-300 dark:border-slate-700 text-gray-500 dark:text-gray-400 text-sm cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2"
-                        >
-                            {receiptFile ? (
-                                <span className="text-blue-600 dark:text-blue-400 font-medium truncate">{receiptFile.name}</span>
+                        <FileUpload.Root>
+                            {uploadedFiles.length === 0 ? (
+                                <FileUpload.DropZone isDisabled={loading} onDropFiles={handleDropFiles} />
                             ) : (
-                                <><span>Click to upload receipt</span><span className="text-xs opacity-60">(Max 5MB)</span></>
+                                <FileUpload.List>
+                                    {uploadedFiles.map((file) => (
+                                        <FileUpload.ListItemProgressBar
+                                            key={file.id}
+                                            {...file}
+                                            size={file.size}
+                                            onDelete={() => handleDeleteFile(file.id)}
+                                            onRetry={() => handleRetryFile(file.id)}
+                                        />
+                                    ))}
+                                </FileUpload.List>
                             )}
-                        </div>
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*,.pdf"
-                            className="hidden"
-                        />
+                        </FileUpload.Root>
                     </div>
 
                     {/* Note */}
