@@ -91,7 +91,7 @@ function NewMember() {
         const data = res.data?.data ?? res.data;
         setAdmissionFee(data?.admissionFee || 0);
         setSettings(data);
-        // Set default plan to first active plan if available
+        // Set default plan to first active plan
         if (data?.plans && data.plans.length > 0) {
           const activePlans = data.plans.filter(p => p.isActive);
           if (activePlans.length > 0) {
@@ -107,8 +107,10 @@ function NewMember() {
       const selectedPlan = settings.plans.find(p => p.name === plan);
       if (selectedPlan) {
         setAmount(selectedPlan.price);
+        return;
       }
-    } else if (plan && settings?.subscriptionPrices) {
+    }
+    if (plan && settings?.subscriptionPrices) {
       const price = settings.subscriptionPrices[plan] || 0;
       setAmount(price);
     }
@@ -524,11 +526,10 @@ function NewMember() {
                           key={g.key}
                           type="button"
                           onClick={() => toggleGoal(g.key)}
-                          className={`px-3 py-2 rounded-xl border font-bold text-[10px] uppercase tracking-wide transition-all ${
-                            active
-                              ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20'
-                              : 'border-gray-100 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
-                          }`}
+                          className={`px-3 py-2 rounded-xl border font-bold text-[10px] uppercase tracking-wide transition-all ${active
+                            ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20'
+                            : 'border-gray-100 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
+                            }`}
                         >
                           {g.label}
                         </button>
@@ -576,7 +577,7 @@ function NewMember() {
                   </h2>
 
                   <div className="space-y-2">
-                    {settings?.plans && settings.plans.length > 0 ? (
+                    {settings?.plans && settings.plans.filter(p => p.isActive).length > 0 ? (
                       settings.plans.filter(p => p.isActive).map((p) => (
                         <button
                           key={p.name}
@@ -719,15 +720,30 @@ function NewMember() {
               className="max-w-xl mx-auto"
             >
               <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-2xl overflow-hidden">
-                <div className="h-2 bg-blue-600 w-full" />
                 <div className="p-6 lg:p-10 space-y-6">
                   <div className="flex items-center gap-5">
-                    <div className="w-20 h-20 rounded-2xl bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 overflow-hidden shadow-inner flex items-center justify-center">
+                    <div className="w-20 h-20 rounded-2xl bg-gray-50 dark:bg-slate-700 border border-gray-100 dark:border-slate-600 overflow-hidden shadow-inner flex items-center justify-center shrink-0">
                       {photoPreview ? <img src={photoPreview} alt="Profile" className="w-full h-full object-cover" /> : <FaUser size={24} className="text-gray-200" />}
                     </div>
-                    <div>
-                      <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase leading-tight">{name}</h2>
-                      <p className="text-blue-600 font-bold tracking-widest text-[10px] uppercase mt-0.5">{gender} • {countryCode}{phone}</p>
+                    <div className="min-w-0">
+                      <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase leading-tight truncate">{name}</h2>
+                      <p className="text-blue-600 font-bold tracking-widest text-[10px] uppercase mt-0.5 truncate">{gender} • {countryCode}{phone}</p>
+                    </div>
+                  </div>
+
+                  {/* Additional Demographic Details */}
+                  <div className="bg-gray-50 dark:bg-slate-900/40 rounded-2xl p-4 border border-gray-100 dark:border-slate-700/50">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-3">Member Details</p>
+                    <div className="grid grid-cols-2 gap-y-3 gap-x-4">
+                      {dob && (
+                        <div>
+                          <p className="text-[10px] text-gray-500 font-semibold mb-0.5">Date of Birth</p>
+                          <p className="text-sm font-bold text-gray-900 dark:text-gray-200">{new Date(dob).toLocaleDateString('en-IN')}</p>
+                        </div>
+                      )}
+                      {!dob && (
+                        <p className="text-xs text-gray-400 font-medium italic col-span-2">No additional demographic details provided.</p>
+                      )}
                     </div>
                   </div>
 
@@ -757,7 +773,7 @@ function NewMember() {
                       onClick={Submit}
                       className="flex-[1.5] py-3.5 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 text-[11px]"
                     >
-                      Enroll Athlete
+                      Add Member
                     </button>
                   </div>
                 </div>
