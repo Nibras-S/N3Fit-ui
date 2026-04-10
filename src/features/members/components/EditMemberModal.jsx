@@ -7,6 +7,20 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 
+/**
+ * Convert a stored UTC instant (e.g. "2026-04-07T18:30:00.000Z" = IST midnight
+ * of Apr 8) to the YYYY-MM-DD calendar day in IST. Using toISOString() here is
+ * wrong because it returns the *UTC* day, which is one day behind for any
+ * date stored at IST midnight — that's the off-by-one bug in the edit modal.
+ */
+const toISTDateInputValue = (input) => {
+    if (!input) return '';
+    const d = input instanceof Date ? input : new Date(input);
+    if (isNaN(d.getTime())) return '';
+    // en-CA gives YYYY-MM-DD, which matches what <input type="date"> expects.
+    return d.toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+};
+
 const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
     const [formData, setFormData] = useState(null);
     const [originalData, setOriginalData] = useState(null);
@@ -83,8 +97,9 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
             if (onUpdate) onUpdate(updateData);
             onClose();
         } catch (error) {
+            // The axios interceptor already toasts the actual server error.
+            // Don't add a generic "Failed to update member" on top of it.
             console.error("Update error:", error);
-            toast.error('Failed to update member');
         }
     };
 
@@ -204,7 +219,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">Start Date</label>
                         <DatePicker
-                            value={formData.date ? new Date(formData.date).toISOString().split('T')[0] : ''}
+                            value={toISTDateInputValue(formData.date)}
                             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
                             className="!bg-gray-50 dark:!bg-slate-900 border-gray-200 dark:border-slate-700"
                         />

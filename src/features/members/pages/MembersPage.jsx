@@ -205,22 +205,55 @@ const MembersPage = () => {
             return;
         }
 
+        // Build a clean payload — drop empty strings and coerce numerics
+        // so the backend Joi schema accepts the request even when the user
+        // didn't pick a date.
+        const payload = { _isRenewal: true };
+        if (renewForm.plan) payload.plan = renewForm.plan;
+        if (renewForm.date) payload.date = renewForm.date;
+        if (renewForm.amount !== '' && renewForm.amount !== null) {
+            payload.amount = Number(renewForm.amount);
+        }
+        if (renewForm.paymentMethod) payload.paymentMethod = renewForm.paymentMethod;
+        if (renewForm.paymentStatus) payload.paymentStatus = renewForm.paymentStatus;
+
         try {
-            await api.put(`/contacts/${memberId}`, { ...renewForm, _isRenewal: true });
+            await api.put(`/contacts/${memberId}`, payload);
             toast.success('Membership renewed successfully');
             setRenewingMemberId(null);
             fetchMembers(); // refresh
         } catch (error) {
-            toast.error('Failed to renew membership');
+            const detail = error.response?.data?.message
+                || error.response?.data?.error?.message
+                || 'Failed to renew membership';
+            toast.error(detail);
         }
     };
 
     // ── WhatsApp ────────────────────────────────────────────────
+    // Build a status-aware message so the gym owner can fire off a manual
+    // ping without retyping. Three buckets:
+    //   - expired   (dews <= 0): renewal nudge with days overdue
+    //   - expiring  (dews 1..7): friendly heads-up
+    //   - active    (otherwise): generic check-in
+    const buildWhatsAppMessage = (member) => {
+        const name = member.name || 'there';
+        const dews = typeof member.dews === 'number' ? member.dews : null;
+        if (dews !== null && dews <= 0) {
+            const overdue = Math.abs(dews);
+            return `Hi ${name}, your gym membership expired ${overdue === 0 ? 'today' : `${overdue} day${overdue === 1 ? '' : 's'} ago`}. Please renew to continue your fitness journey with us! 💪`;
+        }
+        if (dews !== null && dews <= 7) {
+            return `Hi ${name}, just a heads-up — your gym membership expires in ${dews} day${dews === 1 ? '' : 's'}. Renew early to avoid any break in your routine. 💪`;
+        }
+        return `Hi ${name}, hope you're enjoying your workouts! Let us know if you need anything from the gym team. 💪`;
+    };
+
     const handleWhatsApp = (member) => {
         if (!member.phone) return;
         const digits = member.phone.replace(/[^\d]/g, '');
         const phone = digits.length === 10 ? `91${digits}` : digits;
-        const message = `Hi ${member.name}, your gym membership has expired. Please renew to continue enjoying our services! 💪`;
+        const message = buildWhatsAppMessage(member);
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
@@ -243,10 +276,7 @@ const MembersPage = () => {
             {
                 key: 'name', label: 'Name', sortable: true,
                 render: (row) => (
-                    <div
-                        className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700/30 p-1 -m-1 rounded-lg transition-colors group"
-                        onClick={() => navigate(`/members/${row._id}`)}
-                    >
+                    <div className="flex items-center gap-3 group">
                         {row.profileImage ? (
                             <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
                                 <img
@@ -294,8 +324,17 @@ const MembersPage = () => {
     }, [activeTab, backendUrl, navigate]);
 
     // ── Actions ─────────────────────────────────────────────────
+    // stopPropagation on the wrapper so clicks on action buttons don't bubble
+    // up to the row's onClick (which navigates to the member detail page).
+    const whatsAppTitle = (row) => {
+        if (typeof row.dews !== 'number') return 'Send WhatsApp';
+        if (row.dews <= 0) return 'WhatsApp: expired reminder';
+        if (row.dews <= 7) return 'WhatsApp: expiring soon';
+        return 'WhatsApp: send message';
+    };
+
     const renderActions = (row) => (
-        <div className="flex gap-2">
+        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             <button
                 onClick={() => handleRenew(row._id)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg transition-colors"
@@ -303,8 +342,12 @@ const MembersPage = () => {
             >
                 <FaRedo size={11} /> Renew
             </button>
-            {activeTab === 'expired' && row.phone && (
-                <button onClick={() => handleWhatsApp(row)} className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg" title="WhatsApp">
+            {row.phone && (
+                <button
+                    onClick={() => handleWhatsApp(row)}
+                    className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg"
+                    title={whatsAppTitle(row)}
+                >
                     <FaWhatsapp />
                 </button>
             )}
@@ -321,7 +364,7 @@ const MembersPage = () => {
     const renderMobileCard = (row) => (
         <>
             <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3" onClick={() => navigate(`/members/${row._id}`)}>
+                <div className="flex items-center gap-3">
                     {row.profileImage ? (
                         <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
                             <img
@@ -351,12 +394,16 @@ const MembersPage = () => {
                 <span className={row.dews <= 0 ? 'text-red-500 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
                 <span>{formatDate(row.endDate)}</span>
             </div>
-            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700">
+            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
                 <button onClick={() => handleRenew(row._id)} className="flex-1 py-2 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors">
                     <FaRedo size={11} /> Renew
                 </button>
-                {activeTab === 'expired' && row.phone && (
-                    <button onClick={() => handleWhatsApp(row)} className="py-2 px-3 bg-green-50 dark:bg-green-900/20 text-green-600 font-medium rounded-lg text-sm flex items-center justify-center">
+                {row.phone && (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); handleWhatsApp(row); }}
+                        className="py-2 px-3 bg-green-50 dark:bg-green-900/20 text-green-600 font-medium rounded-lg text-sm flex items-center justify-center"
+                        title={whatsAppTitle(row)}
+                    >
                         <FaWhatsapp />
                     </button>
                 )}
@@ -583,6 +630,7 @@ const MembersPage = () => {
                         onSort={handleSort}
                         renderActions={renderActions}
                         renderMobileCard={renderMobileCard}
+                        onRowClick={(row) => navigate(`/members/${row._id}`)}
                         hoverColor={activeTab === 'inactive' ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : 'hover:bg-blue-50 dark:hover:bg-blue-900/10'}
                         gender={genderFilter}
                         serverSide={true}
@@ -641,7 +689,7 @@ const MembersPage = () => {
                                     className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                 >
                                     <option value="">Select Plan...</option>
-                                    {settings?.plans?.map((p, i) => (
+                                    {settings?.plans?.filter(p => p.isActive)?.map((p, i) => (
                                         <option key={i} value={p.name}>{p.name} (₹{p.price})</option>
                                     ))}
                                 </select>
@@ -675,7 +723,6 @@ const MembersPage = () => {
                                     <option value="UPI">UPI</option>
                                     <option value="Card">Card</option>
                                     <option value="Bank Transfer">Bank Transfer</option>
-                                    <option value="Pending">Pending</option>
                                 </select>
                             </div>
                         </div>

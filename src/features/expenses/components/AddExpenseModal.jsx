@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaStickyNote, FaFileInvoice, FaPaperclip } from 'react-icons/fa';
+import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaUserTie, FaStickyNote, FaFileInvoice, FaPaperclip } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
@@ -12,11 +12,16 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
         date: new Date().toISOString().split('T')[0],
         paymentMethod: 'Cash',
         vendor: '',
-        note: ''
+        note: '',
+        staffId: '', // populated only for the Staff Salary category
     });
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [staffOptions, setStaffOptions] = useState([]);
+    const [staffLoading, setStaffLoading] = useState(false);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+    const isStaffSalary = formData.category === 'Staff Salary';
 
     const uploadFile = (file, onProgress) => {
         let progress = 0;
@@ -70,7 +75,8 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                 date: new Date(expense.date).toISOString().split('T')[0],
                 paymentMethod: expense.paymentMethod,
                 vendor: expense.vendor || '',
-                note: expense.note || ''
+                note: expense.note || '',
+                staffId: expense.staffId || '',
             });
             if (expense.receiptUrl) {
                 setUploadedFiles([{
@@ -92,11 +98,39 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                 date: new Date().toISOString().split('T')[0],
                 paymentMethod: 'Cash',
                 vendor: '',
-                note: ''
+                note: '',
+                staffId: '',
             });
             setUploadedFiles([]);
         }
     }, [expense, isOpen]);
+
+    // Lazy-load the staff list the first time Staff Salary is chosen. We don't
+    // fetch unconditionally on mount because most expense entries aren't salary
+    // and the dropdown isn't visible otherwise.
+    useEffect(() => {
+        if (!isOpen || !isStaffSalary || staffOptions.length || staffLoading) return;
+        let cancelled = false;
+        setStaffLoading(true);
+        api.get('/gym/staff')
+            .then((res) => {
+                if (cancelled) return;
+                const data = Array.isArray(res.data?.data) ? res.data.data
+                    : Array.isArray(res.data) ? res.data : [];
+                setStaffOptions(data.filter((s) => s.isActive !== false));
+            })
+            .catch(() => { /* surfaced via global interceptor */ })
+            .finally(() => { if (!cancelled) setStaffLoading(false); });
+        return () => { cancelled = true; };
+    }, [isOpen, isStaffSalary, staffOptions.length, staffLoading]);
+
+    // When the user switches away from Staff Salary, drop the staffId so it
+    // doesn't accidentally hitch a ride on a non-salary expense.
+    useEffect(() => {
+        if (!isStaffSalary && formData.staffId) {
+            setFormData((p) => ({ ...p, staffId: '' }));
+        }
+    }, [isStaffSalary, formData.staffId]);
 
     const categories = [
         "Rent", "Electricity", "Water", "Staff Salary", "Equipment",
@@ -111,6 +145,14 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
 
         const data = new FormData();
         Object.keys(formData).forEach(key => {
+            // Only attach staffId for Staff Salary, and skip the synthetic
+            // "other" sentinel — backend treats it as null.
+            if (key === 'staffId') {
+                if (isStaffSalary && formData.staffId && formData.staffId !== 'other') {
+                    data.append('staffId', formData.staffId);
+                }
+                return;
+            }
             data.append(key, formData[key]);
         });
         if (uploadedFiles.length > 0 && uploadedFiles[0].fileObject) {
@@ -173,6 +215,49 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                         </select>
                     </div>
+
+                    {/* Staff selector — only when category is Staff Salary.
+                        "Other" lets admins log a salary for someone not in the
+                        staff list (e.g. a contractor) without needing to add
+                        them as a user first. */}
+                    {isStaffSalary && (
+                        <div>
+                            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
+                                <FaUserTie className="text-blue-500 text-xs" /> Staff Member
+                            </label>
+                            <select
+                                value={formData.staffId}
+                                onChange={(e) => {
+                                    const v = e.target.value;
+                                    setFormData((p) => ({
+                                        ...p,
+                                        staffId: v,
+                                        // Auto-fill vendor with the chosen staff name for clarity
+                                        // in lists/exports. Cleared when "Other" is picked so the
+                                        // admin can type a custom name in the Vendor field below.
+                                        vendor: v && v !== 'other'
+                                            ? (staffOptions.find((s) => s._id === v)?.name || p.vendor)
+                                            : (v === 'other' ? '' : p.vendor),
+                                    }));
+                                }}
+                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                required
+                            >
+                                <option value="">
+                                    {staffLoading ? 'Loading staff…' : 'Select staff member'}
+                                </option>
+                                {staffOptions.map((s) => (
+                                    <option key={s._id} value={s._id}>{s.name}</option>
+                                ))}
+                                <option value="other">Other (enter name below)</option>
+                            </select>
+                            {formData.staffId === 'other' && (
+                                <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                                    Enter the recipient's name in the Vendor / Receiver field below.
+                                </p>
+                            )}
+                        </div>
+                    )}
 
                     {/* Amount */}
                     <div>

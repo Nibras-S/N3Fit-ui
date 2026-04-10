@@ -22,28 +22,41 @@ function MemberProfile() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
+    const fetchData = async () => {
+        try {
+            const [memberRes, txnRes] = await Promise.all([
+                api.get(`/contacts/${id}`),
+                api.get(`/transactions?memberId=${id}`)
+            ]);
+            setMember(memberRes.data);
+            // Transactions endpoint returns { data: [...], pagination: {...} }
+            // after the api interceptor unwraps the { success, data } envelope.
+            // Older code assumed a bare array and always fell through to [],
+            // which is why the History tab showed "No transaction history found"
+            // even when records existed.
+            const txnData = txnRes.data;
+            const list = Array.isArray(txnData)
+                ? txnData
+                : (Array.isArray(txnData?.data) ? txnData.data : []);
+            setTransactions(list);
+        } catch (error) {
+            console.error("Error fetching member details:", error);
+            toast.error("Failed to load member details");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [memberRes, txnRes] = await Promise.all([
-                    api.get(`/contacts/${id}`),
-                    api.get(`/transactions?memberId=${id}`)
-                ]);
-                setMember(memberRes.data);
-                const txnData = txnRes.data;
-                setTransactions(Array.isArray(txnData) ? txnData : []);
-            } catch (error) {
-                console.error("Error fetching member details:", error);
-                toast.error("Failed to load member details");
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [id, backendUrl]);
 
-    const handleUpdateSuccess = (updatedMember) => {
-        setMember(updatedMember);
+    // EditMemberModal calls onUpdate with the *patch* payload, not a full
+    // member document — so just refetch to keep both the member card and
+    // the transaction list in sync after a renewal.
+    const handleUpdateSuccess = () => {
+        fetchData();
     };
 
     const handleDelete = async () => {

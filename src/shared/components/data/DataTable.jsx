@@ -69,6 +69,7 @@ const DataTable = ({
     onRowsPerPageChange = null,
     rowsPerPage: propRowsPerPage,
     className = '',
+    onRowClick = null,
 }) => {
     const [clientPage, setClientPage] = React.useState(1);
     const [clientRowsPerPage, setClientRowsPerPage] = React.useState(10);
@@ -191,12 +192,14 @@ const DataTable = ({
                             const isEven = index % 2 === 0;
                             return (
                                 <React.Fragment key={rowId}>
-                                    <tr className={`transition-colors duration-100 ${isSelected
-                                        ? 'bg-blue-50 dark:bg-blue-900/20'
-                                        : isEven
-                                            ? `bg-white dark:bg-slate-800 ${hoverColor}`
-                                            : `bg-gray-50/60 dark:bg-slate-800/70 ${hoverColor}`
-                                        }`}>
+                                    <tr
+                                        onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                                        className={`transition-colors duration-100 ${onRowClick ? 'cursor-pointer' : ''} ${isSelected
+                                            ? 'bg-blue-50 dark:bg-blue-900/20'
+                                            : isEven
+                                                ? `bg-white dark:bg-slate-800 ${hoverColor}`
+                                                : `bg-gray-50/60 dark:bg-slate-800/70 ${hoverColor}`
+                                            }`}>
                                         {showSelection && (
                                             <td className="pl-6 pr-3 py-4 w-10">
                                                 <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
@@ -238,7 +241,8 @@ const DataTable = ({
                     return (
                         <div
                             key={rowId}
-                            className={`p-4 relative ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/60 dark:bg-slate-800/70'}`}
+                            onClick={onRowClick ? () => onRowClick(row, index) : undefined}
+                            className={`p-4 relative ${onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/60 dark:bg-slate-800/70'}`}
                         >
                             {showSelection && (
                                 <div className="absolute top-4 right-4">

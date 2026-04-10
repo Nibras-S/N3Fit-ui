@@ -260,7 +260,10 @@ function NewMember() {
       toast.success('Member enrolled successfully!');
       setTimeout(() => navigate('/members'), 1500);
     } catch (err) {
-      toast.error('Enrollment failed');
+      // The axios response interceptor (shared/services/api.js) already shows
+      // a toast with the actual server message (e.g. "phone already exists").
+      // Don't toast a generic "Enrollment failed" on top of it — that's where
+      // the duplicate-toast bug was coming from.
     } finally {
       setSubmitting(false);
     }

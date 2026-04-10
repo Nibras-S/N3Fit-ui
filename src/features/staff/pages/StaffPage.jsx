@@ -5,14 +5,22 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
     FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers, FaUserCheck, FaUserTimes,
-    FaTimes, FaEye, FaEyeSlash, FaSearch
+    FaTimes, FaEye, FaEyeSlash, FaSearch, FaFilePdf, FaFileImage, FaPaperclip
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Mirrors VALID_PERMISSIONS in N3Fit-api/src/config/permissions.js — keep in
+// sync if a new feature is added. Each entry maps a sidebar/feature module
+// to a checkbox in the staff form so admins can grant access per item.
 const AVAILABLE_PERMISSIONS = [
     { key: "members", label: "Members", desc: "View & manage members" },
-    { key: "payments", label: "Payments", desc: "Handle transactions" },
+    { key: "payments", label: "Payments", desc: "Handle transactions & invoices" },
+    { key: "expenses", label: "Expenses", desc: "Record and view expenses" },
     { key: "reports", label: "Reports", desc: "View reports & analytics" },
+    { key: "staff", label: "Staff", desc: "Manage other staff members" },
+    { key: "settings", label: "Settings", desc: "Edit gym profile & settings" },
+    { key: "whatsapp", label: "WhatsApp", desc: "Send WhatsApp notifications" },
+    { key: "announcements", label: "Announcements", desc: "Post announcements" },
 ];
 
 const StaffManagement = () => {
@@ -27,6 +35,8 @@ const StaffManagement = () => {
     const [formData, setFormData] = useState({
         name: "", email: "", password: "", permissions: ["members", "payments"]
     });
+    const [idProofFile, setIdProofFile] = useState(null); // newly selected File
+    const [existingIdProofUrl, setExistingIdProofUrl] = useState(null); // already saved
     const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
@@ -62,6 +72,8 @@ const StaffManagement = () => {
     const openCreateModal = () => {
         setEditingStaff(null);
         setFormData({ name: "", email: "", password: "", permissions: ["members", "payments"] });
+        setIdProofFile(null);
+        setExistingIdProofUrl(null);
         setShowPassword(false);
         setModalOpen(true);
     };
@@ -74,28 +86,78 @@ const StaffManagement = () => {
             password: "",
             permissions: member.permissions || ["members", "payments"]
         });
+        setIdProofFile(null);
+        setExistingIdProofUrl(member.idProofUrl || null);
         setModalOpen(true);
     };
 
+    const backendOrigin = (process.env.REACT_APP_API_BASE_URL || '').replace(/\/api\/v1\/?$/, '');
+    const idProofHref = (url) => (url?.startsWith('http') ? url : `${backendOrigin}${url}`);
+
+    const handleIdProofChange = (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+        if (!allowed.includes(file.type)) {
+            toast.error('ID proof must be a JPG, PNG, or PDF');
+            e.target.value = '';
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('ID proof must be under 5 MB');
+            e.target.value = '';
+            return;
+        }
+        setIdProofFile(file);
+    };
+
     // Submit form
+    //
+    // We always send multipart/form-data when an ID proof file is attached so
+    // the same endpoint works whether or not a document is uploaded. The
+    // backend's multer middleware is a no-op for JSON requests, so attaching
+    // the file is the only thing that flips the wire format.
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
         try {
             if (editingStaff) {
-                await api.put(`/gym/staff/${editingStaff._id}`, {
-                    name: formData.name,
-                    permissions: formData.permissions,
-                });
+                if (idProofFile) {
+                    const fd = new FormData();
+                    fd.append('name', formData.name);
+                    fd.append('permissions', JSON.stringify(formData.permissions));
+                    fd.append('idProof', idProofFile);
+                    await api.put(`/gym/staff/${editingStaff._id}`, fd, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                } else {
+                    await api.put(`/gym/staff/${editingStaff._id}`, {
+                        name: formData.name,
+                        permissions: formData.permissions,
+                    });
+                }
                 toast.success("Staff updated!");
             } else {
-                await api.post("/auth/register", {
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                    role: "staff",
-                    permissions: formData.permissions,
-                });
+                if (idProofFile) {
+                    const fd = new FormData();
+                    fd.append('name', formData.name);
+                    fd.append('email', formData.email);
+                    fd.append('password', formData.password);
+                    fd.append('role', 'staff');
+                    fd.append('permissions', JSON.stringify(formData.permissions));
+                    fd.append('idProof', idProofFile);
+                    await api.post('/auth/register', fd, {
+                        headers: { 'Content-Type': 'multipart/form-data' },
+                    });
+                } else {
+                    await api.post('/auth/register', {
+                        name: formData.name,
+                        email: formData.email,
+                        password: formData.password,
+                        role: 'staff',
+                        permissions: formData.permissions,
+                    });
+                }
                 toast.success("Staff member added!");
             }
             setModalOpen(false);
@@ -400,7 +462,7 @@ const StaffManagement = () => {
                             </div>
 
                             {/* Modal Body */}
-                            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+                            <form onSubmit={handleSubmit} className="p-5 space-y-4 max-h-[75vh] overflow-y-auto">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
                                     <input
@@ -448,6 +510,67 @@ const StaffManagement = () => {
                                         </div>
                                     </>
                                 )}
+
+                                {/* ID Proof Upload — PDF or image */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
+                                        <FaPaperclip className="text-blue-500 text-xs" /> ID Proof Document
+                                        <span className="text-xs font-normal text-gray-400">(PDF / JPG / PNG, max 5 MB)</span>
+                                    </label>
+
+                                    {existingIdProofUrl && !idProofFile && (
+                                        <div className="mb-2 flex items-center justify-between gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600">
+                                            <a
+                                                href={idProofHref(existingIdProofUrl)}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                            >
+                                                {existingIdProofUrl.toLowerCase().endsWith('.pdf')
+                                                    ? <FaFilePdf className="shrink-0" />
+                                                    : <FaFileImage className="shrink-0" />}
+                                                <span className="truncate">View current ID proof</span>
+                                            </a>
+                                            <span className="text-[10px] text-gray-400 shrink-0">replace below</span>
+                                        </div>
+                                    )}
+
+                                    <label className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-300 dark:border-slate-600 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                                        <input
+                                            type="file"
+                                            accept=".pdf,image/jpeg,image/jpg,image/png"
+                                            onChange={handleIdProofChange}
+                                            className="hidden"
+                                        />
+                                        <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                            {idProofFile?.type === 'application/pdf'
+                                                ? <FaFilePdf />
+                                                : idProofFile
+                                                    ? <FaFileImage />
+                                                    : <FaPaperclip />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-gray-700 dark:text-gray-200 truncate">
+                                                {idProofFile?.name || 'Click to upload ID proof'}
+                                            </p>
+                                            <p className="text-xs text-gray-400">
+                                                {idProofFile
+                                                    ? `${(idProofFile.size / 1024).toFixed(1)} KB`
+                                                    : 'Aadhaar, PAN, License — PDF or image'}
+                                            </p>
+                                        </div>
+                                        {idProofFile && (
+                                            <button
+                                                type="button"
+                                                onClick={(e) => { e.preventDefault(); setIdProofFile(null); }}
+                                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                title="Remove"
+                                            >
+                                                <FaTimes size={12} />
+                                            </button>
+                                        )}
+                                    </label>
+                                </div>
 
                                 {/* Permissions */}
                                 <div>
