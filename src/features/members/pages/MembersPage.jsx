@@ -907,7 +907,7 @@ const MembersPage = () => {
             </div>
 
             {/* Expiring Soon FAB */}
-            <div className="fixed bottom-20 right-4 z-10 md:bottom-6 md:right-6">
+            <div className="fixed bottom-24 right-4 z-10 lg:bottom-6 lg:right-6">
                 <button
                     onClick={() => navigate('/inactivesoon')}
                     className="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-shadow relative"
