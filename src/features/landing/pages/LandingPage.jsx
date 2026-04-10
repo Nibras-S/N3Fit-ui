@@ -1,26 +1,25 @@
 import React, { useEffect } from 'react';
+import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import Hero from '../components/Hero';
-import LogoCloud from '../components/LogoCloud';
 import Problem from '../components/Problem';
 import Features from '../components/Features';
-import DashboardShowcase from '../components/DashboardShowcase';
 import HowItWorks from '../components/HowItWorks';
 import Pricing from '../components/Pricing';
 import Testimonials from '../components/Testimonials';
 import FAQ from '../components/FAQ';
 import CallToAction from '../components/CallToAction';
-import { motion, useScroll, useSpring } from 'framer-motion';
+import Footer from '../components/Footer';
+import { FiArrowUp } from 'react-icons/fi';
 
 import '../styles/landing.css';
 
-export default function PageHome() {
+export default function LandingPage() {
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
-    restDelta: 0.001
+    restDelta: 0.001,
   });
 
   useEffect(() => {
@@ -28,24 +27,19 @@ export default function PageHome() {
   }, []);
 
   return (
-    <div className="landing-page-wrapper min-h-screen relative" style={{ background: '#0a0a0a' }}>
-      {/* Scroll Progress Bar — Accent Color */}
+    <div className="landing-page-wrapper min-h-screen">
+      {/* Scroll Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[3px] origin-left z-[9999]"
-        style={{
-          scaleX,
-          background: 'linear-gradient(to right, #4040e0, #00e5ff)',
-        }}
+        style={{ scaleX, background: 'var(--landing-primary)' }}
       />
 
       <Navbar />
 
       <main>
         <Hero />
-        <LogoCloud />
         <Problem />
         <Features />
-        <DashboardShowcase />
         <HowItWorks />
         <Pricing />
         <Testimonials />
@@ -55,21 +49,19 @@ export default function PageHome() {
 
       <Footer />
 
-      {/* Scroll to top — Dark + Accent */}
+      {/* Scroll to top */}
       <motion.button
-        className="fixed bottom-8 right-8 w-12 h-12 rounded-xl flex items-center justify-center z-40 transition-shadow"
+        className="fixed bottom-6 right-6 w-11 h-11 rounded-xl flex items-center justify-center z-40 landing-btn-primary"
+        style={{ padding: 0 }}
         initial={{ opacity: 0, scale: 0 }}
         whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: false, margin: "0px 0px -200px 0px" }}
+        viewport={{ once: false, margin: '0px 0px -300px 0px' }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        style={{
-          background: 'linear-gradient(135deg, #4040e0, #00d4ff)',
-          color: '#ffffff',
-        }}
+        aria-label="Scroll to top"
       >
-        <i className="ri-arrow-up-line text-xl font-bold"></i>
+        <FiArrowUp size={18} />
       </motion.button>
     </div>
   );

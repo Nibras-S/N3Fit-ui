@@ -1,109 +1,116 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import SplitText from './SplitText';
+import { FiSettings, FiUserPlus, FiZap } from 'react-icons/fi';
 
-const HowItWorks = () => {
-    const steps = [
-        {
-            num: "01",
-            icon: "ri-settings-3-line",
-            title: "Set Up Your Fit Club",
-            desc: "Configure your fit club profile, membership plans, and staff roles in under 10 minutes.",
-        },
-        {
-            num: "02",
-            icon: "ri-user-add-line",
-            title: "Add Members",
-            desc: "Import existing members via Excel or register new ones with a quick digital form.",
-        },
-        {
-            num: "03",
-            icon: "ri-rocket-2-line",
-            title: "Automate & Grow",
-            desc: "Let N3 handle billing, reminders, and analytics while you focus on scaling your business.",
-        }
-    ];
+const steps = [
+  {
+    num: '01',
+    icon: FiSettings,
+    title: 'Set Up Your Gym',
+    desc: 'Configure your gym profile, membership plans, and staff roles in under 10 minutes.',
+  },
+  {
+    num: '02',
+    icon: FiUserPlus,
+    title: 'Add Members',
+    desc: 'Import existing members via Excel or register new ones with a quick digital form.',
+  },
+  {
+    num: '03',
+    icon: FiZap,
+    title: 'Automate & Grow',
+    desc: 'Let N3 Fit handle billing, reminders, and analytics while you focus on scaling.',
+  },
+];
 
-    return (
-        <section className="py-24" id="how-it-works" style={{ background: '#0a0a0a' }}>
-            <div className="container mx-auto px-4">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className="text-center mb-16"
-                >
-                    <span className="text-sm font-semibold tracking-widest uppercase mb-4 block" style={{ color: '#00d4ff' }}>
-                        Getting Started
-                    </span>
-                    <div className="mb-4" style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em' }}>
-                        <SplitText
-                            text="GO LIVE IN"
-                            className="text-3xl md:text-5xl font-extrabold text-white mr-3 block md:inline-block"
-                            delay={30} duration={1} ease="power3.out" splitType="chars"
-                            from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
-                            tag="h2"
-                        />
-                        <SplitText
-                            text="3 SIMPLE STEPS"
-                            className="text-3xl md:text-5xl font-extrabold block md:inline-block"
-                            delay={30} duration={1} ease="power3.out" splitType="chars"
-                            from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
-                            tag="span"
-                            style={{
-                                background: 'linear-gradient(135deg, #4040e0, #00e5ff)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                            }}
-                        />
-                    </div>
-                    <p className="text-lg max-w-xl mx-auto" style={{ color: '#666' }}>No credit card. No complex setup. Be running in minutes.</p>
-                </motion.div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative max-w-4xl mx-auto">
-                    {/* Connecting line — behind icons */}
-                    <div
-                        className="hidden md:block absolute top-12 left-[20%] right-[20%] h-[2px] rounded-full"
-                        style={{
-                            background: 'linear-gradient(to right, rgba(0,212,255,0.1), rgba(0,212,255,0.3), rgba(0,212,255,0.1))',
-                            zIndex: 0,
-                        }}
-                    ></div>
-
-                    {steps.map((step, index) => (
-                        <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.15, duration: 0.5 }}
-                            viewport={{ once: true }}
-                            className="text-center relative" style={{ zIndex: 1 }}
-                        >
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center mx-auto mb-8"
-                                style={{
-                                    background: 'linear-gradient(135deg, rgba(64,64,224,0.15), rgba(0,212,255,0.15))',
-                                    border: '1px solid rgba(0,212,255,0.12)',
-                                }}
-                            >
-                                <i className={`${step.icon} text-3xl md:text-4xl`} style={{ color: '#00d4ff' }}></i>
-                            </motion.div>
-                            <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: '#00d4ff', opacity: 0.6 }}>
-                                Step {step.num}
-                            </span>
-                            <h3 className="text-xl font-bold mb-3" style={{ color: '#fff', fontFamily: "'Outfit', sans-serif" }}>
-                                {step.title}
-                            </h3>
-                            <p className="text-sm px-2 leading-relaxed" style={{ color: '#666' }}>
-                                {step.desc}
-                            </p>
-                        </motion.div>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
 };
 
-export default HowItWorks;
+export default function HowItWorks() {
+  return (
+    <section
+      id="how-it-works"
+      className="py-20 lg:py-28"
+      style={{ background: 'var(--landing-bg-alt)' }}
+    >
+      <div className="landing-container">
+        {/* Header */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-2xl mx-auto mb-14"
+        >
+          <span className="landing-section-label">Getting Started</span>
+          <h2 className="landing-heading">
+            Go Live in{' '}
+            <span className="landing-heading-gradient">3 Simple Steps</span>
+          </h2>
+          <p className="landing-subheading mx-auto text-center">
+            No credit card. No complex setup. Be running in minutes.
+          </p>
+        </motion.div>
+
+        {/* Steps */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto relative">
+          {/* Connecting line — desktop only */}
+          <div
+            className="hidden md:block absolute top-14 left-[20%] right-[20%] h-[2px]"
+            style={{ background: 'var(--landing-border)' }}
+          />
+
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            return (
+              <motion.div
+                key={index}
+                variants={fadeUp}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.12 }}
+                className="text-center relative z-10"
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center mx-auto mb-6 transition-transform duration-200 hover:scale-105"
+                  style={{
+                    background: 'var(--landing-primary-50)',
+                    border: '1px solid var(--landing-primary-100)',
+                  }}
+                >
+                  <Icon
+                    size={28}
+                    className="md:w-8 md:h-8"
+                    style={{ color: 'var(--landing-primary)' }}
+                  />
+                </div>
+                <span
+                  className="text-xs font-bold uppercase tracking-widest mb-2 block"
+                  style={{ color: 'var(--landing-primary)', opacity: 0.7 }}
+                >
+                  Step {step.num}
+                </span>
+                <h3
+                  className="text-xl font-bold mb-2"
+                  style={{ color: 'var(--landing-text)' }}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className="text-sm leading-relaxed px-2"
+                  style={{ color: 'var(--landing-text-muted)' }}
+                >
+                  {step.desc}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}

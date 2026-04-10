@@ -1,140 +1,123 @@
 import React from 'react';
-import { motion, useInView } from 'framer-motion';
-import CardSwap, { Card } from './CardSwap';
-import SplitText from './SplitText';
+import { motion } from 'framer-motion';
+import { FiStar } from 'react-icons/fi';
 
-const Testimonials = () => {
-    const ref = React.useRef(null);
-    const isInView = useInView(ref, { once: true, margin: "-100px 0px" });
+const testimonials = [
+  {
+    name: 'Azeez',
+    role: 'Gym Trainer, AzeeFit',
+    text: 'We have been using this management software for 1 year and are well satisfied with the results. It made our daily operations so much easier.',
+    avatar: 'A',
+    color: 'var(--landing-primary)',
+  },
+  {
+    name: 'John D.',
+    role: 'Owner, German Fitness',
+    text: 'Billing used to be a nightmare. Now it\'s automated and seamless. Best investment we made for our gym this year.',
+    avatar: 'J',
+    color: '#7c3aed',
+  },
+  {
+    name: 'Mike R.',
+    role: 'Manager, Iron Gym',
+    text: 'The membership tracking is flawless. We\'ve reduced dropouts by 20% in just 3 months using the renewal reminders.',
+    avatar: 'M',
+    color: '#059669',
+  },
+];
 
-    return (
-        <section className="py-24" id="testimonials" style={{ background: '#0a0a0a' }}>
-            <div className="container mx-auto px-4 relative z-10">
-                <div className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-                    {/* Left Side: Header & Context */}
-                    <div className="flex-1 text-left w-full lg:w-1/2">
-                        <motion.div
-                            ref={ref}
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={isInView ? { opacity: 1, y: 0 } : {}}
-                            transition={{ duration: 0.8 }}
-                        >
-                            <div className="mb-6 font-display" style={{ fontFamily: "'Outfit', sans-serif", letterSpacing: '-0.03em' }}>
-                                <SplitText
-                                    text="Trusted by"
-                                    className="text-3xl md:text-5xl font-extrabold inline-block mr-3 text-white"
-                                    delay={30} duration={1} ease="power3.out" splitType="chars"
-                                    from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
-                                    tag="h2"
-                                />
-                                <SplitText
-                                    text="Top Clubs"
-                                    className="text-3xl md:text-5xl font-extrabold inline-block"
-                                    delay={30} duration={1} ease="power3.out" splitType="chars"
-                                    from={{ opacity: 0, y: 40 }} to={{ opacity: 1, y: 0 }} threshold={0.1}
-                                    tag="span"
-                                    style={{
-                                        background: 'linear-gradient(135deg, #4040e0, #00e5ff)',
-                                        WebkitBackgroundClip: 'text',
-                                        WebkitTextFillColor: 'transparent',
-                                    }}
-                                />
-                            </div>
-                            <p className="section__subheader text-left mx-0 mb-8 max-w-lg">
-                                Join hundreds of fitness centers that have transformed their management with N3 Fit.
-                            </p>
-
-                            <div className="flex gap-4 max-w-md">
-                                <div className="text-center bg-[#111] border border-white/5 p-4 rounded-xl flex-1">
-                                    <div className="text-3xl font-bold text-white mb-1">500+</div>
-                                    <div className="text-xs text-gray-500 uppercase tracking-wider">Active Clubs</div>
-                                </div>
-                                <div className="text-center bg-[#111] border border-white/5 p-4 rounded-xl flex-1">
-                                    <div className="text-3xl font-bold text-gradient mb-1">98%</div>
-                                    <div className="text-xs text-gray-500 uppercase tracking-wider">Satisfaction</div>
-                                </div>
-                            </div>
-                        </motion.div>
-                    </div>
-
-                    {/* Right Side: CardSwap Animation */}
-                    <div className="flex-1 w-full lg:w-1/2 h-[500px] relative flex justify-center items-center">
-                        <CardSwap
-                            width={350}
-                            height={420}
-                            cardDistance={50}
-                            verticalDistance={50}
-                            delay={4000}
-                            pauseOnHover={true}
-                        >
-                            {/* Card 1: AzeeFit (Requested) */}
-                            <Card customClass="glass-dark border border-white/10 p-8 flex flex-col justify-between">
-                                <div className="mb-4">
-                                    <div className="flex text-[#00d4ff] mb-4 gap-1">
-                                        {[...Array(5)].map((_, i) => <i key={i} className="ri-star-fill"></i>)}
-                                    </div>
-                                    <p className="text-xl text-gray-200 font-medium italic">
-                                        "we are using this management for 1 year well satiiesd"
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 mt-auto">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#4040e0] to-[#00d4ff] flex items-center justify-center font-bold text-white text-lg">
-                                        A
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-white">Azeez</h4>
-                                        <p className="text-sm text-gray-400">Gym Trainer, AzeeFit</p>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            {/* Card 2: German Fitness */}
-                            <Card customClass="glass-dark border border-white/10 p-8 flex flex-col justify-between">
-                                <div className="mb-4">
-                                    <div className="flex text-[#00d4ff] mb-4 gap-1">
-                                        {[...Array(5)].map((_, i) => <i key={i} className="ri-star-fill"></i>)}
-                                    </div>
-                                    <p className="text-xl text-gray-200 font-medium italic">
-                                        "Billing used to be a nightmare. Now it's automated and seamless. Best investment we made."
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 mt-auto">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-500 flex items-center justify-center font-bold text-white text-lg">
-                                        J
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-white">John D.</h4>
-                                        <p className="text-sm text-gray-400">Owner, German Fitness</p>
-                                    </div>
-                                </div>
-                            </Card>
-
-                            {/* Card 3: Iron Gym */}
-                            <Card customClass="glass-dark border border-white/10 p-8 flex flex-col justify-between">
-                                <div className="mb-4">
-                                    <div className="flex text-[#00d4ff] mb-4 gap-1">
-                                        {[...Array(5)].map((_, i) => <i key={i} className="ri-star-fill"></i>)}
-                                    </div>
-                                    <p className="text-xl text-gray-200 font-medium italic">
-                                        "The membership tracking is flawless. We've reduced dropouts by 20% in just 3 months."
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-4 mt-auto">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-700 flex items-center justify-center font-bold text-white text-lg">
-                                        M
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-white">Mike R.</h4>
-                                        <p className="text-sm text-gray-400">Manager, Iron Gym</p>
-                                    </div>
-                                </div>
-                            </Card>
-                        </CardSwap>
-                    </div>
-                </div>
-            </div>
-        </section>
-    );
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
 };
 
-export default Testimonials;
+export default function Testimonials() {
+  return (
+    <section
+      id="testimonials"
+      className="py-20 lg:py-28"
+      style={{ background: 'var(--landing-bg)' }}
+    >
+      <div className="landing-container">
+        {/* Header */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="text-center max-w-2xl mx-auto mb-14"
+        >
+          <span className="landing-section-label">Reviews</span>
+          <h2 className="landing-heading">
+            Trusted by{' '}
+            <span className="landing-heading-gradient">Top Clubs</span>
+          </h2>
+          <p className="landing-subheading mx-auto text-center">
+            Join hundreds of fitness centers that have transformed their
+            management with N3 Fit.
+          </p>
+        </motion.div>
+
+        {/* Testimonial Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          {testimonials.map((t, index) => (
+            <motion.div
+              key={index}
+              variants={fadeUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              className="landing-card flex flex-col"
+            >
+              {/* Stars */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <FiStar
+                    key={i}
+                    size={16}
+                    fill="#f59e0b"
+                    style={{ color: '#f59e0b' }}
+                  />
+                ))}
+              </div>
+
+              {/* Quote */}
+              <p
+                className="text-sm leading-relaxed flex-1 mb-6"
+                style={{ color: 'var(--landing-text-secondary)' }}
+              >
+                "{t.text}"
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-4 border-t" style={{ borderColor: 'var(--landing-border-light)' }}>
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                  style={{ background: t.color }}
+                >
+                  {t.avatar}
+                </div>
+                <div>
+                  <h4
+                    className="font-semibold text-sm"
+                    style={{ color: 'var(--landing-text)' }}
+                  >
+                    {t.name}
+                  </h4>
+                  <p
+                    className="text-xs"
+                    style={{ color: 'var(--landing-text-muted)' }}
+                  >
+                    {t.role}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

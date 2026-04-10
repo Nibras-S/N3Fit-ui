@@ -1,91 +1,73 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FiArrowRight } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
-const CallToAction = () => {
-    return (
-        <section className="py-24 relative overflow-hidden" style={{ background: '#0a0a0a' }}>
-            {/* Subtle background pattern */}
-            <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                {/* Grid pattern */}
-                <div className="absolute inset-0 opacity-[0.02]" style={{
-                    backgroundImage: 'radial-gradient(white 1px, transparent 1px)',
-                    backgroundSize: '30px 30px'
-                }}></div>
-            </div>
-
-            <div className="container mx-auto px-4 relative z-10 text-center">
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                >
-                    <div
-                        className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium mb-8"
-                        style={{
-                            background: 'rgba(0,212,255,0.08)',
-                            color: '#00d4ff',
-                            border: '1px solid rgba(0,212,255,0.15)',
-                            backdropFilter: 'blur(8px)',
-                        }}
-                    >
-                        <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#00d4ff' }}></span>
-                        14-Day Free Trial — No Credit Card
-                    </div>
-
-                    <h2
-                        className="text-4xl md:text-6xl lg:text-7xl font-extrabold mb-6 leading-tight"
-                        style={{ fontFamily: "'Outfit', sans-serif", color: '#fff', letterSpacing: '-0.03em' }}
-                    >
-                        READY TO TRANSFORM
-                        <br />
-                        <span style={{
-                            background: 'linear-gradient(135deg, #4040e0, #00e5ff)',
-                            WebkitBackgroundClip: 'text',
-                            WebkitTextFillColor: 'transparent',
-                        }}>
-                            YOUR FITNESS BUSINESS?
-                        </span>
-                    </h2>
-                    <p className="text-xl mb-10 max-w-2xl mx-auto leading-relaxed" style={{ color: '#666' }}>
-                        Join 500+ fit club owners who switched to N3 Fit and never looked back. Start your free trial today — setup takes under 10 minutes.
-                    </p>
-
-                    <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-8 py-4 rounded-xl font-bold text-lg transition-all"
-                            style={{
-                                background: 'linear-gradient(135deg, #4040e0, #00d4ff)',
-                                color: '#ffffff',
-                            }}
-                        >
-                            <i className="ri-rocket-2-line mr-2"></i>
-                            Get Started Free
-                        </motion.button>
-                        <motion.button
-                            whileHover={{ scale: 1.03, background: 'rgba(255,255,255,0.08)' }}
-                            whileTap={{ scale: 0.98 }}
-                            className="px-8 py-4 rounded-xl font-bold text-lg transition-all"
-                            style={{
-                                background: 'rgba(255,255,255,0.05)',
-                                color: '#e0e0e0',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                backdropFilter: 'blur(10px)',
-                            }}
-                        >
-                            <i className="ri-calendar-line mr-2"></i>
-                            Book a Demo
-                        </motion.button>
-                    </div>
-
-                    <p className="text-sm" style={{ color: '#444' }}>
-                        ✓ Free 14-day trial &nbsp; ✓ No setup fee &nbsp; ✓ Cancel anytime
-                    </p>
-                </motion.div>
-            </div>
-        </section>
-    );
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 },
 };
 
-export default CallToAction;
+export default function CallToAction() {
+  const navigate = useNavigate();
+
+  return (
+    <section className="py-20 lg:py-28" style={{ background: 'var(--landing-bg)' }}>
+      <div className="landing-container">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="relative rounded-3xl overflow-hidden px-6 py-16 md:px-12 md:py-20 text-center"
+          style={{
+            background: 'linear-gradient(135deg, var(--landing-primary), var(--landing-primary-dark))',
+          }}
+        >
+          {/* Decorative circles */}
+          <div
+            className="absolute top-[-50px] right-[-50px] w-[200px] h-[200px] rounded-full opacity-10 pointer-events-none"
+            style={{ background: '#ffffff' }}
+          />
+          <div
+            className="absolute bottom-[-30px] left-[-30px] w-[150px] h-[150px] rounded-full opacity-10 pointer-events-none"
+            style={{ background: '#ffffff' }}
+          />
+
+          <div className="relative z-10">
+            <h2
+              className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 leading-tight"
+              style={{ letterSpacing: '-0.025em' }}
+            >
+              Ready to Transform
+              <br />
+              Your Fitness Business?
+            </h2>
+            <p className="text-lg text-white/75 mb-8 max-w-xl mx-auto leading-relaxed">
+              Join 500+ gym owners who switched to N3 Fit and never looked back.
+              Start your free trial today — setup takes under 10 minutes.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+              <button
+                className="landing-cta-primary"
+                onClick={() => navigate('/login')}
+              >
+                Get Started Free
+                <FiArrowRight size={18} />
+              </button>
+              <button className="landing-cta-secondary">
+                Book a Demo
+              </button>
+            </div>
+
+            <p className="text-sm text-white/50">
+              Free 14-day trial &middot; No setup fee &middot; Cancel anytime
+            </p>
+          </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
