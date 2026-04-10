@@ -615,15 +615,8 @@ const MembersPage = () => {
     );
 
     return (
-        <AppLayout showGenderSwitch={false}>
+        <AppLayout title="Members" description="Manage your gym members, renewals, and contact details" icon={FaUsers} showGenderSwitch={false}>
             <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
-
-            <PageHeader
-                title="Members"
-                description="Manage your gym members, renewals, and contact details"
-                icon={FaUsers}
-            />
-
             {/* ── Desktop Tab Bar ─────────────────────────────── */}
             <div className="hidden lg:block mb-6">
                 <div className="flex items-end justify-between border-b border-gray-200 dark:border-slate-700">

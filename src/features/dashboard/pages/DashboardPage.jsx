@@ -94,15 +94,8 @@ const Dashboard = () => {
     const monthChange = stats?.income?.monthChange || 0;
 
     return (
-        <AppLayout showGenderSwitch={false}>
-            <div className="space-y-6 pb-10">
-                <PageHeader
-                    title="Financial Dashboard"
-                    description="Complete business overview with revenue tracking"
-                    icon={FaChartPie}
-                />
-
-                {/* ========== DAILY REPORT SECTION ========== */}
+        <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
+            <div className="space-y-6 pb-10">                {/* ========== DAILY REPORT SECTION ========== */}
                 <button
                     type="button"
                     onClick={() => setTodayModalOpen(true)}

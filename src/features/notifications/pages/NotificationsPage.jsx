@@ -16,7 +16,7 @@ const Notifications = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <div className="max-w-4xl mx-auto pb-10">
+            <div className="mx-auto pb-10">
                 <Toaster position="top-right" />
 
                 <div className="flex justify-between items-center">

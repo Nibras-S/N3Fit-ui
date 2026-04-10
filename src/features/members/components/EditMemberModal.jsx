@@ -5,6 +5,7 @@ import 'react-phone-input-2/lib/style.css';
 import { FaMale, FaFemale, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 
 /**
@@ -28,6 +29,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
     const [settings, setSettings] = useState(null);
     const { hasFeature } = useAuth();
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,20 +68,25 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
+            // Detect if this is a renewal (plan or amount changed)
+            const planChanged = formData.plan !== originalData.plan;
+            const amountChanged = formData.amount !== originalData.amount;
+            const isRenewal = planChanged || amountChanged;
+
             const updateData = {
                 name: formData.name,
                 phone: formData.phone,
                 plan: formData.plan,
                 gender: formData.gender,
                 date: formData.date,
-                paymentStatus: formData.paymentStatus,
-                paymentMethod: formData.paymentMethod,
+                // Payment status/method only sent for plain edits; renewals
+                // always create a Pending transaction and go through the
+                // MembershipCard → RecordPaymentModal flow.
+                ...(isRenewal ? {} : {
+                    paymentStatus: formData.paymentStatus,
+                    paymentMethod: formData.paymentMethod,
+                }),
             };
-
-            // Detect if this is a renewal (plan or amount changed)
-            const planChanged = formData.plan !== originalData.plan;
-            const amountChanged = formData.amount !== originalData.amount;
-            const isRenewal = planChanged || amountChanged;
 
             if (isRenewal) {
                 updateData._isRenewal = true;
@@ -91,11 +98,20 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                 if (planDays) updateData.planDays = planDays;
             }
 
-            await api.put(`/contacts/${formData._id}`, updateData);
+            const res = await api.put(`/contacts/${formData._id}`, updateData);
+            const responseData = res.data;
 
-            toast.success('Member updated successfully');
-            if (onUpdate) onUpdate(updateData);
-            onClose();
+            if (isRenewal && responseData?.transaction) {
+                // Renewal: navigate to MembershipCard so staff can record payment
+                toast.success('Membership renewed! Record payment below.');
+                onClose();
+                const txnParam = `?txn=${responseData.transaction._id}`;
+                navigate(`/members/${formData._id}/card${txnParam}`);
+            } else {
+                toast.success('Member updated successfully');
+                if (onUpdate) onUpdate(updateData);
+                onClose();
+            }
         } catch (error) {
             // The axios interceptor already toasts the actual server error.
             // Don't add a generic "Failed to update member" on top of it.

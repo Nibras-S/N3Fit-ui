@@ -10,6 +10,7 @@ import MembersPage from '../features/members/pages/MembersPage';
 import MemberProfilePage from '../features/members/pages/MemberProfilePage';
 import RegisterMemberPage from '../features/members/pages/RegisterMemberPage';
 import InactiveSoonPage from '../features/members/pages/InactiveSoonPage';
+import MembershipCardPage from '../features/members/pages/MembershipCardPage';
 
 // Dashboard & Analytics
 import DashboardPage from '../features/dashboard/pages/DashboardPage';
@@ -56,6 +57,7 @@ export default function AppRoutes() {
             <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
                 <Route path="/members" element={<MembersPage />} />
                 <Route path="/members/:id" element={<MemberProfilePage />} />
+                <Route path="/members/:id/card" element={<MembershipCardPage />} />
                 <Route path="/register" element={<RegisterMemberPage />} />
                 <Route path="/inactivesoon" element={<InactiveSoonPage />} />
                 <Route path="/invoice/:id" element={<InvoicePage />} />

@@ -272,8 +272,9 @@ function NewMember() {
 
     formData.append('amount', totalAmount);
     formData.append('discount', disc);
-    formData.append('paymentMethod', paymentMethod);
-    formData.append('paymentStatus', paymentStatus);
+    // Payment method and status are NOT sent here — enrollment always creates
+    // a Pending transaction. Staff records the actual payment via the
+    // MembershipCard / RecordPaymentModal immediately after enrollment.
 
     // Compute planDays from settings plan duration + durationType
     if (settings?.plans && settings.plans.length > 0) {
@@ -303,11 +304,15 @@ function NewMember() {
     }
 
     try {
-      await api.post(`/contacts/`, formData, {
+      const res = await api.post(`/contacts/`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      toast.success('Member enrolled successfully!');
-      setTimeout(() => navigate('/members'), 1500);
+      const { member, transaction } = res.data;
+      toast.success('Member enrolled! Record payment below.');
+      // Navigate to the membership card — the transaction is Pending until
+      // staff records the payment via the Mark-as-Paid flow.
+      const txnParam = transaction?._id ? `?txn=${transaction._id}` : '';
+      navigate(`/members/${member._id}/card${txnParam}`);
     } catch (err) {
       // The axios response interceptor (shared/services/api.js) already shows
       // a toast with the actual server message (e.g. "phone already exists").
@@ -674,23 +679,14 @@ function NewMember() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <select
-                      value={paymentMethod}
-                      onChange={e => setPaymentMethod(e.target.value)}
-                      className="bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 p-2.5 rounded-xl outline-none font-bold text-[10px] uppercase"
-                    >
-                      {["Cash", "UPI", "Card", "Bank Transfer"].map(m => <option key={m} value={m}>{m}</option>)}
-                    </select>
-                    <select
-                      value={paymentStatus}
-                      onChange={e => setPaymentStatus(e.target.value)}
-                      className={`p-2.5 rounded-xl border-2 outline-none transition-all font-black text-[10px] uppercase ${paymentStatus === 'Paid' ? 'border-green-500 bg-green-50 text-green-700' : 'border-red-500 bg-red-50 text-red-700'}`}
-                    >
-                      <option value="Paid">PAID</option>
-                      <option value="Pending">PENDING</option>
-                      <option value="Partial">PARTIAL</option>
-                    </select>
+                  {/* Payment status is always set to Pending at enrollment;
+                      staff records the actual payment on the next screen
+                      (MembershipCard → Mark as Paid flow). */}
+                  <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                    <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+                    <p className="text-[10px] font-bold text-amber-700 dark:text-amber-400">
+                      Payment will be recorded on the next screen — you can choose Cash, UPI, Card, or split.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -744,8 +740,8 @@ function NewMember() {
                     <div className="pl-2">
                       <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1.5">Settlement</p>
                       <p className="text-xl font-black text-gray-900 dark:text-white">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</p>
-                      <p className={`text-[9px] font-black px-2 py-0.5 rounded-full inline-block mt-1 ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {paymentStatus.toUpperCase()} ({paymentMethod.toUpperCase()})
+                      <p className="text-[9px] font-black px-2 py-0.5 rounded-full inline-block mt-1 bg-amber-100 text-amber-700">
+                        PENDING — Pay on next screen
                       </p>
                     </div>
                   </div>

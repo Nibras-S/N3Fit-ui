@@ -46,6 +46,9 @@ export function AppLayout({
   onSwitchGender,
   showGenderSwitch = true,
   showBackToList = false,
+  title,
+  description,
+  icon: PageIcon,
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -54,11 +57,9 @@ export function AppLayout({
 
   // Network indicator + page-title source for the mobile header.
   const { status: networkStatus } = useOnlineStatus();
-  const currentPageTitle = getRouteTitle(location.pathname);
+  const currentPageTitle = title || getRouteTitle(location.pathname);
 
   // Sidebar collapsed state — persisted across sessions in localStorage.
-  // Click the logo (or the small chevron) to toggle. In collapsed mode the
-  // sidebar shrinks to icon-only at lg:w-20.
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     try {
       return localStorage.getItem('n3_sidebar_collapsed') === '1';
@@ -67,39 +68,11 @@ export function AppLayout({
     }
   });
 
-  // Scroll-driven auto-collapse: as soon as the user scrolls past a small
-  // threshold we shrink the sidebar to icon-only mode so wide tables (like
-  // the members list) get the full horizontal real estate. The state is
-  // separate from the persisted user preference so manually expanding while
-  // scrolled still works — the next scroll re-collapses.
-  const [autoCollapsed, setAutoCollapsed] = useState(false);
-  useEffect(() => {
-    let raf = 0;
-    const onScroll = () => {
-      if (raf) return;
-      raf = requestAnimationFrame(() => {
-        setAutoCollapsed(window.scrollY > 80);
-        raf = 0;
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, []);
-
-  // Effective collapsed state used by every render path below.
-  const isCollapsed = sidebarCollapsed || autoCollapsed;
+  const isCollapsed = sidebarCollapsed;
 
   const toggleSidebar = () => {
-    // If we're currently collapsed for ANY reason (manual or scroll-driven),
-    // a click means "expand now". Clear both flags so the user gets the full
-    // sidebar back even mid-scroll.
     if (isCollapsed) {
       setSidebarCollapsed(false);
-      setAutoCollapsed(false);
       try { localStorage.setItem('n3_sidebar_collapsed', '0'); } catch (_) { }
       return;
     }
@@ -121,7 +94,6 @@ export function AppLayout({
 
   const isActive = (path) => {
     const [pathPart] = path.split('?');
-    // For /members — highlight on any /members sub-path regardless of tab param
     if (pathPart === '/members') return location.pathname === '/members' || location.pathname.startsWith('/members');
     return location.pathname === pathPart;
   };
@@ -137,7 +109,6 @@ export function AppLayout({
     }
   }, [activeWarning]);
 
-  // Confirm Modal state
   const [confirmState, setConfirmState] = useState({
     isOpen: false,
     title: "",
@@ -146,9 +117,6 @@ export function AppLayout({
     type: "danger"
   });
 
-  /**
-   * Safe navigation that checks for unsaved registration data.
-   */
   const safeNavigate = (path) => {
     if (isDirty) {
       setConfirmState({
@@ -185,7 +153,6 @@ export function AppLayout({
     }
   };
 
-  // Role-based navigation with feature gating
   const navItems = [
     { path: "/dashboard", label: "Dashboard", icon: FaChartPie, roles: ["gymadmin"] },
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
@@ -213,7 +180,6 @@ export function AppLayout({
     .filter((item) => !item.roles || item.roles.includes(user?.role))
     .filter((item) => !item.feature || hasFeature(item.feature))
     .map((item) => {
-      // Also filter sub-items by feature
       if (item.subItems) {
         return {
           ...item,
@@ -224,7 +190,6 @@ export function AppLayout({
     });
 
   const [expandedItems, setExpandedItems] = useState(() => {
-    // Expand groups if a subItem is active
     const expanded = {};
     navItems.forEach(item => {
       if (item.subItems?.some(sub => isActive(sub.path))) {
@@ -246,7 +211,6 @@ export function AppLayout({
   const gymLogo = user?.gym?.logo;
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-  // Dedicated bottom nav items (role-aware)
   const bottomNavItems = user?.role === 'superadmin'
     ? [
       { path: "/superadmin", label: "Dashboard", icon: FaBuilding },
@@ -269,60 +233,51 @@ export function AppLayout({
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 font-sans flex flex-col lg:flex-row transition-colors duration-200">
-      {/* Desktop Sidebar */}
+
+      {/* ─── Desktop Sidebar ──────────────────────────────────────────────── */}
       <aside
-        className={`hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 shrink-0 transition-all duration-200 ${
-          isCollapsed ? "lg:w-20" : "lg:w-60"
-        }`}
+        className={`hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-[#0e1726] border-r border-gray-200 dark:border-transparent shrink-0 relative transition-all duration-300 ${isCollapsed ? "lg:w-[72px]" : "lg:w-[240px]"
+          }`}
       >
-        <div className={`flex flex-col h-full ${isCollapsed ? "p-3" : "p-5"}`}>
-          {/* Logo / Gym Name — clickable to collapse / expand */}
+        <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ${isCollapsed ? "px-3 py-5" : "px-4 py-5"}`}>
+
+          {/* Logo / Gym Name */}
           <button
             type="button"
             onClick={toggleSidebar}
             aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-            className={`group relative flex items-center mb-8 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors ${
-              isCollapsed ? "justify-center px-1 py-2" : "gap-3 px-2 py-2"
-            }`}
+            className={`group flex items-center mb-8 rounded-xl transition-all duration-200 ${isCollapsed
+              ? "justify-center p-2 hover:bg-gray-100 dark:hover:bg-white/8"
+              : "gap-3 px-3 py-2.5 hover:bg-gray-100 dark:hover:bg-white/8"
+              }`}
           >
             {gymLogo ? (
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center overflow-hidden shrink-0">
+              <div className="w-9 h-9 rounded-xl overflow-hidden shrink-0 ring-2 ring-gray-200 dark:ring-white/10">
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-white">
-                <img src={n3Logo} alt="Fit" className="w-full h-full object-contain" />
+              <div className="w-9 h-9 rounded-xl shrink-0 bg-blue-600 flex items-center justify-center ring-2 ring-blue-500/30 shadow-lg shadow-blue-500/20">
+                <img src={n3Logo} alt="Fit" className="w-7 h-7 object-contain" />
               </div>
             )}
             {!isCollapsed && (
-              <div className="min-w-0 flex-1 text-left">
-                <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate">{gymName}</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{userRole}</p>
-              </div>
-            )}
-            {!isCollapsed && (
-              <FaAngleDoubleLeft className="text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-200 text-sm shrink-0" />
+              <>
+                <div className="min-w-0 flex-1 text-left">
+                  <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate leading-tight">{gymName}</h1>
+                  <p className="text-[11px] text-blue-600 dark:text-blue-400 truncate font-medium">{userRole}</p>
+                </div>
+                <FaAngleDoubleLeft className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 text-xs shrink-0 transition-colors" />
+              </>
             )}
           </button>
 
-          {/* Floating expand button when collapsed (like the reference image) */}
-          {isCollapsed && (
-            <button
-              type="button"
-              onClick={toggleSidebar}
-              aria-label="Expand sidebar"
-              title="Expand sidebar"
-              className="absolute top-7 -right-3 z-10 w-6 h-6 rounded-full bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 shadow-md flex items-center justify-center text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
-            >
-              <FaAngleDoubleRight className="text-[10px]" />
-            </button>
-          )}
+
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 overflow-y-auto custom-scrollbar pr-1">
+          <nav className="flex-1 space-y-0.5 overflow-y-auto custom-scrollbar">
             {!isCollapsed && (
-              <p className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider px-3 mb-2">Menu</p>
+              <p className="text-[10px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-widest px-3 mb-3">Menu</p>
             )}
             {navItems.map((item) => {
               const { path, label, icon: Icon, subItems, badge } = item;
@@ -331,24 +286,25 @@ export function AppLayout({
 
               if (subItems) {
                 return (
-                  <div key={label} className="space-y-1">
+                  <div key={label} className="space-y-0.5">
                     <button
                       onClick={() => {
                         toggleExpand(label);
                         if (item.defaultPath) safeNavigate(item.defaultPath);
                       }}
                       title={isCollapsed ? label : undefined}
-                      className={`w-full text-left ${isCollapsed ? "px-2 py-3 justify-center" : "px-3 py-3 justify-between"} flex items-center transition-colors text-sm font-medium rounded-md ${isItemActive
-                        ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
-                        : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
+                      className={`w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 justify-between"
+                        } ${isItemActive
+                          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                         }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
-                        <Icon className={`text-xl shrink-0 ${isItemActive ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
-                        {!isCollapsed && <span>{label}</span>}
+                        <Icon className={`text-[18px] shrink-0 ${isItemActive ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
+                        {!isCollapsed && <span className={`${isItemActive ? "text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
                       </div>
                       {!isCollapsed && (
-                        <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
+                        <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} ${isItemActive ? 'text-white/60' : 'text-gray-600'}`} />
                       )}
                     </button>
                     {!isCollapsed && (
@@ -361,14 +317,14 @@ export function AppLayout({
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                           >
-                            <div className="ml-4 pl-4 border-l-2 border-gray-100 dark:border-slate-700 space-y-1 mt-1">
+                            <div className="ml-4 pl-4 border-l border-gray-200 dark:border-white/10 space-y-0.5 mt-0.5">
                               {subItems.map((sub) => (
                                 <button
                                   key={sub.path}
                                   onClick={() => safeNavigate(sub.path)}
-                                  className={`w-full text-left px-3 py-3 flex items-center gap-3 transition-colors text-sm font-medium rounded-md ${isActive(sub.path)
-                                    ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
-                                    : "text-gray-600 dark:text-gray-400 active:bg-gray-50 dark:active:bg-slate-800/50"
+                                  className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
+                                    ? "bg-blue-600/80 text-white"
+                                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                                     }`}
                                 >
                                   {sub.label}
@@ -388,20 +344,22 @@ export function AppLayout({
                   key={path}
                   onClick={() => safeNavigate(path)}
                   title={isCollapsed ? label : undefined}
-                  className={`relative w-full text-left ${isCollapsed ? "px-2 py-3 justify-center" : "px-3 py-3 gap-3"} flex items-center transition-colors text-sm font-medium rounded-md ${isActive(path)
-                    ? "bg-gray-50 dark:bg-slate-800/80 text-gray-900 dark:text-white"
-                    : "text-gray-700 dark:text-gray-300 active:bg-gray-50 dark:active:bg-slate-800/50"
+                  className={`relative w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 gap-3"
+                    } ${isActive(path)
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                     }`}
                 >
-                  <Icon className={`text-xl shrink-0 ${isActive(path) ? "text-gray-700 dark:text-gray-200" : "text-gray-500 dark:text-gray-400"}`} />
-                  {!isCollapsed && <span className="flex-1">{label}</span>}
-                  {!isCollapsed && badge && (
-                    <span className="bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-xs font-semibold px-2 py-0.5 rounded-full ml-auto">
+                  <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
+                  {!isCollapsed && <span className={`flex-1 ${isActive(path) ? "text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
+                  {/* Badge — collapsed: red dot overlay; expanded: pill */}
+                  {badge && !isCollapsed && (
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto ${isActive(path) ? "bg-white/20 text-white" : "bg-blue-600/20 text-blue-400"}`}>
                       {badge}
                     </span>
                   )}
-                  {isCollapsed && badge && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                  {badge && isCollapsed && (
+                    <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                       {badge}
                     </span>
                   )}
@@ -410,128 +368,150 @@ export function AppLayout({
             })}
           </nav>
 
-
-          {/* Profile Section with Modal */}
-          <div className="pt-4 border-t border-gray-100 dark:border-slate-700 mt-auto relative">
-            <AnimatePresence>
-              {profileModalOpen && (
-                <>
-                  {/* Backdrop for closing modal when clicking outside */}
-                  <div
-                    className="fixed inset-0 z-10"
-                    onClick={() => setProfileModalOpen(false)}
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute bottom-full left-0 mb-4 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden z-20"
-                  >
-                    <div className="p-4 border-b border-gray-50 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30">
-                      <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">User Profile</p>
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg overflow-hidden">
-                          {user?.profileImage ? (
-                            <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
-                          ) : (
-                            userInitial
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userName}</p>
-                          <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{user?.email}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="p-2 space-y-1">
-                      <button
-                        onClick={() => {
-                          safeNavigate(user?.role === 'superadmin' ? '/superadmin/settings' : '/settings');
-                          setProfileModalOpen(false);
-                        }}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                      >
-                        <FaUserCog className="text-blue-500" />
-                        Manage Account
-                      </button>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
-                      >
-                        <FaSignOutAlt />
-                        Logout
-                      </button>
-                      <button
-                        onClick={toggleTheme}
-                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                      >
-                        {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-600" />}
-                        <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                </>
-              )}
-            </AnimatePresence>
-
-            <button
-              onClick={() => setProfileModalOpen(!profileModalOpen)}
-              title={isCollapsed ? userName : undefined}
-              className={`w-full flex items-center ${isCollapsed ? "justify-center" : "gap-3"} px-2 py-2 rounded-xl transition-all duration-200 group ${profileModalOpen
-                ? "bg-blue-50 dark:bg-blue-900/20"
-                : "hover:bg-gray-50 dark:hover:bg-slate-700/50"
-                }`}
-            >
-              <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-lg overflow-hidden shrink-0 shadow-sm group-hover:scale-105 transition-transform">
-                {user?.profileImage ? (
-                  <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  userInitial
-                )}
+          {/* Sidebar footer */}
+          <div className="pt-4 border-t border-gray-200 dark:border-white/8 mt-4 flex justify-center items-center">
+            {isCollapsed ? (
+              <img src={n3Logo} alt="N3 Fit" className="w-6 h-6 opacity-60 grayscale" />
+            ) : (
+              <div className="flex items-center gap-2">
+                <img src={n3Logo} alt="N3 Fit" className="w-5 h-5 opacity-60 grayscale" />
+                <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 opacity-60">Powered by N3 Fit</p>
               </div>
-              {!isCollapsed && (
-                <>
-                  <div className="flex-1 min-w-0 flex flex-col justify-center text-left">
-                    <p className="text-sm font-bold text-gray-900 dark:text-white truncate leading-tight mb-0.5">{userName}</p>
-                    <div className="flex items-center gap-1.5 overflow-hidden">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse shrink-0"></div>
-                      <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate font-medium uppercase tracking-wider leading-none">{gymName}</p>
-                    </div>
-                    {gymCode && (
-                      <span className="text-[9px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-1.5 py-0.5 rounded-full mt-0.5 inline-block">{gymCode}</span>
-                    )}
-                  </div>
-                  <div className={`transition-transform duration-200 ${profileModalOpen ? 'rotate-180' : ''}`}>
-                    <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                    </svg>
-                  </div>
-                </>
-              )}
-            </button>
-            {!isCollapsed && (
-              <p className="text-center text-[9px] font-black uppercase tracking-[0.2em] text-gray-300 dark:text-gray-600 mt-4 opacity-50">Powered by Fit</p>
             )}
           </div>
         </div>
       </aside>
 
-      {/* Main content
-          `min-w-0` is critical: as a flex item with `flex-1`, <main> would
-          otherwise default to `min-width: auto` and grow to its content's
-          intrinsic width — which means a wide table would push the page
-          horizontally instead of letting the table's own `overflow-x-auto`
-          wrapper scroll. Setting min-w-0 lets <main> shrink to its track,
-          so any descendant overflow scroller actually clips and scrolls. */}
+      {/* ─── Main Content ─────────────────────────────────────────────────── */}
+      {/* `min-w-0` is critical: prevents flex item from growing beyond its
+          track, which allows nested overflow-x-auto tables to actually scroll. */}
       <main className="flex-1 min-w-0 flex flex-col min-h-screen lg:min-h-0 bg-gray-50 dark:bg-slate-900 transition-colors duration-200">
-        {/* Mobile top bar — three-zone layout:
-              LEFT:   notification bell + unread badge
-              CENTER: current page title + live network status indicator
-              RIGHT:  hamburger menu (opens drawer)
-            The status dot pulses green when healthy, amber when weak,
-            red when offline. */}
+
+        {/* Desktop Header — sticky, shown only on lg+ */}
+        <header className="hidden lg:flex items-center justify-between px-6 py-3.5 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700/60 sticky top-0 z-20 shrink-0">
+          {/* Left: page title */}
+          <div className="flex items-center gap-3">
+            {PageIcon && (
+              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-slate-700/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <PageIcon size={20} />
+              </div>
+            )}
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+                {currentPageTitle}
+              </h1>
+              <p className="text-xs text-gray-500 dark:text-gray-400 font-medium mt-0.5">
+                {description || gymName}
+              </p>
+            </div>
+          </div>
+
+          {/* Right: online status + notification + profile */}
+          <div className="flex items-center gap-2">
+            {/* Online / offline indicator */}
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-700/50 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-600/50">
+              <NetworkDot status={networkStatus} />
+              <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 capitalize">{networkStatus}</span>
+            </div>
+
+            {/* Notification bell */}
+            <button
+              onClick={() => safeNavigate('/notifications')}
+              aria-label="Notifications"
+              className="relative p-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-150"
+            >
+              <FaBell className="text-[17px]" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center shadow-md">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            {/* Desktop profile avatar + dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setProfileModalOpen(!profileModalOpen)}
+                className={`flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl border transition-all duration-150 group ${profileModalOpen
+                  ? "bg-gray-100 dark:bg-slate-700 border-gray-200 dark:border-slate-600"
+                  : "bg-gray-50 dark:bg-slate-700/50 border-gray-100 dark:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700"
+                  }`}
+              >
+                <div className="relative w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs overflow-hidden shrink-0">
+                  {user?.profileImage ? (
+                    <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+                  ) : userInitial}
+                  <span className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-green-400 border border-white" />
+                </div>
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 max-w-[100px] truncate">{userName}</span>
+                <svg className={`w-3 h-3 text-gray-400 transition-transform ${profileModalOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {/* Profile dropdown — opens below the button */}
+              <AnimatePresence>
+                {profileModalOpen && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setProfileModalOpen(false)} />
+                    <motion.div
+                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden z-40"
+                    >
+                      {/* User info header */}
+                      <div className="p-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40">
+                        <div className="flex items-center gap-3">
+                          <div className="relative w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                            {user?.profileImage ? (
+                              <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+                            ) : userInitial}
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-slate-700" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userName}</p>
+                            <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="p-2 space-y-0.5">
+                        <button
+                          onClick={() => {
+                            safeNavigate(user?.role === 'superadmin' ? '/superadmin/settings' : '/settings');
+                            setProfileModalOpen(false);
+                          }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                        >
+                          <FaUserCog className="text-blue-500 text-base shrink-0" />
+                          Manage Account
+                        </button>
+                        <button
+                          onClick={() => { toggleTheme(); setProfileModalOpen(false); }}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                        >
+                          {theme === 'dark' ? <FaSun className="text-amber-400 text-base shrink-0" /> : <FaMoon className="text-slate-500 text-base shrink-0" />}
+                          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+                        </button>
+                        <div className="h-px bg-gray-100 dark:bg-slate-700 my-1" />
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        >
+                          <FaSignOutAlt className="text-base shrink-0" />
+                          Logout
+                        </button>
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+        </header>
+
+        {/* Mobile top bar */}
         <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
           {/* Left: notifications */}
           <button
@@ -548,14 +528,19 @@ export function AppLayout({
           </button>
 
           {/* Center: page title + status pulse */}
-          <div className="flex-1 flex items-center justify-center gap-2 min-w-0 px-2">
-            <h1 className="text-base font-bold text-gray-900 dark:text-white truncate">
-              {currentPageTitle}
-            </h1>
-            <NetworkDot status={networkStatus} />
+          <div className="flex-1 flex flex-col items-center justify-center min-w-0 px-2">
+            <div className="flex items-center justify-center gap-2">
+              <h1 className="text-base font-bold text-gray-900 dark:text-white truncate">
+                {currentPageTitle}
+              </h1>
+              <NetworkDot status={networkStatus} />
+            </div>
+            {description && (
+              <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate w-full text-center mt-0.5">{description}</p>
+            )}
           </div>
 
-          {/* Right: hamburger menu */}
+          {/* Right: hamburger */}
           <button
             onClick={() => setMobileMenuOpen((o) => !o)}
             className="p-2 -mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
@@ -612,8 +597,8 @@ export function AppLayout({
                                   setMobileMenuOpen(false);
                                 }
                               }}
-                              className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center justify-between transition-all text-sm ${isItemActive
-                                ? "text-blue-600 dark:text-blue-400 font-bold"
+                              className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all text-sm ${isItemActive
+                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
                                 : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                                 }`}
                             >
@@ -653,7 +638,7 @@ export function AppLayout({
                             safeNavigate(path);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full text-left px-3 py-2.5 rounded-lg flex items-center gap-3 text-sm ${isActive(path)
+                          className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 text-sm ${isActive(path)
                             ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
                             : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                             }`}
@@ -668,7 +653,7 @@ export function AppLayout({
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     <FaSignOutAlt /> Logout
                   </button>
@@ -679,7 +664,7 @@ export function AppLayout({
                         toggleTheme();
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                     >
                       {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-500" />}
                       <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
@@ -754,16 +739,11 @@ export function AppLayout({
         </AnimatePresence>
       </main>
 
-      {/* PWA Install Floating Modal — bottom-right, global */}
+      {/* PWA Install Floating Modal */}
       <InstallPWA />
 
-      {/* Mobile Bottom Navigation — five tabs with an elevated center FAB.
-          The SVG behind the bar paints a curved notch around the center
-          button so it looks like the FAB sits in a scoop, not on a wall.
-          The notch is decorative-only (pointer-events:none), so taps still
-          land on the buttons. */}
+      {/* Mobile Bottom Navigation */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 safe-area-pb">
-        {/* Curved background with cutout for the center button */}
         <div className="relative">
           <svg
             className="absolute inset-x-0 bottom-0 w-full h-[72px] text-white dark:text-slate-800 drop-shadow-[0_-4px_8px_rgba(15,23,42,0.06)] pointer-events-none"
@@ -795,17 +775,14 @@ export function AppLayout({
         </div>
       </nav>
 
-      {/* Spacer for bottom nav — matches the 72px nav height */}
+      {/* Spacer for mobile bottom nav */}
       <div className="lg:hidden h-[72px] shrink-0" aria-hidden="true" />
-    </div >
+    </div>
   );
 }
 
 function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
   if (isPrimary) {
-    // Center "+" button — sits inside the SVG notch carved by the parent.
-    // The negative top offset lifts it above the bar; the no-label
-    // variant matches the reference design (image 3).
     return (
       <div className="relative -top-7 flex flex-col items-center justify-center z-30 flex-1">
         <button
@@ -844,35 +821,26 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
 }
 
 /**
- * NetworkDot — small pulsing status indicator next to the mobile page title.
- *
- * Three states, three colours:
- *   online  — green dot, gentle pulse
- *   weak    — amber dot, faster pulse (you should know about it)
- *   offline — red dot, no pulse (because there's nothing to wait for)
- *
- * The double-layer trick (a static dot + a ping-animated halo) is the
- * standard tailwind pattern for "this thing is alive". `aria-label` on the
- * wrapper announces the state to screen readers.
+ * NetworkDot — pulsing status indicator.
  */
 function NetworkDot({ status }) {
-  const config = {
-    online:  { color: 'bg-green-500',  ring: 'bg-green-400',  pulse: true,  label: 'Online' },
-    weak:    { color: 'bg-amber-500',  ring: 'bg-amber-400',  pulse: true,  label: 'Weak connection' },
-    offline: { color: 'bg-red-500',    ring: 'bg-red-400',    pulse: false, label: 'Offline' },
+  const cfg = {
+    online: { color: 'bg-green-500', ring: 'bg-green-400', pulse: true, label: 'Online' },
+    weak: { color: 'bg-amber-500', ring: 'bg-amber-400', pulse: true, label: 'Weak connection' },
+    offline: { color: 'bg-red-500', ring: 'bg-red-400', pulse: false, label: 'Offline' },
   }[status] || { color: 'bg-gray-400', ring: 'bg-gray-300', pulse: false, label: 'Unknown' };
 
   return (
     <span
       className="relative flex w-2 h-2 shrink-0"
       role="status"
-      aria-label={config.label}
-      title={config.label}
+      aria-label={cfg.label}
+      title={cfg.label}
     >
-      {config.pulse && (
-        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${config.ring}`} />
+      {cfg.pulse && (
+        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${cfg.ring}`} />
       )}
-      <span className={`relative inline-flex rounded-full h-2 w-2 ${config.color}`} />
+      <span className={`relative inline-flex rounded-full h-2 w-2 ${cfg.color}`} />
     </span>
   );
 }

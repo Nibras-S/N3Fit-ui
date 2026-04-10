@@ -160,219 +160,211 @@ const ReportsPage = () => {
     }
 
     return (
-        <AppLayout showGenderSwitch={false}>
+        <AppLayout title="Reports" description="Complete business overview with revenue tracking" icon={FaChartPie} showGenderSwitch={false}>
             <div className="max-w-7xl mx-auto space-y-6">
-            <PageHeader
-                title="Financial Dashboard"
-                description="Complete business overview with revenue tracking"
-                icon={FaChartPie}
-                action={
-                    <>
-                        <button
-                            onClick={fetchReports}
-                            disabled={loading}
-                            title="Refresh"
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-700"
-                        >
-                            <FaSync size={13} className={loading ? 'animate-spin' : ''} />
-                        </button>
-                        <DateRangeFilter value={filter} onChange={handleFilterChange} />
-                    </>
-                }
-            />
-
-            {/* KPI Cards — every card is a navigation entry into its detail page.
+                <div className="flex justify-end items-center gap-3 w-full">
+                    <button
+                        onClick={fetchReports}
+                        disabled={loading}
+                        title="Refresh"
+                        className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
+                    >
+                        <FaSync size={13} className={loading ? 'animate-spin' : ''} />
+                    </button>
+                    <DateRangeFilter value={filter} onChange={handleFilterChange} />
+                </div>
+                {/* KPI Cards — every card is a navigation entry into its detail page.
                 Hover styles include a subtle ring + arrow to make affordance obvious. */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Income → /reports/income */}
-                <button
-                    onClick={() => drillTo('/reports/income')}
-                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 hover:-translate-y-0.5 transition-all"
-                >
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-green-600 dark:text-green-400">
-                            <FaArrowUp size={20} />
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {/* Income → /reports/income */}
+                    <button
+                        onClick={() => drillTo('/reports/income')}
+                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 hover:-translate-y-0.5 transition-all"
+                    >
+                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-green-600 dark:text-green-400">
+                                <FaArrowUp size={20} />
+                            </div>
+                            <span className="text-xs font-bold px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded-full">Income</span>
                         </div>
-                        <span className="text-xs font-bold px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded-full">Income</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalIncome)}</h3>
-                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
-                        <span>Total Revenue Generated</span>
-                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
-                    </p>
-                </button>
+                        <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalIncome)}</h3>
+                        <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Total Revenue Generated</span>
+                            <FaArrowRight size={11} className="text-gray-300 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
+                        </p>
+                    </button>
 
-                {/* Expenses → /reports/expense */}
-                <button
-                    onClick={() => drillTo('/reports/expense')}
-                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-red-200 dark:hover:border-red-800 hover:-translate-y-0.5 transition-all"
-                >
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400">
-                            <FaArrowDown size={20} />
+                    {/* Expenses → /reports/expense */}
+                    <button
+                        onClick={() => drillTo('/reports/expense')}
+                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-red-200 dark:hover:border-red-800 hover:-translate-y-0.5 transition-all"
+                    >
+                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400">
+                                <FaArrowDown size={20} />
+                            </div>
+                            <span className="text-xs font-bold px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-full">Expense</span>
                         </div>
-                        <span className="text-xs font-bold px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-full">Expense</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalExpense)}</h3>
-                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
-                        <span>Total Operational Cost</span>
-                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-red-500 group-hover:translate-x-0.5 transition-all" />
-                    </p>
-                </button>
+                        <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalExpense)}</h3>
+                        <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Total Operational Cost</span>
+                            <FaArrowRight size={11} className="text-gray-300 group-hover:text-red-500 group-hover:translate-x-0.5 transition-all" />
+                        </p>
+                    </button>
 
-                {/* Net Profit — non-clickable for now (no detail page yet).
+                    {/* Net Profit — non-clickable for now (no detail page yet).
                     Marked with cursor-default so users don't expect a drill-in. */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
-                            <FaWallet size={20} />
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl text-blue-600 dark:text-blue-400">
+                                <FaWallet size={20} />
+                            </div>
+                            <span className="text-xs font-bold px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full">Profit</span>
                         </div>
-                        <span className="text-xs font-bold px-2 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 rounded-full">Profit</span>
+                        <h3 className={`text-3xl font-black ${data.kpi.netProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
+                            {formatCurrency(data.kpi.netProfit)}
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">Net Income Retained</p>
                     </div>
-                    <h3 className={`text-3xl font-black ${data.kpi.netProfit >= 0 ? 'text-blue-600 dark:text-blue-400' : 'text-red-600 dark:text-red-400'}`}>
-                        {formatCurrency(data.kpi.netProfit)}
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">Net Income Retained</p>
+
+                    {/* Active Members → /members */}
+                    <button
+                        onClick={() => navigate('/members?tab=active')}
+                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 hover:-translate-y-0.5 transition-all"
+                    >
+                        <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                        <div className="flex justify-between items-start mb-4">
+                            <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-purple-600 dark:text-purple-400">
+                                <FaUsers size={20} />
+                            </div>
+                            <span className="text-xs font-bold px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-full">Active</span>
+                        </div>
+                        <h3 className="text-3xl font-black text-gray-900 dark:text-white">{data.kpi.activeMembers}</h3>
+                        <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                            <span>Current Subscribed Members</span>
+                            <FaArrowRight size={11} className="text-gray-300 group-hover:text-purple-500 group-hover:translate-x-0.5 transition-all" />
+                        </p>
+                    </button>
                 </div>
 
-                {/* Active Members → /members */}
-                <button
-                    onClick={() => navigate('/members?tab=active')}
-                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 hover:-translate-y-0.5 transition-all"
-                >
-                    <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-purple-600 dark:text-purple-400">
-                            <FaUsers size={20} />
-                        </div>
-                        <span className="text-xs font-bold px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-full">Active</span>
-                    </div>
-                    <h3 className="text-3xl font-black text-gray-900 dark:text-white">{data.kpi.activeMembers}</h3>
-                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
-                        <span>Current Subscribed Members</span>
-                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-purple-500 group-hover:translate-x-0.5 transition-all" />
-                    </p>
-                </button>
-            </div>
+                {isEmpty ? (
+                    <ReportsEmptyState />
+                ) : (
+                    <>
+                        {/* Charts Row 1 */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-            {isEmpty ? (
-                <ReportsEmptyState />
-            ) : (
-                <>
-            {/* Charts Row 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Financial Overview (Bar Chart) */}
+                            <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Financial Overview (Income vs Expense)</h3>
+                                <div className="h-80">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={data.financialChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000) + 'k' : value}`} />
+                                            <Tooltip
+                                                cursor={{ fill: 'transparent' }}
+                                                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                                                formatter={(value) => formatCurrency(value)}
+                                            />
+                                            <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                                            <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                            <Bar dataKey="expense" name="Expense" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
 
-                {/* Financial Overview (Bar Chart) */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Financial Overview (Income vs Expense)</h3>
-                    <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={data.financialChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `₹${value >= 1000 ? (value / 1000) + 'k' : value}`} />
-                                <Tooltip
-                                    cursor={{ fill: 'transparent' }}
-                                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                                    formatter={(value) => formatCurrency(value)}
-                                />
-                                <Legend wrapperStyle={{ paddingTop: '20px' }} />
-                                <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                                <Bar dataKey="expense" name="Expense" fill="#ef4444" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
-
-                {/* Expense Breakdown (Pie Chart) */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Expense Breakdown</h3>
-                    <p className="text-xs text-gray-500 mb-6">Category wise distribution</p>
-                    {data.expenseBreakdown.length > 0 ? (
-                        <div className="h-64">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <PieChart>
-                                    <Pie
-                                        data={data.expenseBreakdown}
-                                        cx="50%"
-                                        cy="50%"
-                                        innerRadius={60}
-                                        outerRadius={80}
-                                        paddingAngle={5}
-                                        dataKey="value"
-                                        stroke="none"
-                                    >
-                                        {data.expenseBreakdown.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                        ))}
-                                    </Pie>
-                                    <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                                </PieChart>
-                            </ResponsiveContainer>
-                            <div className="flex flex-wrap justify-center gap-3 mt-4">
-                                {data.expenseBreakdown.map((entry, index) => (
-                                    <div key={entry.name} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300">
-                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                                        {entry.name}
+                            {/* Expense Breakdown (Pie Chart) */}
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Expense Breakdown</h3>
+                                <p className="text-xs text-gray-500 mb-6">Category wise distribution</p>
+                                {data.expenseBreakdown.length > 0 ? (
+                                    <div className="h-64">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <PieChart>
+                                                <Pie
+                                                    data={data.expenseBreakdown}
+                                                    cx="50%"
+                                                    cy="50%"
+                                                    innerRadius={60}
+                                                    outerRadius={80}
+                                                    paddingAngle={5}
+                                                    dataKey="value"
+                                                    stroke="none"
+                                                >
+                                                    {data.expenseBreakdown.map((entry, index) => (
+                                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                    ))}
+                                                </Pie>
+                                                <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
+                                            </PieChart>
+                                        </ResponsiveContainer>
+                                        <div className="flex flex-wrap justify-center gap-3 mt-4">
+                                            {data.expenseBreakdown.map((entry, index) => (
+                                                <div key={entry.name} className="flex items-center gap-1.5 text-xs font-medium text-gray-600 dark:text-gray-300">
+                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+                                                    {entry.name}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="h-64 flex items-center justify-center text-sm text-gray-400 italic">No expense data for this period</div>
+                                )}
                             </div>
                         </div>
-                    ) : (
-                        <div className="h-64 flex items-center justify-center text-sm text-gray-400 italic">No expense data for this period</div>
-                    )}
-                </div>
-            </div>
 
-            {/* Charts Row 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Charts Row 2 */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-                {/* Net Profit Flow (Area Chart) */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Net Profit Growth</h3>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={data.financialChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <defs>
-                                    <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                                    </linearGradient>
-                                </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `${value >= 1000 ? (value / 1000) + 'k' : value}`} />
-                                <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                <Area type="monotone" dataKey="profit" name="Net Profit" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
-                            </AreaChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                            {/* Net Profit Flow (Area Chart) */}
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Net Profit Growth</h3>
+                                <div className="h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <AreaChart data={data.financialChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <defs>
+                                                <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                                </linearGradient>
+                                            </defs>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `${value >= 1000 ? (value / 1000) + 'k' : value}`} />
+                                            <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ borderRadius: '12px', border: 'none' }} />
+                                            <Area type="monotone" dataKey="profit" name="Net Profit" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
+                                        </AreaChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
 
-                {/* Member Retention & Churn (Line Chart) */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
-                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Member Activity vs Expiry Rate</h3>
-                    <div className="h-72">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <LineChart data={data.memberChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
-                                <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
-                                <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                                <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                <Legend wrapperStyle={{ paddingTop: '10px' }} />
-                                <Line type="monotone" dataKey="joined" name="New Members" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                                <Line type="monotone" dataKey="expired" name="Expired Members" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                            </LineChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                            {/* Member Retention & Churn (Line Chart) */}
+                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Member Activity vs Expiry Rate</h3>
+                                <div className="h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart data={data.memberChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
+                                            <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
+                                            <YAxis axisLine={false} tickLine={false} allowDecimals={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                                            <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
+                                            <Legend wrapperStyle={{ paddingTop: '10px' }} />
+                                            <Line type="monotone" dataKey="joined" name="New Members" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                            <Line type="monotone" dataKey="expired" name="Expired Members" stroke="#ef4444" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
 
-                </div>
-                </>
-            )}
+                        </div>
+                    </>
+                )}
             </div>
         </AppLayout>
     );

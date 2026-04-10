@@ -208,7 +208,7 @@ const Announcement = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <div className="max-w-5xl mx-auto pb-10">
+            <div className="mx-auto pb-10">
                 <Toaster position="top-right" />
 
 

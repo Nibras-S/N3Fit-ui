@@ -146,14 +146,10 @@ const Expenses = () => {
     ];
 
     return (
-        <AppLayout showGenderSwitch={false}>
+        <AppLayout title="Expense Tracker" description="Monitor your gym's spending and financial health" icon={FaWallet} showGenderSwitch={false}>
             <div className="space-y-6">
-                {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Expense Tracker</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Monitor your gym's spending and financial health</p>
-                    </div>
+                {/* Header Actions */}
+                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
                     <div className="flex items-center gap-3">
                         {selectedIds.length > 0 && (
                             <button
