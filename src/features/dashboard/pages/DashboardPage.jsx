@@ -23,7 +23,7 @@ const Dashboard = () => {
     const [todayModalOpen, setTodayModalOpen] = useState(false);
 
     useEffect(() => {
-        if (user && user.role === 'staff') {
+        if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
             navigate('/members');
             return;
         }
