@@ -157,7 +157,7 @@ export function AppLayout({
   };
 
   const navItems = [
-    { path: "/dashboard", label: "Dashboard", icon: FaChartPie, roles: ["gymadmin"] },
+    { path: "/dashboard", label: "Dashboard", icon: FaChartPie, roles: ["gymadmin", "staff"], permission: "dashboard" },
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
     { path: "/superadmin/plans", label: "SaaS Plans", icon: FaCrown, roles: ["superadmin"] },
     {
@@ -167,13 +167,14 @@ export function AppLayout({
       roles: ["gymadmin", "staff"],
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
-    { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin"] },
-    { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "staff", "superadmin"] },
+    { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin", "staff"], permission: "expenses" },
+    { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "staff", "superadmin"], permission: "reports" },
     {
       path: "/notifications",
       label: "Notifications",
       icon: FaBell,
       roles: ["gymadmin", "staff"],
+      permission: "notifications",
       badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null
     },
     { path: "/announcement", label: "Announcement", icon: FaBullhorn, roles: ["gymadmin", "superadmin"], feature: "announcements" },
@@ -181,6 +182,13 @@ export function AppLayout({
     { path: "/settings", label: "Settings", icon: FaCog, roles: ["gymadmin", "staff"] },
   ]
     .filter((item) => !item.roles || item.roles.includes(user?.role))
+    .filter((item) => {
+      // Permission-gated items: staff must have the permission to see it
+      if (item.permission && user?.role === 'staff') {
+        return user?.permissions?.includes(item.permission);
+      }
+      return true;
+    })
     .filter((item) => !item.feature || hasFeature(item.feature))
     .map((item) => {
       if (item.subItems) {
@@ -214,19 +222,25 @@ export function AppLayout({
   const gymLogo = user?.gym?.logo;
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-  const bottomNavItems = user?.role === 'superadmin'
+  const bottomNavItems = (user?.role === 'superadmin'
     ? [
       { path: "/superadmin", label: "Dashboard", icon: FaBuilding },
       { path: "/superadmin/plans", label: "Plans", icon: FaCrown },
       { path: "/superadmin/settings", label: "Settings", icon: FaCog },
     ]
     : [
-      { path: "/dashboard", label: "Dashboard", icon: FaChartPie },
+      { path: "/dashboard", label: "Dashboard", icon: FaChartPie, permission: "dashboard" },
       { path: "/members", label: "Members", icon: FaUsers },
       { path: "/register", label: "New", icon: FaUserPlus },
-      { path: "/notifications", label: "Alerts", icon: FaBell, badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
+      { path: "/notifications", label: "Alerts", icon: FaBell, permission: "notifications", badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null },
       { path: "/settings", label: "Settings", icon: FaCog },
-    ];
+    ]
+  ).filter((item) => {
+    if (item.permission && user?.role === 'staff') {
+      return user?.permissions?.includes(item.permission);
+    }
+    return true;
+  });
 
   const getImageUrl = (path) => {
     if (!path) return null;

@@ -35,6 +35,10 @@ import GymDetailsPage from '../features/superadmin/pages/GymDetailsPage';
 import SuperAdminSettingsPage from '../features/superadmin/pages/SuperAdminSettingsPage';
 import SaaSPlanPage from '../features/superadmin/pages/SaaSPlanPage';
 
+// Detect if running as installed PWA (standalone mode)
+const isPWA = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+
 /**
  * Centralized route configuration.
  * All routes are organized by access level.
@@ -43,7 +47,7 @@ export default function AppRoutes() {
     return (
         <Routes>
             {/* ── Public ──────────────────────────────────────────── */}
-            <Route path="/" element={<LandingPage />} />
+            <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />
             <Route path="/login" element={<LoginGuard />} />
             <Route path="/admin" element={<LoginGuard />} />
 
@@ -68,12 +72,20 @@ export default function AppRoutes() {
                 <Route path="/manageUsers" element={<Navigate to="/members?tab=all" replace />} />
             </Route>
 
+            {/* ── Gym Admin + Staff with dashboard permission ─────── */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+            </Route>
+
+            {/* ── Gym Admin + Staff with expenses permission ──────── */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                <Route path="/expenses" element={<ExpensesPage />} />
+            </Route>
+
             {/* ── Gym Admin Only ──────────────────────────────────── */}
             <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
-                <Route path="/expenses" element={<ExpensesPage />} />
             </Route>
 
             {/* ── Analytics (Admin / Staff / Superadmin) ──────────── */}

@@ -31,7 +31,7 @@
   "display": "standalone",
   "theme_color": "#1565C0",
   "background_color": "#0f172a",
-  "orientation": "portrait",
+  "orientation": "any",
   "scope": "/",
   "description": "All-in-One Fitness Club Management Platform — manage members, payments, staff & more.",
   "categories": [

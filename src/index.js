@@ -8,18 +8,31 @@ import { ThemeProvider } from './shared/context/ThemeContext';
 // Interceptors are now in shared/services/api.js — import to register them
 import './shared/services/api';
 
-// Patch ResizeObserver to heavily debounce/RAF the callbacks and prevent the 'loop limit' UI overlay crash
-if (typeof window !== 'undefined' && window.ResizeObserver) {
-  const _ResizeObserver = window.ResizeObserver;
-  window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
-    constructor(callback) {
-      super((entries, observer) => {
-        window.requestAnimationFrame(() => {
-          callback(entries, observer);
-        });
-      });
+// Suppress the harmless ResizeObserver "loop completed" error.
+// This error is cosmetic — the browser fires it when resize callbacks can't
+// all finish in one frame. It doesn't affect functionality.
+if (typeof window !== 'undefined') {
+  // Suppress from error overlay
+  window.addEventListener('error', (e) => {
+    if (e.message?.includes('ResizeObserver loop')) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
     }
-  };
+  });
+
+  // Patch ResizeObserver to debounce callbacks via rAF
+  if (window.ResizeObserver) {
+    const _ResizeObserver = window.ResizeObserver;
+    window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
+      constructor(callback) {
+        super((entries, observer) => {
+          window.requestAnimationFrame(() => {
+            callback(entries, observer);
+          });
+        });
+      }
+    };
+  }
 }
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

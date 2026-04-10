@@ -95,8 +95,7 @@ const Dashboard = () => {
                 >
                     <div className="flex items-center gap-2 mb-4">
                         <FaCalendarAlt />
-                        <h2 className="text-lg font-bold">Today's Daily Report</h2>
-                        <span className="text-[10px] uppercase tracking-wider bg-white/15 px-2 py-0.5 rounded-full ml-2">click for breakdown</span>
+                        <h2 className="text-lg font-bold">dinDaily Report</h2>
                         <span className="text-sm opacity-75 ml-auto">
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                         </span>

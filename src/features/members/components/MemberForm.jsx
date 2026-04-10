@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useFormState } from '../../../shared/context/FormStateContext';
 import {
-  FaUser, FaCamera, FaUpload, FaChevronRight, FaChevronLeft,
-  FaCheckCircle, FaTrash, FaIdCard, FaHistory, FaCrown, FaCalendarAlt,
+  FaUser, FaCamera, FaUpload,
+  FaCheckCircle, FaTrash, FaCrown,
   FaMoneyBillWave, FaArrowLeft, FaArrowRight, FaTimes, FaCropAlt,
-  FaMale, FaFemale, FaDumbbell, FaWeight, FaRulerVertical
+  FaDumbbell, FaWeight, FaRulerVertical, FaSyncAlt
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
@@ -160,12 +160,14 @@ function NewMember() {
   }, [name, phone, photoBlob, gender, dob, discount, weight, height, goals, customGoal, setDirty]);
 
   // Camera Logic
-  const startCamera = async () => {
+  const [facingMode, setFacingMode] = useState('user');
+
+  const startCamera = async (mode = facingMode) => {
     setIsCameraModalOpen(true);
     setTempCapturedImage(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } }
+        video: { facingMode: mode, width: { ideal: 1280 }, height: { ideal: 720 } }
       });
       streamRef.current = stream;
       if (modalVideoRef.current) {
@@ -175,6 +177,16 @@ function NewMember() {
       toast.error("Could not access camera");
       setIsCameraModalOpen(false);
     }
+  };
+
+  const switchCamera = () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newMode);
+    // Stop current stream and restart with new facing mode
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+    }
+    startCamera(newMode);
   };
 
   const stopCamera = () => {
@@ -830,7 +842,15 @@ function NewMember() {
                       className="px-10 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2"
                     >
                       <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                      Take Snap
+                      Snap
+                    </button>
+                    <button
+                      onClick={switchCamera}
+                      className="px-6 py-3 bg-white/5 text-white/70 hover:bg-white/10 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all flex items-center gap-2"
+                      title="Switch Camera"
+                    >
+                      <FaSyncAlt size={14} />
+                      Flip
                     </button>
                   </>
                 ) : (

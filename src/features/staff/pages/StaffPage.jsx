@@ -14,12 +14,14 @@ import { motion, AnimatePresence } from "framer-motion";
 // sync if a new feature is added. Each entry maps a sidebar/feature module
 // to a checkbox in the staff form so admins can grant access per item.
 const AVAILABLE_PERMISSIONS = [
+    { key: "dashboard", label: "Dashboard", desc: "View dashboard & analytics" },
     { key: "members", label: "Members", desc: "View & manage members" },
     { key: "payments", label: "Payments", desc: "Handle transactions & invoices" },
     { key: "expenses", label: "Expenses", desc: "Record and view expenses" },
     { key: "reports", label: "Reports", desc: "View reports & analytics" },
     { key: "staff", label: "Staff", desc: "Manage other staff members" },
     { key: "settings", label: "Settings", desc: "Edit gym profile & settings" },
+    { key: "notifications", label: "Notifications", desc: "View alerts & notifications" },
     { key: "whatsapp", label: "WhatsApp", desc: "Send WhatsApp notifications" },
     { key: "announcements", label: "Announcements", desc: "Post announcements" },
 ];
@@ -192,7 +194,12 @@ const StaffManagement = () => {
             setModalOpen(false);
             fetchStaff();
         } catch (err) {
-            toast.error(err.response?.data?.message || "Operation failed");
+            const details = err.response?.data?.error?.details;
+            if (details?.length) {
+                details.forEach(d => toast.error(`${d.field}: ${d.message}`));
+            } else {
+                toast.error(err.response?.data?.message || "Operation failed");
+            }
         } finally {
             setSubmitting(false);
         }
