@@ -5,7 +5,9 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
     if (!isOpen || !expense) return null;
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
-    const fileUrl = expense.receiptUrl ? `${backendUrl}${expense.receiptUrl}` : null;
+    const fileUrl = expense.receiptUrl
+        ? (expense.receiptUrl.startsWith('http') ? expense.receiptUrl : `${backendUrl}${expense.receiptUrl}`)
+        : null;
     const isPDF = expense.receiptUrl?.toLowerCase().endsWith('.pdf');
 
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;

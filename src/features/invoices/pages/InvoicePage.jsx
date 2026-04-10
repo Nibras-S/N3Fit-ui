@@ -90,7 +90,7 @@ const Invoice = () => {
                     <div className="flex gap-4 items-center">
                         {gym?.logo ? (
                             <img
-                                src={`${backendUrl}${gym.logo}`}
+                                src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`}
                                 alt="Fit Club Logo"
                                 className="w-16 h-16 object-contain rounded-lg bg-gray-50"
                             />
