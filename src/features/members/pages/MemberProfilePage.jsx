@@ -10,6 +10,7 @@ import {
 import toast, { Toaster } from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
+import RecordPaymentModal from '../components/RecordPaymentModal';
 
 function MemberProfile() {
     const { id } = useParams();
@@ -20,6 +21,7 @@ function MemberProfile() {
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [paymentTxn, setPaymentTxn] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchData = async () => {
@@ -249,13 +251,23 @@ function MemberProfile() {
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4">
-                                                        <button
-                                                            onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
-                                                            title="View Invoice"
-                                                        >
-                                                            Invoice
-                                                        </button>
+                                                        <div className="flex items-center gap-2">
+                                                            {(txn.paymentStatus === 'Pending' || txn.paymentStatus === 'Partial') && (
+                                                                <button
+                                                                    onClick={() => setPaymentTxn(txn)}
+                                                                    className="px-2.5 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium whitespace-nowrap"
+                                                                >
+                                                                    Mark as Paid
+                                                                </button>
+                                                            )}
+                                                            <button
+                                                                onClick={() => navigate(`/invoice/${txn._id}`)}
+                                                                className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                title="View Invoice"
+                                                            >
+                                                                Invoice
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))}
@@ -281,11 +293,19 @@ function MemberProfile() {
                                                         <span>{txn.paymentMethod}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-right shrink-0">
+                                                <div className="text-right shrink-0 flex flex-col items-end gap-1">
                                                     <p className="font-bold text-gray-800 dark:text-gray-200 text-sm">₹{txn.amount}</p>
+                                                    {(txn.paymentStatus === 'Pending' || txn.paymentStatus === 'Partial') && (
+                                                        <button
+                                                            onClick={() => setPaymentTxn(txn)}
+                                                            className="px-2 py-0.5 bg-green-600 text-white rounded text-[10px] font-medium"
+                                                        >
+                                                            Mark as Paid
+                                                        </button>
+                                                    )}
                                                     <button
                                                         onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                        className="text-blue-500 text-xs font-medium mt-0.5"
+                                                        className="text-blue-500 text-xs font-medium"
                                                     >
                                                         Invoice
                                                     </button>
@@ -340,6 +360,18 @@ function MemberProfile() {
                     </div>
                 </div>
             </div>
+
+            {/* Record Payment Modal */}
+            {paymentTxn && (
+                <RecordPaymentModal
+                    transactionId={paymentTxn._id}
+                    totalAmount={paymentTxn.amount}
+                    paidSoFar={paymentTxn.paidAmount || 0}
+                    memberName={member.name}
+                    onClose={() => setPaymentTxn(null)}
+                    onPaid={() => { setPaymentTxn(null); fetchData(); }}
+                />
+            )}
 
             {/* Edit Modal */}
             {isEditing && (

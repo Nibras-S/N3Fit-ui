@@ -207,16 +207,14 @@ const Announcement = () => {
     };
 
     return (
-        <AppLayout showGenderSwitch={false}>
+        <AppLayout
+            title={user?.role === 'superadmin' ? 'Internal Broadcast' : 'WhatsApp Announcement'}
+            description={user?.role === 'superadmin' ? 'Post news or urgent warnings to fit club dashboards' : 'Broadcast messages to your fit club members instantly'}
+            icon={user?.role === 'superadmin' ? FaBell : FaWhatsapp}
+            showGenderSwitch={false}
+        >
             <div className="mx-auto pb-10">
                 <Toaster position="top-right" />
-
-
-
-                <PageHeader
-                    title={user?.role === 'superadmin' ? 'Internal Broadcast' : 'WhatsApp Announcement'}
-                    subtitle={user?.role === 'superadmin' ? 'Post news or urgent warnings to fit club dashboards' : 'Broadcast messages to your fit club members instantly'}
-                />
 
                 {/* No more toggle - feature is strictly role-based */}
 

@@ -215,7 +215,7 @@ const Settings = () => {
 
     if (loading) {
         return (
-            <AppLayout showGenderSwitch={false}>
+            <AppLayout title="Settings" description="Manage your account and preferences" icon={FaCog} showGenderSwitch={false}>
                 <div className="flex items-center justify-center h-[60vh]">
                     <div className="loading-spinner w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
@@ -224,32 +224,27 @@ const Settings = () => {
     }
 
     return (
-        <AppLayout showGenderSwitch={false}>
+        <AppLayout title="Settings" description="Manage your account and preferences" icon={FaCog} showGenderSwitch={false}>
             <div className={`mx-auto px-2 py-6 sm:py-10`}>
                 <Toaster position="top-right" />
 
-                {/* Dynamic Header */}
-                <div className="mb-6 sm:mb-10 animate-in fade-in slide-in-from-left-4 duration-500">
-                    <div className="flex items-center gap-4">
-                        {activeTab !== 'main' && (
-                            <button
-                                onClick={() => {
-                                    setActiveTab('main');
-                                    setIsEditingBranding(false);
-                                    setIsEditingPricing(false);
-                                    setIsEditingProfile(false);
-                                }}
-                                className="w-10 h-10 rounded-2xl bg-white dark:bg-slate-800 border border-gray-100 dark:border-slate-700 shadow-sm flex items-center justify-center text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                            >
-                                <FaChevronRight className="rotate-180" size={14} />
-                            </button>
-                        )}
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Settings</h1>
-                            <p className="text-gray-500 dark:text-gray-400">Manage your account and preferences</p>
-                        </div>
+                {/* Back button for sub-pages */}
+                {activeTab !== 'main' && (
+                    <div className="mb-6 animate-in fade-in slide-in-from-left-4 duration-500">
+                        <button
+                            onClick={() => {
+                                setActiveTab('main');
+                                setIsEditingBranding(false);
+                                setIsEditingPricing(false);
+                                setIsEditingProfile(false);
+                            }}
+                            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors"
+                        >
+                            <FaChevronRight className="rotate-180" size={12} />
+                            Back to Settings
+                        </button>
                     </div>
-                </div>
+                )}
 
                 {activeTab === 'main' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">

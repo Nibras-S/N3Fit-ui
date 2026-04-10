@@ -151,9 +151,24 @@ const ReportsPage = () => {
 
     if (loading && !data.financialChart.length) {
         return (
-            <AppLayout showGenderSwitch={false}>
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <AppLayout title="Reports" description="Complete business overview with revenue tracking" icon={FaChartPie} showGenderSwitch={false}>
+                <div className="max-w-7xl mx-auto space-y-6">
+                    {/* Header Actions Skeleton */}
+                    <div className="flex justify-end gap-3 opacity-50">
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-slate-700/50 animate-pulse rounded-lg"></div>
+                        <div className="h-10 w-48 bg-gray-200 dark:bg-slate-700/50 animate-pulse rounded-lg"></div>
+                    </div>
+                    {/* KPI Cards Skeleton */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {[1, 2, 3, 4].map(i => (
+                            <div key={i} className="h-[120px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                        ))}
+                    </div>
+                    {/* Charts Skeleton */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 h-[400px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                        <div className="h-[400px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                    </div>
                 </div>
             </AppLayout>
         );

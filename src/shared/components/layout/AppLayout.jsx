@@ -1,3 +1,4 @@
+// Hot reload trigger
 import React, { useState, useEffect } from "react";
 import n3Logo from '../../../assets/n3Logo.png';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -32,7 +33,9 @@ import {
   FaDownload,
   FaChartLine,
   FaAngleDoubleLeft,
-  FaAngleDoubleRight
+  FaAngleDoubleRight,
+  FaArrowLeft,
+  FaBars
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -512,19 +515,14 @@ export function AppLayout({
         </header>
 
         {/* Mobile top bar */}
-        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
-          {/* Left: notifications */}
+        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700/60 shadow-sm">
+          {/* Left: hamburger or back */}
           <button
-            onClick={() => safeNavigate('/notifications')}
-            className="relative p-2 -ml-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
-            aria-label="Notifications"
+            onClick={() => showBackToList ? safeNavigate('/members') : setMobileMenuOpen(true)}
+            className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            aria-label="Menu"
           >
-            <FaBell className="text-lg" />
-            {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center">
-                {unreadCount > 9 ? '9+' : unreadCount}
-              </span>
-            )}
+            {showBackToList ? <FaArrowLeft size={16} /> : <span className="flex items-center"><FaBars size={16} /></span>}
           </button>
 
           {/* Center: page title + status pulse */}
@@ -535,20 +533,20 @@ export function AppLayout({
               </h1>
               <NetworkDot status={networkStatus} />
             </div>
-            {description && (
-              <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate w-full text-center mt-0.5">{description}</p>
-            )}
           </div>
 
-          {/* Right: hamburger */}
+          {/* Right: notifications */}
           <button
-            onClick={() => setMobileMenuOpen((o) => !o)}
-            className="p-2 -mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300"
-            aria-label="Menu"
+            onClick={() => safeNavigate('/notifications')}
+            className="relative w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            aria-label="Notifications"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <FaBell size={16} />
+            {unreadCount > 0 && (
+              <span className="absolute top-2.5 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-slate-800">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
         </header>
 
@@ -563,19 +561,24 @@ export function AppLayout({
               onClick={() => setMobileMenuOpen(false)}
             >
               <motion.div
-                initial={{ x: "100%" }}
+                initial={{ x: "-100%" }}
                 animate={{ x: 0 }}
-                exit={{ x: "100%" }}
+                exit={{ x: "-100%" }}
                 transition={{ type: "tween", duration: 0.2 }}
-                className="absolute right-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-800 shadow-xl border-l dark:border-slate-700"
+                className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-800 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-slate-700 flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="p-4">
+                <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
                   <div className="flex justify-between items-center mb-6">
-                    <span className="font-semibold text-gray-900 dark:text-white">Menu</span>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-lg outline outline-2 outline-blue-600 bg-blue-600 flex items-center justify-center">
+                        <span className="text-white font-black italic text-xs">N3</span>
+                      </div>
+                      <span className="font-bold text-gray-900 dark:text-white truncate" style={{ fontSize: "16px" }}>{gymName}</span>
+                    </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400"
+                      className="p-2 -mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 focus:outline-none"
                     >
                       ✕
                     </button>
@@ -743,35 +746,19 @@ export function AppLayout({
       <InstallPWA />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 safe-area-pb">
-        <div className="relative">
-          <svg
-            className="absolute inset-x-0 bottom-0 w-full h-[72px] text-white dark:text-slate-800 drop-shadow-[0_-4px_8px_rgba(15,23,42,0.06)] pointer-events-none"
-            viewBox="0 0 400 72"
-            preserveAspectRatio="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M0,8 L168,8 C176,8 180,12 184,18 C190,30 196,38 200,38 C204,38 210,30 216,18 C220,12 224,8 232,8 L400,8 L400,72 L0,72 Z"
-              fill="currentColor"
-              stroke="rgb(229 231 235)"
-              strokeWidth="1"
-              className="dark:[stroke:rgb(51_65_85)]"
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] safe-area-pb">
+        <div className="relative flex items-center justify-around px-2 pt-2 pb-1.5 h-[68px]">
+          {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
+            <BottomNavButton
+              key={path}
+              active={isActive(path)}
+              onClick={() => safeNavigate(path)}
+              label={label}
+              icon={<Icon className={path === "/register" ? "text-[22px] text-white" : "text-[20px]"} />}
+              badge={badge}
+              isPrimary={path === "/register"}
             />
-          </svg>
-          <div className="relative flex items-end justify-around px-2 pt-2 pb-1.5 h-[72px]">
-            {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
-              <BottomNavButton
-                key={path}
-                active={isActive(path)}
-                onClick={() => safeNavigate(path)}
-                label={label}
-                icon={<Icon className={path === "/register" ? "text-xl text-white" : "text-lg"} />}
-                badge={badge}
-                isPrimary={path === "/register"}
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </nav>
 
@@ -784,10 +771,10 @@ export function AppLayout({
 function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
   if (isPrimary) {
     return (
-      <div className="relative -top-7 flex flex-col items-center justify-center z-30 flex-1">
+      <div className="relative -top-[1.2rem] flex flex-col items-center justify-center z-30 flex-1">
         <button
           onClick={onClick}
-          className="flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 shadow-lg shadow-blue-500/40 hover:from-blue-600 hover:to-blue-800 transition-all border-4 border-white dark:border-slate-800 active:scale-95"
+          className="flex items-center justify-center w-[50px] h-[50px] rounded-full bg-blue-600 shadow-[0_4px_14px_rgba(37,99,235,0.39)] hover:bg-blue-700 transition-all active:scale-95 text-white"
           aria-label={label}
         >
           {icon}
@@ -799,9 +786,9 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] py-1.5 px-1 rounded-lg transition-colors relative flex-1 ${active
-        ? "text-blue-600 dark:text-blue-400 font-semibold"
-        : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200"
+      className={`flex flex-col items-center justify-center gap-1 min-w-[48px] py-1.5 px-1 rounded-lg transition-colors relative flex-1 ${active
+        ? "text-blue-600 dark:text-blue-400 font-medium"
+        : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
     >
       <div className="relative">
@@ -813,9 +800,6 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
         )}
       </div>
       <span className="text-[10px] leading-none">{label}</span>
-      {active && (
-        <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-blue-600 dark:bg-blue-400" />
-      )}
     </button>
   );
 }

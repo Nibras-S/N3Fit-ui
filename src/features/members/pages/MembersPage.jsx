@@ -10,11 +10,12 @@ import CSVImportModal from '../components/ImportModal';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaSync,
     FaUserCheck, FaUserTimes, FaExclamationTriangle, FaWhatsapp,
     FaFileImport, FaUserPlus, FaRedo, FaTimesCircle, FaColumns,
-    FaFileExport, FaCheck
+    FaFileExport, FaCheck, FaFilter, FaPlus
 } from 'react-icons/fa';
 
 // Columns the user can toggle on/off via the column chooser. The Name column
@@ -58,6 +59,7 @@ const MembersPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
+    const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
     const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
@@ -483,7 +485,7 @@ const MembersPage = () => {
     // ── Mobile card ─────────────────────────────────────────────
     const renderMobileCard = (row) => (
         <>
-            <div className="flex justify-between items-start mb-3">
+            <div className="flex justify-between items-start mb-3 relative">
                 <div className="flex items-center gap-3">
                     {row.profileImage ? (
                         <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
@@ -504,33 +506,37 @@ const MembersPage = () => {
                         <div className="text-sm text-gray-500 dark:text-gray-400">{row.phone}</div>
                     </div>
                 </div>
-                {activeTab === 'all' && (
-                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
-                        {row.dews > 0 ? 'Active' : 'Expired'}
-                    </span>
-                )}
+
+                <div className="flex flex-col items-end gap-2 ml-auto shrink-0">
+                    {/* Top Right Placement of WhatsApp inside the card */}
+                    {row.phone && (
+                        <button
+                            onClick={(e) => { e.stopPropagation(); handleWhatsApp(row); }}
+                            className="w-8 h-8 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center transition-colors"
+                            title={whatsAppTitle(row)}
+                        >
+                            <FaWhatsapp size={16} />
+                        </button>
+                    )}
+                    {activeTab === 'all' && (
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                            {row.dews > 0 ? 'Active' : 'Expired'}
+                        </span>
+                    )}
+                </div>
             </div>
             <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
                 <span className={row.dews <= 0 ? 'text-red-500 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
                 <span>{formatDate(row.endDate)}</span>
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => handleRenew(row._id)} className="flex-1 py-2 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors">
+                <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaRedo size={11} /> Renew
                 </button>
-                {row.phone && (
-                    <button
-                        onClick={(e) => { e.stopPropagation(); handleWhatsApp(row); }}
-                        className="py-2 px-3 bg-green-50 dark:bg-green-900/20 text-green-600 font-medium rounded-lg text-sm flex items-center justify-center"
-                        title={whatsAppTitle(row)}
-                    >
-                        <FaWhatsapp />
-                    </button>
-                )}
-                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-medium rounded-lg text-sm flex items-center justify-center gap-2">
+                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaEdit /> Edit
                 </button>
-                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-medium rounded-lg text-sm flex items-center justify-center gap-2">
+                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaTrash /> Delete
                 </button>
             </div>
@@ -655,7 +661,7 @@ const MembersPage = () => {
             </div>
 
             {/* ── Mobile: simple tab pills ────────────────────── */}
-            <div className="flex lg:hidden gap-2 mb-4 overflow-x-auto pb-1">
+            <div className="flex lg:hidden gap-2 mb-4 w-full">
                 {TAB_CONFIG.map(tab => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.key;
@@ -663,13 +669,13 @@ const MembersPage = () => {
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
+                            className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
                                 ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
                                 : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700'
                                 }`}
                         >
                             <Icon size={11} />
-                            {tab.label}
+                            {tab.label.replace(' Members', '')}
                             {isActive && <span className="ml-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-white/20">{allStats.total}</span>}
                         </button>
                     );
@@ -679,8 +685,8 @@ const MembersPage = () => {
             {/* ── Toolbar & Table Card (Combined Full Size) ── */}
             <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col mb-4">
 
-                {/* Toolbar Header section */}
-                <div className="flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+                {/* Desktop Toolbar Header section */}
+                <div className="hidden lg:flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-slate-700">
                     {/* Search */}
                     <div className="relative flex-1 min-w-48 max-w-sm">
                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
@@ -834,6 +840,37 @@ const MembersPage = () => {
                             ))}
                         </div>
                     </div>
+                </div>
+
+                {/* Mobile Toolbar */}
+                <div className="flex lg:hidden gap-3 px-4 py-3 border-b border-gray-200 dark:border-slate-700 items-center bg-gray-50/50 dark:bg-slate-800/50">
+                    <div className="relative flex-1">
+                        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                        />
+                        {searchTerm && (
+                            <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                <FaTimesCircle size={14} />
+                            </button>
+                        )}
+                    </div>
+                    <button
+                        onClick={() => setIsFilterSheetOpen(true)}
+                        className="w-[38px] h-[38px] border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
+                    >
+                        <FaFilter size={14} />
+                    </button>
+                    <button
+                        onClick={() => navigate('/register')}
+                        className="w-[38px] h-[38px] bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-500/25 active:scale-95 transition-all shrink-0"
+                    >
+                        <FaPlus size={16} />
+                    </button>
                 </div>
 
                 {/* Table or Empty State (integrated into the card) */}
@@ -991,6 +1028,99 @@ const MembersPage = () => {
                 onClose={() => setIsImportModalOpen(false)}
                 onRefresh={fetchMembers}
             />
+            {/* Mobile Bottom Filter Sheet */}
+            <AnimatePresence>
+                {isFilterSheetOpen && (
+                    <>
+                        <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm lg:hidden" onClick={() => setIsFilterSheetOpen(false)} />
+                        <motion.div
+                            initial={{ y: "100%" }}
+                            animate={{ y: 0 }}
+                            exit={{ y: "100%" }}
+                            transition={{ type: "tween", duration: 0.3 }}
+                            className="fixed inset-x-0 bottom-0 z-[70] bg-white dark:bg-slate-800 rounded-t-3xl shadow-2xl pb-safe flex flex-col max-h-[85vh] lg:hidden"
+                        >
+                            {/* Drag Handle */}
+                            <div className="flex justify-center pt-3 pb-2 shrink-0">
+                                <div className="w-12 h-1.5 bg-gray-300 dark:bg-slate-600 rounded-full" />
+                            </div>
+
+                            {/* Header */}
+                            <div className="flex justify-between items-center px-6 pb-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
+                                <h3 className="font-bold text-lg dark:text-white tracking-tight">Filters</h3>
+                                <button
+                                    onClick={() => {
+                                        setGenderFilter('all');
+                                        setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
+                                    }}
+                                    className="text-blue-600 font-semibold text-sm"
+                                >
+                                    Reset all
+                                </button>
+                            </div>
+
+                            {/* Body */}
+                            <div className="p-6 space-y-8 overflow-y-auto custom-scrollbar flex-1">
+                                {/* Gender Section */}
+                                <div>
+                                    <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Gender</label>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['all', 'Male', 'Female'].map(f => (
+                                            <button
+                                                key={f}
+                                                onClick={() => setGenderFilter(f)}
+                                                className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${genderFilter === f
+                                                    ? 'bg-blue-600 border border-blue-600 text-white shadow-blue-500/30'
+                                                    : 'bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-600'
+                                                    }`}
+                                            >
+                                                {f === 'all' ? 'All' : f}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Columns to show */}
+                                <div>
+                                    <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Columns to show</label>
+                                    <div className="space-y-1">
+                                        {/* Disabled name checkbox */}
+                                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 cursor-not-allowed">
+                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-500 opacity-50">
+                                                <FaCheck size={10} />
+                                            </div>
+                                            <span className="text-sm font-semibold text-gray-400 dark:text-gray-500">Name</span>
+                                            <span className="ml-auto text-[10px] font-bold uppercase text-gray-400">Required</span>
+                                        </label>
+
+                                        {TOGGLEABLE_COLUMNS.map(col => {
+                                            const checked = visibleColumns.includes(col.key);
+                                            return (
+                                                <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer border border-transparent dark:hover:border-slate-600">
+                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800'}`}>
+                                                        {checked && <FaCheck size={10} />}
+                                                    </div>
+                                                    <span className={`text-sm font-semibold ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="p-4 border-t border-gray-100 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800">
+                                <button
+                                    onClick={() => setIsFilterSheetOpen(false)}
+                                    className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-blue-500/30"
+                                >
+                                    Show Results
+                                </button>
+                            </div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
         </AppLayout>
     );
 };

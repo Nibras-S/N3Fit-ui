@@ -5,15 +5,15 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import {
     FaWallet, FaUsers, FaChartPie, FaRupeeSign, FaClock, FaCalendarAlt,
     FaArrowUp, FaArrowDown, FaMoneyCheckAlt, FaUserPlus, FaChartLine, FaChartBar,
-    FaExclamationCircle, FaWhatsapp, FaPhone, FaUserClock, FaPercentage, FaCheck
+    FaExclamationCircle, FaWhatsapp, FaPhone, FaUserClock, FaPercentage
 } from 'react-icons/fa';
 import {
     PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip,
     BarChart, Bar, XAxis, YAxis, CartesianGrid
 } from 'recharts';
-import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -29,8 +29,7 @@ const Dashboard = () => {
         }
         fetchStats();
     }, [user]);
-    const [collectingId, setCollectingId] = useState(null);
-    const [collectMethod, setCollectMethod] = useState('Cash');
+    const [paymentTxn, setPaymentTxn] = useState(null);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchStats = async () => {
@@ -51,22 +50,6 @@ const Dashboard = () => {
         fetchStats();
     }, [backendUrl]);
 
-    // Handle collect payment
-    const handleCollectPayment = async (txnId) => {
-        try {
-            await api.put(`/transactions/${txnId}/collect`, {
-                paymentMethod: collectMethod
-            });
-            setCollectingId(null);
-            setCollectMethod('Cash');
-            // Refresh stats
-            fetchStats();
-        } catch (error) {
-            console.error("Error collecting payment:", error);
-            toast.error("Failed to collect payment");
-        }
-    };
-
     // Colors
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#3b82f6', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
     const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#ef4444' };
@@ -77,9 +60,18 @@ const Dashboard = () => {
 
     if (loading) {
         return (
-            <AppLayout showGenderSwitch={false}>
-                <div className="flex items-center justify-center h-[80vh]">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
+                <div className="space-y-6 pb-10">
+                    <div className="h-28 bg-gradient-to-r from-gray-200 to-gray-300 dark:from-slate-700/50 dark:to-slate-600/50 animate-pulse rounded-2xl w-full"></div>
+                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+                        {[1, 2, 3, 4, 5].map(i => (
+                            <div key={i} className="h-24 bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-xl border border-gray-100 dark:border-slate-700"></div>
+                        ))}
+                    </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 h-[450px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                        <div className="h-[450px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                    </div>
                 </div>
             </AppLayout>
         );
@@ -258,47 +250,18 @@ const Dashboard = () => {
                                             </td>
                                             <td className="py-3">
                                                 <div className="flex gap-2 items-center">
-                                                    {collectingId === txn._id ? (
-                                                        <>
-                                                            <select
-                                                                value={collectMethod}
-                                                                onChange={(e) => setCollectMethod(e.target.value)}
-                                                                className="text-xs border rounded px-1 py-1 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
-                                                            >
-                                                                <option>Cash</option>
-                                                                <option>UPI</option>
-                                                                <option>Card</option>
-                                                                <option>Bank Transfer</option>
-                                                            </select>
-                                                            <button
-                                                                onClick={() => handleCollectPayment(txn._id)}
-                                                                className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
-                                                            >
-                                                                <FaCheck />
-                                                            </button>
-                                                            <button
-                                                                onClick={() => setCollectingId(null)}
-                                                                className="p-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-400 dark:hover:bg-gray-600 text-xs"
-                                                            >
-                                                                ✕
-                                                            </button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <button
-                                                                onClick={() => setCollectingId(txn._id)}
-                                                                className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
-                                                            >
-                                                                Collect
-                                                            </button>
-                                                            {txn.phone && (
-                                                                <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, this is a reminder regarding your pending gym fee of ${formatCurrency(txn.amount)}. Please clear the dues.`}
-                                                                    target="_blank" rel="noopener noreferrer"
-                                                                    className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" title="Send WhatsApp">
-                                                                    <FaWhatsapp />
-                                                                </a>
-                                                            )}
-                                                        </>
+                                                    <button
+                                                        onClick={() => setPaymentTxn(txn)}
+                                                        className="px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
+                                                    >
+                                                        Mark as Paid
+                                                    </button>
+                                                    {txn.phone && (
+                                                        <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, this is a reminder regarding your pending gym fee of ${formatCurrency(txn.amount)}. Please clear the dues.`}
+                                                            target="_blank" rel="noopener noreferrer"
+                                                            className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" title="Send WhatsApp">
+                                                            <FaWhatsapp />
+                                                        </a>
                                                     )}
                                                 </div>
                                             </td>
@@ -332,23 +295,10 @@ const Dashboard = () => {
                                         </div>
                                     </div>
                                     <div className="flex gap-2">
-                                        {collectingId === txn._id ? (
-                                            <>
-                                                <select value={collectMethod} onChange={(e) => setCollectMethod(e.target.value)}
-                                                    className="text-xs border rounded-lg px-2 py-1.5 flex-1 dark:bg-slate-700 dark:border-slate-600 dark:text-white">
-                                                    <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option>
-                                                </select>
-                                                <button onClick={() => handleCollectPayment(txn._id)} className="p-2 bg-green-600 text-white rounded-lg text-xs"><FaCheck /></button>
-                                                <button onClick={() => setCollectingId(null)} className="p-2 bg-gray-300 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg text-xs">✕</button>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <button onClick={() => setCollectingId(txn._id)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-medium">Collect</button>
-                                                {txn.phone && (
-                                                    <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, reminder for pending fee of ${formatCurrency(txn.amount)}.`}
-                                                        target="_blank" rel="noopener noreferrer" className="p-2 bg-green-500 text-white rounded-lg"><FaWhatsapp size={14} /></a>
-                                                )}
-                                            </>
+                                        <button onClick={() => setPaymentTxn(txn)} className="flex-1 py-2 bg-green-600 text-white rounded-lg text-xs font-medium">Mark as Paid</button>
+                                        {txn.phone && (
+                                            <a href={`https://wa.me/${txn.phone.replace(/[^\d]/g, '').replace(/^(\d{10})$/, '91$1')}?text=Hi ${txn.memberName}, reminder for pending fee of ${formatCurrency(txn.amount)}.`}
+                                                target="_blank" rel="noopener noreferrer" className="p-2 bg-green-500 text-white rounded-lg"><FaWhatsapp size={14} /></a>
                                         )}
                                     </div>
                                 </div>
@@ -618,6 +568,17 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+            )}
+
+            {paymentTxn && (
+                <RecordPaymentModal
+                    transactionId={paymentTxn._id}
+                    totalAmount={paymentTxn.amount}
+                    paidSoFar={paymentTxn.paidAmount || 0}
+                    memberName={paymentTxn.memberName}
+                    onClose={() => setPaymentTxn(null)}
+                    onPaid={() => { setPaymentTxn(null); fetchStats(); }}
+                />
             )}
         </AppLayout>
     );
