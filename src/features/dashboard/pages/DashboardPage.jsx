@@ -95,7 +95,7 @@ const Dashboard = () => {
                 >
                     <div className="flex items-center gap-2 mb-4">
                         <FaCalendarAlt />
-                        <h2 className="text-lg font-bold">dinDaily Report</h2>
+                        <h2 className="text-lg font-bold">Daily Report</h2>
                         <span className="text-sm opacity-75 ml-auto">
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                         </span>
