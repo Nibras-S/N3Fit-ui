@@ -5,7 +5,8 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
     FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers, FaUserCheck, FaUserTimes,
-    FaTimes, FaEye, FaEyeSlash, FaSearch, FaFilePdf, FaFileImage, FaPaperclip
+    FaTimes, FaEye, FaEyeSlash, FaSearch, FaFilePdf, FaFileImage, FaPaperclip,
+    FaArchive, FaUndo, FaCalendarAlt
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,30 +26,47 @@ const AVAILABLE_PERMISSIONS = [
 
 const StaffManagement = () => {
     const { api } = useAuth();
-    const [staff, setStaff] = useState([]);
+    // Both lists are kept around so the stats cards (which always summarise
+    // the active roster) stay accurate even while the user is browsing the
+    // archive bin.
+    const [activeStaff, setActiveStaff] = useState([]);
+    const [archivedStaff, setArchivedStaff] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
+    // 'active' shows the working roster, 'archived' shows the soft-delete bin.
+    // The two views fetch from the same endpoint with different query flags.
+    const [view, setView] = useState('active');
+    const staff = view === 'archived' ? archivedStaff : activeStaff;
+    const archivedCount = archivedStaff.length;
 
     // Modal state
     const [modalOpen, setModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState(null); // null = create, object = edit
     const [formData, setFormData] = useState({
-        name: "", email: "", password: "", permissions: ["members", "payments"]
+        name: "", email: "", password: "", permissions: ["members", "payments"], joiningDate: ""
     });
     const [idProofFile, setIdProofFile] = useState(null); // newly selected File
     const [existingIdProofUrl, setExistingIdProofUrl] = useState(null); // already saved
     const [showPassword, setShowPassword] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
+    const [restoringId, setRestoringId] = useState(null);
     const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
     const fetchStaff = useCallback(async () => {
         try {
-            const res = await api.get("/gym/staff");
-            const data = Array.isArray(res.data?.data) ? res.data.data
+            setLoading(true);
+            // Fire both lists in parallel so the archive badge stays accurate
+            // even when the user is viewing the active roster.
+            const [activeRes, archivedRes] = await Promise.all([
+                api.get('/gym/staff'),
+                api.get('/gym/staff', { params: { archived: 'true' } }),
+            ]);
+            const unwrap = (res) => Array.isArray(res.data?.data) ? res.data.data
                 : Array.isArray(res.data?.staff) ? res.data.staff
                     : Array.isArray(res.data) ? res.data : [];
-            setStaff(data);
+            setActiveStaff(unwrap(activeRes));
+            setArchivedStaff(unwrap(archivedRes));
         } catch (err) {
             toast.error("Failed to load staff");
         } finally {
@@ -58,9 +76,10 @@ const StaffManagement = () => {
 
     useEffect(() => { fetchStaff(); }, [fetchStaff]);
 
-    // Stats
-    const activeCount = staff.filter(s => s.isActive).length;
-    const inactiveCount = staff.length - activeCount;
+    // Stats always describe the active roster, regardless of which view is on
+    // screen. The third card switches between Inactive and Archived in JSX.
+    const activeCount = activeStaff.filter(s => s.isActive).length;
+    const inactiveCount = activeStaff.length - activeCount;
 
     // Filtered
     const filtered = staff.filter(s =>
@@ -71,7 +90,11 @@ const StaffManagement = () => {
     // Open modal
     const openCreateModal = () => {
         setEditingStaff(null);
-        setFormData({ name: "", email: "", password: "", permissions: ["members", "payments"] });
+        setFormData({
+            name: "", email: "", password: "",
+            permissions: ["members", "payments"],
+            joiningDate: "",
+        });
         setIdProofFile(null);
         setExistingIdProofUrl(null);
         setShowPassword(false);
@@ -84,7 +107,9 @@ const StaffManagement = () => {
             name: member.name,
             email: member.email,
             password: "",
-            permissions: member.permissions || ["members", "payments"]
+            permissions: member.permissions || ["members", "payments"],
+            // The backend stores ISO timestamps; <input type="date"> needs YYYY-MM-DD.
+            joiningDate: member.joiningDate ? new Date(member.joiningDate).toISOString().split('T')[0] : "",
         });
         setIdProofFile(null);
         setExistingIdProofUrl(member.idProofUrl || null);
@@ -126,6 +151,7 @@ const StaffManagement = () => {
                     const fd = new FormData();
                     fd.append('name', formData.name);
                     fd.append('permissions', JSON.stringify(formData.permissions));
+                    fd.append('joiningDate', formData.joiningDate || '');
                     fd.append('idProof', idProofFile);
                     await api.put(`/gym/staff/${editingStaff._id}`, fd, {
                         headers: { 'Content-Type': 'multipart/form-data' },
@@ -134,6 +160,7 @@ const StaffManagement = () => {
                     await api.put(`/gym/staff/${editingStaff._id}`, {
                         name: formData.name,
                         permissions: formData.permissions,
+                        joiningDate: formData.joiningDate || null,
                     });
                 }
                 toast.success("Staff updated!");
@@ -145,6 +172,7 @@ const StaffManagement = () => {
                     fd.append('password', formData.password);
                     fd.append('role', 'staff');
                     fd.append('permissions', JSON.stringify(formData.permissions));
+                    fd.append('joiningDate', formData.joiningDate || '');
                     fd.append('idProof', idProofFile);
                     await api.post('/auth/register', fd, {
                         headers: { 'Content-Type': 'multipart/form-data' },
@@ -156,6 +184,7 @@ const StaffManagement = () => {
                         password: formData.password,
                         role: 'staff',
                         permissions: formData.permissions,
+                        joiningDate: formData.joiningDate || null,
                     });
                 }
                 toast.success("Staff member added!");
@@ -186,18 +215,41 @@ const StaffManagement = () => {
     };
 
     // Confirm Delete
+    //
+    // From the active view this is a soft archive (the backend keeps the row).
+    // From the archive view it's a permanent delete via ?hard=true. The button
+    // labels and confirmation copy below switch based on `view` accordingly.
     const confirmDelete = async () => {
         if (!confirmDeleteId) return;
         try {
             setDeletingId(confirmDeleteId);
-            await api.delete(`/gym/staff/${confirmDeleteId}`);
-            toast.success("Staff removed");
+            const url = view === 'archived'
+                ? `/gym/staff/${confirmDeleteId}?hard=true`
+                : `/gym/staff/${confirmDeleteId}`;
+            await api.delete(url);
+            toast.success(view === 'archived' ? 'Staff permanently deleted' : 'Staff archived');
             fetchStaff();
         } catch (err) {
-            toast.error("Failed to remove staff");
+            toast.error(err.response?.data?.message || 'Failed to remove staff');
         } finally {
             setDeletingId(null);
             setConfirmDeleteId(null);
+        }
+    };
+
+    // Restore an archived staff member back into the active roster. We leave
+    // isActive=false on purpose so the admin reviews permissions before
+    // re-enabling login.
+    const handleRestore = async (id) => {
+        try {
+            setRestoringId(id);
+            await api.post(`/gym/staff/${id}/restore`);
+            toast.success('Staff restored — re-enable login from the active list');
+            fetchStaff();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to restore staff');
+        } finally {
+            setRestoringId(null);
         }
     };
 
@@ -229,13 +281,52 @@ const StaffManagement = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">Manage your fit club's team members</p>
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                            {view === 'archived'
+                                ? 'Soft-deleted staff. Restore to bring them back into the roster.'
+                                : "Manage your fit club's team members"}
+                        </p>
                     </div>
+                    {view === 'active' && (
+                        <button
+                            onClick={openCreateModal}
+                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                        >
+                            <FaPlus size={12} /> Add Staff
+                        </button>
+                    )}
+                </div>
+
+                {/* View tabs — Active vs Archived */}
+                <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
                     <button
-                        onClick={openCreateModal}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                        onClick={() => setView('active')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            view === 'active'
+                                ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                        }`}
                     >
-                        <FaPlus size={12} /> Add Staff
+                        <FaUsers size={12} /> Active
+                    </button>
+                    <button
+                        onClick={() => setView('archived')}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                            view === 'archived'
+                                ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                        }`}
+                    >
+                        <FaArchive size={12} /> Archived
+                        {archivedCount > 0 && (
+                            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                                view === 'archived'
+                                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                                    : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300'
+                            }`}>
+                                {archivedCount}
+                            </span>
+                        )}
                     </button>
                 </div>
 
@@ -247,7 +338,7 @@ const StaffManagement = () => {
                                 <FaUsers className="text-blue-600 dark:text-blue-400" />
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{staff.length}</p>
+                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeStaff.length}</p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400">Total Staff</p>
                             </div>
                         </div>
@@ -265,12 +356,27 @@ const StaffManagement = () => {
                     </div>
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-                                <FaUserTimes className="text-red-600 dark:text-red-400" />
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                                view === 'archived'
+                                    ? 'bg-amber-100 dark:bg-amber-900/30'
+                                    : 'bg-red-100 dark:bg-red-900/30'
+                            }`}>
+                                {view === 'archived'
+                                    ? <FaArchive className="text-amber-600 dark:text-amber-400" />
+                                    : <FaUserTimes className="text-red-600 dark:text-red-400" />}
                             </div>
                             <div>
-                                <p className="text-2xl font-bold text-red-600 dark:text-red-400">{inactiveCount}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Inactive</p>
+                                {view === 'archived' ? (
+                                    <>
+                                        <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{archivedCount}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Archived</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <p className="text-2xl font-bold text-red-600 dark:text-red-400">{inactiveCount}</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Inactive</p>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -316,16 +422,22 @@ const StaffManagement = () => {
                                         </td>
                                         <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{member.email}</td>
                                         <td className="px-5 py-4">
-                                            <button
-                                                onClick={() => toggleActive(member)}
-                                                className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium cursor-pointer transition-colors ${member.isActive
-                                                    ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                                    : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                                    }`}
-                                            >
-                                                <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-red-500"}`}></span>
-                                                {member.isActive ? "Active" : "Inactive"}
-                                            </button>
+                                            {view === 'archived' ? (
+                                                <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
+                                                    <FaArchive size={9} /> Archived
+                                                </span>
+                                            ) : (
+                                                <button
+                                                    onClick={() => toggleActive(member)}
+                                                    className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium cursor-pointer transition-colors ${member.isActive
+                                                        ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
+                                                        : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                                        }`}
+                                                >
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-red-500"}`}></span>
+                                                    {member.isActive ? "Active" : "Inactive"}
+                                                </button>
+                                            )}
                                         </td>
                                         <td className="px-5 py-4">
                                             <div className="flex gap-1.5 flex-wrap">
@@ -337,29 +449,68 @@ const StaffManagement = () => {
                                             </div>
                                         </td>
                                         <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                            {new Date(member.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {/* Show the user-supplied joining date when present, otherwise
+                                                fall back to the account-creation timestamp so the column is
+                                                never blank for legacy rows. */}
+                                            {member.joiningDate
+                                                ? new Date(member.joiningDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                                                : new Date(member.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            {!member.joiningDate && (
+                                                <span className="block text-[10px] text-gray-400 italic">account created</span>
+                                            )}
                                         </td>
                                         <td className="px-5 py-4">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={() => openEditModal(member)}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
-                                                    title="Edit"
-                                                >
-                                                    <FaEdit size={14} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(member._id)}
-                                                    disabled={deletingId === member._id}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
-                                                    title="Delete"
-                                                >
-                                                    {deletingId === member._id ? (
-                                                        <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
-                                                    ) : (
-                                                        <FaTrash size={13} />
-                                                    )}
-                                                </button>
+                                                {view === 'archived' ? (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleRestore(member._id)}
+                                                            disabled={restoringId === member._id}
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50"
+                                                            title="Restore"
+                                                        >
+                                                            {restoringId === member._id ? (
+                                                                <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <FaUndo size={13} />
+                                                            )}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(member._id)}
+                                                            disabled={deletingId === member._id}
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                                                            title="Delete permanently"
+                                                        >
+                                                            {deletingId === member._id ? (
+                                                                <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <FaTrash size={13} />
+                                                            )}
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() => openEditModal(member)}
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <FaEdit size={14} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(member._id)}
+                                                            disabled={deletingId === member._id}
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50"
+                                                            title="Archive"
+                                                        >
+                                                            {deletingId === member._id ? (
+                                                                <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                                                            ) : (
+                                                                <FaArchive size={13} />
+                                                            )}
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -367,9 +518,19 @@ const StaffManagement = () => {
                                 {filtered.length === 0 && (
                                     <tr>
                                         <td colSpan="6" className="text-center py-12 text-gray-400">
-                                            <FaUserShield size={28} className="mx-auto mb-3 opacity-40" />
-                                            <p className="font-medium">No staff members yet</p>
-                                            <p className="text-xs mt-1">Click "Add Staff" to invite your first team member</p>
+                                            {view === 'archived' ? (
+                                                <>
+                                                    <FaArchive size={28} className="mx-auto mb-3 opacity-40" />
+                                                    <p className="font-medium">Archive bin is empty</p>
+                                                    <p className="text-xs mt-1">Archived staff members will appear here</p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <FaUserShield size={28} className="mx-auto mb-3 opacity-40" />
+                                                    <p className="font-medium">No staff members yet</p>
+                                                    <p className="text-xs mt-1">Click "Add Staff" to invite your first team member</p>
+                                                </>
+                                            )}
                                         </td>
                                     </tr>
                                 )}
@@ -381,32 +542,54 @@ const StaffManagement = () => {
                     <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-700">
                         {filtered.length === 0 ? (
                             <div className="text-center py-12 text-gray-400">
-                                <FaUserShield size={28} className="mx-auto mb-3 opacity-40" />
-                                <p className="font-medium">No staff members yet</p>
-                                <p className="text-xs mt-1">Click "Add Staff" to invite your first team member</p>
+                                {view === 'archived' ? (
+                                    <>
+                                        <FaArchive size={28} className="mx-auto mb-3 opacity-40" />
+                                        <p className="font-medium">Archive bin is empty</p>
+                                        <p className="text-xs mt-1">Archived staff members will appear here</p>
+                                    </>
+                                ) : (
+                                    <>
+                                        <FaUserShield size={28} className="mx-auto mb-3 opacity-40" />
+                                        <p className="font-medium">No staff members yet</p>
+                                        <p className="text-xs mt-1">Click "Add Staff" to invite your first team member</p>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             filtered.map((member) => (
                                 <div key={member._id} className="p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive && view === 'active' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
                                                 {member.name?.charAt(0)?.toUpperCase()}
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-gray-900 dark:text-white text-sm">{member.name}</p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">{member.email}</p>
+                                                {member.joiningDate && (
+                                                    <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
+                                                        <FaCalendarAlt size={8} />
+                                                        Joined {new Date(member.joiningDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => toggleActive(member)}
-                                            className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
-                                                ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                                                : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
-                                                }`}
-                                        >
-                                            {member.isActive ? "Active" : "Inactive"}
-                                        </button>
+                                        {view === 'archived' ? (
+                                            <span className="text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
+                                                Archived
+                                            </span>
+                                        ) : (
+                                            <button
+                                                onClick={() => toggleActive(member)}
+                                                className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
+                                                    ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                                                    : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                                                    }`}
+                                            >
+                                                {member.isActive ? "Active" : "Inactive"}
+                                            </button>
+                                        )}
                                     </div>
                                     <div className="flex items-center justify-between">
                                         <div className="flex gap-1.5 flex-wrap">
@@ -415,13 +598,28 @@ const StaffManagement = () => {
                                             ))}
                                         </div>
                                         <div className="flex items-center gap-1">
-                                            <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
-                                                <FaEdit size={14} />
-                                            </button>
-                                            <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
-                                                className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
-                                                {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div> : <FaTrash size={13} />}
-                                            </button>
+                                            {view === 'archived' ? (
+                                                <>
+                                                    <button onClick={() => handleRestore(member._id)} disabled={restoringId === member._id}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50">
+                                                        {restoringId === member._id ? <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div> : <FaUndo size={13} />}
+                                                    </button>
+                                                    <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
+                                                        {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div> : <FaTrash size={13} />}
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                                                        <FaEdit size={14} />
+                                                    </button>
+                                                    <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50">
+                                                        {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div> : <FaArchive size={13} />}
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -510,6 +708,24 @@ const StaffManagement = () => {
                                         </div>
                                     </>
                                 )}
+
+                                {/* Joining Date — optional reference for HR records */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
+                                        <FaCalendarAlt className="text-blue-500 text-xs" /> Joining Date
+                                        <span className="text-xs font-normal text-gray-400">(optional)</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={formData.joiningDate}
+                                        onChange={(e) => setFormData(p => ({ ...p, joiningDate: e.target.value }))}
+                                        max={new Date().toISOString().split('T')[0]}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    />
+                                    <p className="text-[11px] text-gray-400 mt-1">
+                                        When this person actually joined the team — distinct from when their app account was created.
+                                    </p>
+                                </div>
 
                                 {/* ID Proof Upload — PDF or image */}
                                 <div>
@@ -624,14 +840,16 @@ const StaffManagement = () => {
                 )}
             </AnimatePresence>
 
-            {/* Delete Confirmation Modal */}
+            {/* Archive / Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={!!confirmDeleteId}
                 onClose={() => setConfirmDeleteId(null)}
                 onConfirm={confirmDelete}
-                title="Remove Staff Member"
-                message="Are you sure you want to remove this staff member? This action cannot be undone."
-                confirmText="Remove Staff"
+                title={view === 'archived' ? 'Permanently Delete Staff' : 'Archive Staff Member'}
+                message={view === 'archived'
+                    ? 'This will permanently delete the staff record. Historical references (expenses, transactions) may show "Unknown user". This cannot be undone.'
+                    : "This staff member will be moved to the archive. They'll be hidden from rosters and dropdowns, but you can restore them anytime from the Archived tab."}
+                confirmText={view === 'archived' ? 'Delete Permanently' : 'Move to Archive'}
                 cancelText="Cancel"
                 type="danger"
             />

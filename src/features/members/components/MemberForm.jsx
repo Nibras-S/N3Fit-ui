@@ -7,11 +7,26 @@ import {
   FaUser, FaCamera, FaUpload, FaChevronRight, FaChevronLeft,
   FaCheckCircle, FaTrash, FaIdCard, FaHistory, FaCrown, FaCalendarAlt,
   FaMoneyBillWave, FaArrowLeft, FaArrowRight, FaTimes, FaCropAlt,
-  FaMale, FaFemale
+  FaMale, FaFemale, FaDumbbell, FaWeight, FaRulerVertical
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast, { Toaster } from 'react-hot-toast';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
+
+// Canonical goal keys — must match FITNESS_GOALS in
+// N3Fit-api/src/modules/member/member.validation.js. The label/icon are
+// frontend-only; the backend stores the keys.
+const FITNESS_GOAL_OPTIONS = [
+  { key: 'weightLoss', label: 'Weight Loss' },
+  { key: 'muscleGain', label: 'Muscle Gain' },
+  { key: 'betterPhysique', label: 'Better Physique' },
+  { key: 'sixPack', label: 'Six Pack' },
+  { key: 'weightLifting', label: 'Weight Lifting' },
+  { key: 'endurance', label: 'Endurance' },
+  { key: 'flexibility', label: 'Flexibility' },
+  { key: 'generalFitness', label: 'General Fitness' },
+  { key: 'other', label: 'Other' },
+];
 
 function NewMember() {
   const { setDirty } = useFormState();
@@ -23,6 +38,25 @@ function NewMember() {
   const [plan, setPlan] = useState("1-Month");
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [gender, setGender] = useState("");
+
+  // Optional fitness profile — captured at enrollment so trainers have a
+  // baseline. All four fields are optional; an empty selection submits cleanly.
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [goals, setGoals] = useState([]);     // array of goal keys
+  const [customGoal, setCustomGoal] = useState(""); // free text when goals includes 'other'
+
+  const toggleGoal = (key) => {
+    setGoals((prev) => {
+      const next = prev.includes(key)
+        ? prev.filter((g) => g !== key)
+        : [...prev, key];
+      // Clearing the 'other' chip should also blank the free-text field so it
+      // doesn't quietly hitch a ride on the next submit.
+      if (key === 'other' && prev.includes('other')) setCustomGoal('');
+      return next;
+    });
+  };
 
   // Photo State
   const [photoBlob, setPhotoBlob] = useState(null);
@@ -106,7 +140,11 @@ function NewMember() {
       photoBlob !== null ||
       gender !== "" ||
       dob !== "" ||
-      discount !== 0;
+      discount !== 0 ||
+      weight !== "" ||
+      height !== "" ||
+      goals.length > 0 ||
+      customGoal !== "";
 
     setDirty(isDirty);
 
@@ -117,7 +155,7 @@ function NewMember() {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
     };
-  }, [name, phone, photoBlob, gender, dob, discount, setDirty]);
+  }, [name, phone, photoBlob, gender, dob, discount, weight, height, goals, customGoal, setDirty]);
 
   // Camera Logic
   const startCamera = async () => {
@@ -251,6 +289,17 @@ function NewMember() {
 
     if (photoBlob) {
       formData.append('profileImage', photoBlob, 'profile.jpg');
+    }
+
+    // Optional fitness profile — skip blank fields entirely so the request
+    // doesn't carry empty strings the backend would have to coerce. Goals is
+    // JSON-encoded because multipart turns arrays into repeated fields, which
+    // the parseGoalsField middleware on the API explicitly looks for.
+    if (weight !== '' && weight != null) formData.append('weight', weight);
+    if (height !== '' && height != null) formData.append('height', height);
+    if (goals.length > 0) formData.append('goals', JSON.stringify(goals));
+    if (goals.includes('other') && customGoal.trim() !== '') {
+      formData.append('customGoal', customGoal.trim());
     }
 
     try {
@@ -410,6 +459,88 @@ function NewMember() {
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+
+              {/* ── Optional Fitness Profile ──
+                  Trainers want a baseline at enrollment time. The whole
+                  section is optional — the form submits cleanly even if every
+                  field stays blank. */}
+              <div className="mt-8 pt-6 border-t border-dashed border-gray-100 dark:border-slate-700">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase flex items-center gap-2">
+                    <FaDumbbell className="text-blue-600" size={14} /> Fitness Profile
+                  </h3>
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Optional</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block flex items-center gap-1">
+                      <FaWeight size={8} /> Weight (kg)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="0.1"
+                      value={weight}
+                      onChange={(e) => setWeight(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      placeholder="e.g. 72"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block flex items-center gap-1">
+                      <FaRulerVertical size={8} /> Height (cm)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      max="300"
+                      step="0.1"
+                      value={height}
+                      onChange={(e) => setHeight(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      placeholder="e.g. 175"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
+                    Goals <span className="text-gray-300">(select any that apply)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {FITNESS_GOAL_OPTIONS.map((g) => {
+                      const active = goals.includes(g.key);
+                      return (
+                        <button
+                          key={g.key}
+                          type="button"
+                          onClick={() => toggleGoal(g.key)}
+                          className={`px-3 py-2 rounded-xl border font-bold text-[10px] uppercase tracking-wide transition-all ${
+                            active
+                              ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20'
+                              : 'border-gray-100 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
+                          }`}
+                        >
+                          {g.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {goals.includes('other') && (
+                    <input
+                      type="text"
+                      value={customGoal}
+                      onChange={(e) => setCustomGoal(e.target.value)}
+                      maxLength={200}
+                      className="mt-3 w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      placeholder="Describe the goal in your own words…"
+                    />
+                  )}
                 </div>
               </div>
 

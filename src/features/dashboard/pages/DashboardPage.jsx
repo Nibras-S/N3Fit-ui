@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import PageHeader from '../../../shared/components/layout/PageHeader';
 import {
     FaWallet, FaUsers, FaChartPie, FaRupeeSign, FaClock, FaCalendarAlt,
     FaArrowUp, FaArrowDown, FaMoneyCheckAlt, FaUserPlus, FaChartLine, FaChartBar,
@@ -95,11 +96,11 @@ const Dashboard = () => {
     return (
         <AppLayout showGenderSwitch={false}>
             <div className="space-y-6 pb-10">
-                {/* Header */}
-                <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Financial Dashboard</h1>
-                    <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">Complete business overview with revenue tracking</p>
-                </div>
+                <PageHeader
+                    title="Financial Dashboard"
+                    description="Complete business overview with revenue tracking"
+                    icon={FaChartPie}
+                />
 
                 {/* ========== DAILY REPORT SECTION ========== */}
                 <button

@@ -7,13 +7,36 @@ import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
+import PageHeader from '../../../shared/components/layout/PageHeader';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import {
     FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaSync,
     FaUserCheck, FaUserTimes, FaExclamationTriangle, FaWhatsapp,
-    FaFileImport, FaUserPlus, FaRedo, FaTimesCircle
+    FaFileImport, FaUserPlus, FaRedo, FaTimesCircle, FaColumns,
+    FaFileExport, FaCheck
 } from 'react-icons/fa';
+
+// Columns the user can toggle on/off via the column chooser. The Name column
+// is intentionally not in this list — it's always shown. Order here is the
+// order they'll render in the table when enabled.
+const TOGGLEABLE_COLUMNS = [
+    { key: 'phone', label: 'Phone' },
+    { key: 'plan', label: 'Plan' },
+    { key: 'gender', label: 'Gender' },
+    { key: 'status', label: 'Status' },
+    { key: 'dews', label: 'Days Left' },
+    { key: 'endDate', label: 'End Date' },
+    { key: 'createdAt', label: 'Joined On' },
+];
+
+// Sensible defaults — what shows out of the box. Start Date is intentionally
+// excluded: after a renewal the backend overwrites `member.date` with the new
+// renewal start, so the column was misleading users into thinking it was the
+// original join date. Use the "Joined On" column (createdAt) for that.
+const DEFAULT_VISIBLE_COLUMNS = ['phone', 'status', 'dews', 'endDate'];
+
+const COLUMN_PREF_KEY = 'n3fit:members:visibleColumns';
 
 const TAB_CONFIG = [
     { key: 'active', label: 'Active Members', icon: FaUserCheck, status: 'Active' },
@@ -47,6 +70,32 @@ const MembersPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editData, setEditData] = useState(null);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+
+    // ── Column chooser state (persisted) ────────────────────────
+    const [visibleColumns, setVisibleColumns] = useState(() => {
+        try {
+            const stored = localStorage.getItem(COLUMN_PREF_KEY);
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (_) { /* ignore corrupt prefs */ }
+        return DEFAULT_VISIBLE_COLUMNS;
+    });
+    const [columnChooserOpen, setColumnChooserOpen] = useState(false);
+
+    useEffect(() => {
+        try {
+            localStorage.setItem(COLUMN_PREF_KEY, JSON.stringify(visibleColumns));
+        } catch (_) { /* localStorage may be unavailable */ }
+    }, [visibleColumns]);
+
+    // ── Row selection state (used by All Members tab) ───────────
+    const [selectedIds, setSelectedIds] = useState([]);
+
+    // Reset selection on tab change so the export button doesn't carry stale
+    // ids across tabs.
+    useEffect(() => { setSelectedIds([]); }, [activeTab]);
 
     // ── Inline Renewal State ────────────────────────────────────
     const [renewingMemberId, setRenewingMemberId] = useState(null);
@@ -257,6 +306,72 @@ const MembersPage = () => {
         window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
     };
 
+    // ── Export selected to CSV ──────────────────────────────────
+    // Builds a CSV from the currently-loaded members whose _id is in
+    // selectedIds. We don't hit the backend — the rows the user just selected
+    // are already in memory, so this stays a fast client-side action.
+    const exportSelectedToCSV = () => {
+        if (selectedIds.length === 0) {
+            toast.error('Select at least one member to export');
+            return;
+        }
+        const selectedSet = new Set(selectedIds);
+        const rows = members.filter(m => selectedSet.has(m._id));
+        if (rows.length === 0) {
+            toast.error('No matching rows on this page');
+            return;
+        }
+
+        // CSV escaping: wrap any field that contains a comma, quote, or
+        // newline in double quotes and double up internal quotes.
+        const escape = (val) => {
+            if (val === null || val === undefined) return '';
+            const str = String(val);
+            if (/[",\n\r]/.test(str)) return `"${str.replace(/"/g, '""')}"`;
+            return str;
+        };
+
+        const headers = [
+            'Name', 'Phone', 'Plan', 'Gender', 'Status', 'Days Left',
+            'Start Date', 'End Date', 'Joined On',
+            'Amount', 'Discount', 'Payment Method', 'Payment Status',
+        ];
+        const lines = [headers.join(',')];
+
+        for (const m of rows) {
+            const status = m.dews > 0 ? 'Active' : 'Expired';
+            lines.push([
+                escape(m.name),
+                escape(m.phone),
+                escape(m.plan),
+                escape(m.gender),
+                escape(status),
+                escape(m.dews),
+                escape(formatDate(m.date)),
+                escape(formatDate(m.endDate)),
+                escape(formatDate(m.createdAt)),
+                escape(m.amount ?? ''),
+                escape(m.discount ?? ''),
+                escape(m.paymentMethod ?? ''),
+                escape(m.paymentStatus ?? ''),
+            ].join(','));
+        }
+
+        // BOM so Excel opens UTF-8 (₹, names with accents) correctly.
+        const blob = new Blob(['\ufeff' + lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const timestamp = new Date().toISOString().split('T')[0];
+        a.href = url;
+        a.download = `members-${timestamp}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        toast.success(`Exported ${rows.length} member${rows.length === 1 ? '' : 's'}`);
+    };
+
     // ── Edit ────────────────────────────────────────────────────
     const handleEditClick = (userId) => {
         setEditData(userId);
@@ -271,57 +386,62 @@ const MembersPage = () => {
     const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
 
     // ── Column definitions ──────────────────────────────────────
+    // Renderers for every toggleable column live here, keyed by column key.
+    // The Name column is always rendered first and isn't part of this map.
+    const columnRenderers = useMemo(() => ({
+        phone: { key: 'phone', label: 'Phone', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400">{row.phone}</span> },
+        plan: { key: 'plan', label: 'Plan', sortable: true, render: (row) => <span className="text-gray-700 dark:text-gray-300">{row.plan || '-'}</span> },
+        gender: { key: 'gender', label: 'Gender', sortable: false, render: (row) => <span className="text-gray-500 dark:text-gray-400">{row.gender || '-'}</span> },
+        status: {
+            key: 'status', label: 'Status',
+            render: (row) => (
+                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                    {row.dews > 0 ? 'Active' : 'Expired'}
+                </span>
+            ),
+        },
+        dews: {
+            key: 'dews', label: 'Days Left', sortable: true,
+            render: (row) => <span className={row.dews <= 0 ? 'text-red-500 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>,
+        },
+        endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
+        createdAt: { key: 'createdAt', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.createdAt)}</span> },
+    }), []);
+
     const columns = useMemo(() => {
-        const base = [
-            {
-                key: 'name', label: 'Name', sortable: true,
-                render: (row) => (
-                    <div className="flex items-center gap-3 group">
-                        {row.profileImage ? (
-                            <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
-                                <img
-                                    src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
-                                    alt={row.name}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => { e.target.style.display = 'none'; }}
-                                />
-                            </div>
-                        ) : (
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
-                                {row.name?.charAt(0)}
-                            </div>
-                        )}
-                        <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{row.name}</span>
-                    </div>
-                )
-            },
-            { key: 'phone', label: 'Phone', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400">{row.phone}</span> },
-        ];
+        const nameColumn = {
+            key: 'name', label: 'Name', sortable: true,
+            render: (row) => (
+                <div className="flex items-center gap-3 group">
+                    {row.profileImage ? (
+                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
+                            <img
+                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                alt={row.name}
+                                className="w-full h-full object-cover"
+                                onError={(e) => { e.target.style.display = 'none'; }}
+                            />
+                        </div>
+                    ) : (
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                            {row.name?.charAt(0)}
+                        </div>
+                    )}
+                    <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{row.name}</span>
+                </div>
+            ),
+        };
 
-        // All Members tab gets a Status column
-        if (activeTab === 'all') {
-            base.push({
-                key: 'status', label: 'Status',
-                render: (row) => (
-                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
-                        {row.dews > 0 ? 'Active' : 'Expired'}
-                    </span>
-                )
-            });
-        }
-        // Note: dews <= 0 = Expired per backend pre-save hook (status = 'InActive' when dews <= 0)
+        // Walk TOGGLEABLE_COLUMNS (which preserves the canonical column order)
+        // and pick the ones the user has enabled.
+        const visibleSet = new Set(visibleColumns);
+        const extras = TOGGLEABLE_COLUMNS
+            .filter(c => visibleSet.has(c.key))
+            .map(c => columnRenderers[c.key])
+            .filter(Boolean);
 
-        base.push(
-            {
-                key: 'dews', label: 'Days Left', sortable: true,
-                render: (row) => <span className={row.dews <= 0 ? 'text-red-500 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>
-            },
-            { key: 'date', label: 'Start Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.date)}</span> },
-            { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
-        );
-
-        return base;
-    }, [activeTab, backendUrl, navigate]);
+        return [nameColumn, ...extras];
+    }, [visibleColumns, columnRenderers, backendUrl]);
 
     // ── Actions ─────────────────────────────────────────────────
     // stopPropagation on the wrapper so clicks on action buttons don't bubble
@@ -498,6 +618,12 @@ const MembersPage = () => {
         <AppLayout showGenderSwitch={false}>
             <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
 
+            <PageHeader
+                title="Members"
+                description="Manage your gym members, renewals, and contact details"
+                icon={FaUsers}
+            />
+
             {/* ── Desktop Tab Bar ─────────────────────────────── */}
             <div className="hidden lg:block mb-6">
                 <div className="flex items-end justify-between border-b border-gray-200 dark:border-slate-700">
@@ -581,6 +707,28 @@ const MembersPage = () => {
 
                     {/* Right controls */}
                     <div className="flex items-center gap-2 shrink-0 ml-auto flex-wrap">
+                        {/* New Member — primary action, always visible on every tab so
+                            admins don't have to bounce off into an empty state to enroll. */}
+                        <button
+                            onClick={() => navigate('/register')}
+                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-sm shadow-blue-500/25"
+                            title="Enroll a new member"
+                        >
+                            <FaUserPlus size={13} /><span className="hidden sm:inline">New Member</span>
+                        </button>
+
+                        {/* Export to CSV — gated by feature flag, only on All Members tab */}
+                        {activeTab === 'all' && hasFeature('memberExport') && (
+                            <button
+                                onClick={exportSelectedToCSV}
+                                disabled={selectedIds.length === 0}
+                                className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm font-bold border border-blue-100 dark:border-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                title={selectedIds.length === 0 ? 'Select members to export' : `Export ${selectedIds.length} selected`}
+                            >
+                                <FaFileExport size={13} />
+                                <span className="hidden sm:inline">Export{selectedIds.length > 0 ? ` (${selectedIds.length})` : ''}</span>
+                            </button>
+                        )}
                         {activeTab === 'all' && hasFeature('memberImport') && (
                             <button
                                 onClick={() => setIsImportModalOpen(true)}
@@ -589,6 +737,87 @@ const MembersPage = () => {
                                 <FaFileImport size={13} /><span className="hidden sm:inline">Import</span>
                             </button>
                         )}
+
+                        {/* Column chooser */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setColumnChooserOpen(o => !o)}
+                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-600"
+                                title="Choose columns"
+                            >
+                                <FaColumns size={13} />
+                            </button>
+                            {columnChooserOpen && (
+                                <>
+                                    {/* Click-outside backdrop */}
+                                    <div
+                                        className="fixed inset-0 z-30"
+                                        onClick={() => setColumnChooserOpen(false)}
+                                    />
+                                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl z-40 overflow-hidden">
+                                        <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                                            <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Show columns</span>
+                                            <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={visibleColumns.length === TOGGLEABLE_COLUMNS.length}
+                                                    onChange={(e) => setVisibleColumns(
+                                                        e.target.checked ? TOGGLEABLE_COLUMNS.map(c => c.key) : []
+                                                    )}
+                                                    className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                />
+                                                Select All
+                                            </label>
+                                        </div>
+                                        <div className="max-h-72 overflow-y-auto py-1">
+                                            {/* Name is always shown — render disabled checkbox so the user knows */}
+                                            <label className="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed">
+                                                <input type="checkbox" checked disabled className="w-4 h-4 rounded border-gray-300 text-blue-600" />
+                                                <span>Name</span>
+                                                <span className="ml-auto text-[10px] uppercase">Required</span>
+                                            </label>
+                                            {TOGGLEABLE_COLUMNS.map(col => {
+                                                const checked = visibleColumns.includes(col.key);
+                                                return (
+                                                    <label
+                                                        key={col.key}
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={checked}
+                                                            onChange={(e) => {
+                                                                setVisibleColumns(prev => e.target.checked
+                                                                    ? [...prev, col.key]
+                                                                    : prev.filter(k => k !== col.key));
+                                                            }}
+                                                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                        />
+                                                        <span>{col.label}</span>
+                                                        {checked && <FaCheck className="ml-auto text-blue-500" size={10} />}
+                                                    </label>
+                                                );
+                                            })}
+                                        </div>
+                                        <div className="px-4 py-2 border-t border-gray-100 dark:border-slate-700 flex justify-between">
+                                            <button
+                                                onClick={() => setVisibleColumns(DEFAULT_VISIBLE_COLUMNS)}
+                                                className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                            >
+                                                Reset to default
+                                            </button>
+                                            <button
+                                                onClick={() => setColumnChooserOpen(false)}
+                                                className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                                            >
+                                                Done
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
                         <button
                             onClick={fetchMembers} disabled={loading}
                             className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
@@ -631,6 +860,9 @@ const MembersPage = () => {
                         renderActions={renderActions}
                         renderMobileCard={renderMobileCard}
                         onRowClick={(row) => navigate(`/members/${row._id}`)}
+                        showSelection={activeTab === 'all'}
+                        selectedIds={selectedIds}
+                        onSelectionChange={setSelectedIds}
                         hoverColor={activeTab === 'inactive' ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : 'hover:bg-blue-50 dark:hover:bg-blue-900/10'}
                         gender={genderFilter}
                         serverSide={true}

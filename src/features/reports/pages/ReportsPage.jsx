@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     FaChartPie, FaWallet, FaArrowUp, FaArrowDown,
-    FaUsers, FaSearch, FaSync
+    FaUsers, FaSync, FaArrowRight
 } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
@@ -11,10 +12,13 @@ import {
     AreaChart, Area
 } from 'recharts';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import PageHeader from '../../../shared/components/layout/PageHeader';
+import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 
 const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#6366f1'];
 
 const ReportsPage = () => {
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState({
         kpi: { totalIncome: 0, totalExpense: 0, netProfit: 0, activeMembers: 0 },
@@ -23,20 +27,24 @@ const ReportsPage = () => {
         memberChart: []
     });
 
+    // Filter shape: { preset, startDate, endDate, interval }.
+    // The interval is derived from the preset (long ranges → monthly, short
+    // → daily) so the chart never tries to render 365 daily bars.
     const [filter, setFilter] = useState({
-        interval: 'monthly',
+        preset: 'all_time',
         startDate: '',
-        endDate: ''
+        endDate: '',
+        interval: 'monthly',
     });
 
     const fetchReports = async () => {
         try {
             setLoading(true);
-            let url = `/reports/dashboard?interval=${filter.interval}`;
-            if (filter.startDate) url += `&startDate=${filter.startDate}`;
-            if (filter.endDate) url += `&endDate=${filter.endDate}`;
+            const params = new URLSearchParams({ interval: filter.interval });
+            if (filter.startDate) params.set('startDate', filter.startDate);
+            if (filter.endDate) params.set('endDate', filter.endDate);
 
-            const res = await api.get(url);
+            const res = await api.get(`/reports/dashboard?${params.toString()}`);
             setData(res.data);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to load reports');
@@ -47,39 +55,45 @@ const ReportsPage = () => {
 
     useEffect(() => {
         fetchReports();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [filter]);
 
-    const handlePresetChange = (preset) => {
-        const today = new Date();
-        let start = new Date();
-        let end = new Date();
-        let interval = 'daily';
+    /**
+     * Choose a sensible chart granularity for a given range. We don't expose
+     * this to the user — the math is mechanical: ≤ 14 days → daily, ≤ 90 days
+     * → daily (still readable), longer → monthly. Avoids the "62 daily bars
+     * crammed into a chart" problem when the user picks This Year.
+     */
+    const intervalForRange = (startDate, endDate) => {
+        if (!startDate || !endDate) return 'monthly';
+        const days = Math.round(
+            (new Date(endDate).getTime() - new Date(startDate).getTime()) / 86_400_000
+        );
+        if (days <= 90) return 'daily';
+        if (days <= 730) return 'monthly';
+        return 'yearly';
+    };
 
-        switch (preset) {
-            case 'this_month':
-                start = new Date(today.getFullYear(), today.getMonth(), 1);
-                interval = 'daily';
-                break;
-            case 'last_month':
-                start = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                end = new Date(today.getFullYear(), today.getMonth(), 0);
-                interval = 'daily';
-                break;
-            case 'this_year':
-                start = new Date(today.getFullYear(), 0, 1);
-                interval = 'monthly';
-                break;
-            default:
-                start = '';
-                end = '';
-                interval = 'monthly';
-        }
-
+    const handleFilterChange = (next) => {
+        // next = { preset, startDate, endDate } from DateRangeFilter
         setFilter({
-            interval,
-            startDate: start ? start.toISOString().split('T')[0] : '',
-            endDate: end ? end.toISOString().split('T')[0] : ''
+            ...next,
+            interval: intervalForRange(next.startDate, next.endDate),
         });
+    };
+
+    /**
+     * When the user clicks a KPI card we navigate to the matching detail
+     * page and forward the current date filter on the URL so the detail
+     * page boots up scoped to the same window.
+     */
+    const drillTo = (path) => {
+        const params = new URLSearchParams();
+        if (filter.preset && filter.preset !== 'all_time') params.set('preset', filter.preset);
+        if (filter.startDate) params.set('startDate', filter.startDate);
+        if (filter.endDate) params.set('endDate', filter.endDate);
+        const qs = params.toString();
+        navigate(qs ? `${path}?${qs}` : path);
     };
 
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
@@ -120,7 +134,7 @@ const ReportsPage = () => {
 
             <div className="flex items-center gap-3 z-10">
                 <button
-                    onClick={() => handlePresetChange('all_time')}
+                    onClick={() => handleFilterChange({ ...computePresetRange('all_time'), preset: 'all_time' })}
                     className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
                 >
                     Show all time
@@ -148,43 +162,33 @@ const ReportsPage = () => {
     return (
         <AppLayout showGenderSwitch={false}>
             <div className="max-w-7xl mx-auto space-y-6">
-            {/* Header & Filters — matches the Members toolbar look */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 px-6 py-4">
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-                            <FaChartPie className="text-blue-500" />
-                            Comprehensive Reports
-                        </h1>
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Financial &amp; Member Analytics Dashboard</p>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
+            <PageHeader
+                title="Financial Dashboard"
+                description="Complete business overview with revenue tracking"
+                icon={FaChartPie}
+                action={
+                    <>
                         <button
                             onClick={fetchReports}
                             disabled={loading}
                             title="Refresh"
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
+                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-700"
                         >
                             <FaSync size={13} className={loading ? 'animate-spin' : ''} />
                         </button>
-                        <select
-                            onChange={(e) => handlePresetChange(e.target.value)}
-                            className="px-3 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-gray-900 dark:text-white"
-                        >
-                            <option value="all_time">All Time</option>
-                            <option value="this_month">This Month</option>
-                            <option value="last_month">Last Month</option>
-                            <option value="this_year">This Year</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
+                        <DateRangeFilter value={filter} onChange={handleFilterChange} />
+                    </>
+                }
+            />
 
-            {/* KPI Cards */}
+            {/* KPI Cards — every card is a navigation entry into its detail page.
+                Hover styles include a subtle ring + arrow to make affordance obvious. */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Income */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                {/* Income → /reports/income */}
+                <button
+                    onClick={() => drillTo('/reports/income')}
+                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 hover:-translate-y-0.5 transition-all"
+                >
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl text-green-600 dark:text-green-400">
@@ -193,11 +197,17 @@ const ReportsPage = () => {
                         <span className="text-xs font-bold px-2 py-1 bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 rounded-full">Income</span>
                     </div>
                     <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalIncome)}</h3>
-                    <p className="text-sm text-gray-500 mt-1">Total Revenue Generated</p>
-                </div>
+                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                        <span>Total Revenue Generated</span>
+                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-green-500 group-hover:translate-x-0.5 transition-all" />
+                    </p>
+                </button>
 
-                {/* Expenses */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                {/* Expenses → /reports/expense */}
+                <button
+                    onClick={() => drillTo('/reports/expense')}
+                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-red-200 dark:hover:border-red-800 hover:-translate-y-0.5 transition-all"
+                >
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-red-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400">
@@ -206,10 +216,14 @@ const ReportsPage = () => {
                         <span className="text-xs font-bold px-2 py-1 bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 rounded-full">Expense</span>
                     </div>
                     <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalExpense)}</h3>
-                    <p className="text-sm text-gray-500 mt-1">Total Operational Cost</p>
-                </div>
+                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                        <span>Total Operational Cost</span>
+                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-red-500 group-hover:translate-x-0.5 transition-all" />
+                    </p>
+                </button>
 
-                {/* Net Profit */}
+                {/* Net Profit — non-clickable for now (no detail page yet).
+                    Marked with cursor-default so users don't expect a drill-in. */}
                 <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div className="flex justify-between items-start mb-4">
@@ -224,8 +238,11 @@ const ReportsPage = () => {
                     <p className="text-sm text-gray-500 mt-1">Net Income Retained</p>
                 </div>
 
-                {/* Active Members */}
-                <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                {/* Active Members → /members */}
+                <button
+                    onClick={() => navigate('/members?tab=active')}
+                    className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 hover:-translate-y-0.5 transition-all"
+                >
                     <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl text-purple-600 dark:text-purple-400">
@@ -234,8 +251,11 @@ const ReportsPage = () => {
                         <span className="text-xs font-bold px-2 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 rounded-full">Active</span>
                     </div>
                     <h3 className="text-3xl font-black text-gray-900 dark:text-white">{data.kpi.activeMembers}</h3>
-                    <p className="text-sm text-gray-500 mt-1">Current Subscribed Members</p>
-                </div>
+                    <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
+                        <span>Current Subscribed Members</span>
+                        <FaArrowRight size={11} className="text-gray-300 group-hover:text-purple-500 group-hover:translate-x-0.5 transition-all" />
+                    </p>
+                </button>
             </div>
 
             {isEmpty ? (

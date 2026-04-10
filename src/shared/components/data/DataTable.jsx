@@ -201,7 +201,7 @@ const DataTable = ({
                                                 : `bg-gray-50/60 dark:bg-slate-800/70 ${hoverColor}`
                                             }`}>
                                         {showSelection && (
-                                            <td className="pl-6 pr-3 py-4 w-10">
+                                            <td className="pl-6 pr-3 py-4 w-10" onClick={(e) => e.stopPropagation()}>
                                                 <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
                                                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
                                             </td>
@@ -245,7 +245,7 @@ const DataTable = ({
                             className={`p-4 relative ${onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-blue-50 dark:bg-blue-900/20' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/60 dark:bg-slate-800/70'}`}
                         >
                             {showSelection && (
-                                <div className="absolute top-4 right-4">
+                                <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
                                     <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
                                         className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer shadow-sm" />
                                 </div>

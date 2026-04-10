@@ -39,7 +39,8 @@ const GymDetails = () => {
         announcements: true,
         archiveExpired: true,
         whatsappNotifications: false,
-        memberImport: false
+        memberImport: false,
+        memberExport: false
     });
     const [updatingFeatures, setUpdatingFeatures] = useState(false);
 
@@ -397,7 +398,8 @@ const GymDetails = () => {
                                     { key: 'announcements', label: 'WhatsApp Announcements', icon: '📢', desc: 'Enable bulk WhatsApp messaging' },
                                     { key: 'archiveExpired', label: 'Auto-Archive Expired', icon: '📦', desc: 'Automatically archive memberships' },
                                     { key: 'whatsappNotifications', label: 'WhatsApp Notifications', icon: '💬', desc: 'Auto-send payment & expiry reminders' },
-                                    { key: 'memberImport', label: 'CSV Member Import', icon: '📤', desc: 'Allow bulk importing members via CSV wizard' }
+                                    { key: 'memberImport', label: 'CSV Member Import', icon: '📤', desc: 'Allow bulk importing members via CSV wizard' },
+                                    { key: 'memberExport', label: 'CSV Member Export', icon: '📥', desc: 'Allow exporting selected members to a CSV file' }
                                 ].map((feature) => (
                                     <button
                                         key={feature.key}

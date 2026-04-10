@@ -16,6 +16,8 @@ import DashboardPage from '../features/dashboard/pages/DashboardPage';
 import ExpensesPage from '../features/expenses/pages/ExpensesPage';
 import TransactionsPage from '../features/transactions/pages/TransactionsPage';
 import ReportsPage from '../features/reports/pages/ReportsPage';
+import IncomeDetailPage from '../features/reports/pages/IncomeDetailPage';
+import ExpenseDetailPage from '../features/reports/pages/ExpenseDetailPage';
 
 // Staff, Settings, Notifications, Whatsapp
 import StaffPage from '../features/staff/pages/StaffPage';
@@ -75,6 +77,8 @@ export default function AppRoutes() {
             {/* ── Analytics (Admin / Staff / Superadmin) ──────────── */}
             <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
                 <Route path="/reports" element={<ReportsPage />} />
+                <Route path="/reports/income" element={<IncomeDetailPage />} />
+                <Route path="/reports/expense" element={<ExpenseDetailPage />} />
             </Route>
 
             {/* ── Super Admin ─────────────────────────────────────── */}
