@@ -93,7 +93,7 @@ export const NotificationProvider = ({ children }) => {
         fetchNotifications();
         checkWarning();
 
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
         const sock = io(backendUrl, {
             withCredentials: true,
             transports: ['websocket', 'polling'],

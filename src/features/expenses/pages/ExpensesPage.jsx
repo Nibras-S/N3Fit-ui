@@ -19,7 +19,7 @@ const Expenses = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (user && user.role === 'staff') {
+        if (user && user.role === 'staff' && !user.permissions?.includes('expenses')) {
             navigate('/members');
         }
     }, [user]);
