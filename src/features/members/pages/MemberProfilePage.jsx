@@ -5,12 +5,13 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
-    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave
+    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
+import EditEndDateModal from '../components/EditEndDateModal';
 
 function MemberProfile() {
     const { id } = useParams();
@@ -22,25 +23,26 @@ function MemberProfile() {
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
+    const [isExtendOpen, setIsExtendOpen] = useState(false);
+    const [auditLogs, setAuditLogs] = useState([]);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchData = async () => {
         try {
-            const [memberRes, txnRes] = await Promise.all([
+            const [memberRes, txnRes, auditRes] = await Promise.all([
                 api.get(`/contacts/${id}`),
-                api.get(`/transactions?memberId=${id}`)
+                api.get(`/transactions?memberId=${id}`),
+                api.get(`/contacts/${id}/audit`),
             ]);
             setMember(memberRes.data);
             // Transactions endpoint returns { data: [...], pagination: {...} }
             // after the api interceptor unwraps the { success, data } envelope.
-            // Older code assumed a bare array and always fell through to [],
-            // which is why the History tab showed "No transaction history found"
-            // even when records existed.
             const txnData = txnRes.data;
             const list = Array.isArray(txnData)
                 ? txnData
                 : (Array.isArray(txnData?.data) ? txnData.data : []);
             setTransactions(list);
+            setAuditLogs(Array.isArray(auditRes.data) ? auditRes.data : []);
         } catch (error) {
             console.error("Error fetching member details:", error);
             toast.error("Failed to load member details");
@@ -152,6 +154,18 @@ function MemberProfile() {
                         Transaction History
                         {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-red-400 rounded-t-full"></div>}
                     </button>
+                    <button
+                        onClick={() => setActiveTab('audit')}
+                        className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'audit' ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                    >
+                        Edit History
+                        {activeTab === 'audit' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-red-400 rounded-t-full"></div>}
+                        {auditLogs.length > 0 && (
+                            <span className="ml-1.5 text-[10px] bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-1.5 py-0.5 rounded-full font-semibold">
+                                {auditLogs.length}
+                            </span>
+                        )}
+                    </button>
                 </div>
             </div>
 
@@ -184,10 +198,21 @@ function MemberProfile() {
                                     </p>
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl">
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1">Expiry Date</p>
-                                    <p className="font-bold text-gray-900 dark:text-white">
-                                        {new Date(member.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
-                                    </p>
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1">Expiry Date</p>
+                                            <p className="font-bold text-gray-900 dark:text-white">
+                                                {new Date(member.endDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                            </p>
+                                        </div>
+                                        <button
+                                            onClick={() => setIsExtendOpen(true)}
+                                            title="Extend membership"
+                                            className="flex items-center gap-1 text-xs text-rose-500 hover:text-rose-700 dark:hover:text-rose-300 font-medium transition-colors mt-0.5"
+                                        >
+                                            <FaPlusCircle className="text-sm" /> Extend
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -321,6 +346,61 @@ function MemberProfile() {
                             )}
                         </div>
                     )}
+                    {activeTab === 'audit' && (
+                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                            <div className="p-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                                <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
+                                    <FaCalendarAlt className="text-rose-500" /> Membership Edit History
+                                </h3>
+                                <span className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
+                                    {auditLogs.length} {auditLogs.length === 1 ? 'Change' : 'Changes'}
+                                </span>
+                            </div>
+
+                            {auditLogs.length > 0 ? (
+                                <div className="divide-y divide-gray-100 dark:divide-slate-700">
+                                    {auditLogs.map((log) => (
+                                        <div key={log._id} className="p-4 space-y-1.5">
+                                            <div className="flex items-start justify-between gap-2">
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                                        {log.performedBy?.name || 'Unknown'}
+                                                        <span className="ml-1.5 text-xs font-normal text-gray-400">({log.performedBy?.role})</span>
+                                                    </p>
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                        {new Date(log.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                                        {' '}at{' '}
+                                                        {new Date(log.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                                                    </p>
+                                                </div>
+                                                <span className="shrink-0 text-[10px] bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-2 py-0.5 rounded-full font-medium">
+                                                    End Date Edit
+                                                </span>
+                                            </div>
+                                            <div className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-300">
+                                                <span className="line-through text-gray-400">
+                                                    {new Date(log.previousEndDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    {' '}({log.previousDews}d)
+                                                </span>
+                                                <span className="text-gray-400">→</span>
+                                                <span className="font-medium text-green-600 dark:text-green-400">
+                                                    {new Date(log.newEndDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                    {' '}({log.newDews}d)
+                                                </span>
+                                            </div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 italic">
+                                                "{log.reason}"
+                                            </p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                                    No edit history found.
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {/* Right Column (Stats/Actions) */}
@@ -343,6 +423,12 @@ function MemberProfile() {
                                 className="w-full py-2.5 px-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <FaCheckCircle /> Renew Membership
+                            </button>
+                            <button
+                                onClick={() => setIsExtendOpen(true)}
+                                className="w-full py-2.5 px-4 bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-400 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/30 transition-colors text-sm font-medium flex items-center gap-2"
+                            >
+                                <FaPlusCircle /> Extend Days
                             </button>
                             <button
                                 onClick={() => setIsEditing(true)}
@@ -372,6 +458,14 @@ function MemberProfile() {
                     onPaid={() => { setPaymentTxn(null); fetchData(); }}
                 />
             )}
+
+            {/* Extend End Date Modal */}
+            <EditEndDateModal
+                isOpen={isExtendOpen}
+                onClose={() => setIsExtendOpen(false)}
+                member={member}
+                onSuccess={() => { setIsExtendOpen(false); fetchData(); }}
+            />
 
             {/* Edit Modal */}
             {isEditing && (

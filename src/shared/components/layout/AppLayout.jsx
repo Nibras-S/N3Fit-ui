@@ -587,9 +587,15 @@ export function AppLayout({
                 <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg outline outline-2 outline-red-600 bg-zinc-900 flex items-center justify-center">
-                        <span className="text-white font-black italic text-xs">N3</span>
-                      </div>
+                      {gymLogo ? (
+                        <div className="w-8 h-8 rounded-lg overflow-hidden ring-2 ring-gray-200 dark:ring-white/10 shrink-0">
+                          <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-red-500/20 shrink-0">
+                          <img src={n3Logo} alt="N3" className="w-6 h-6 object-contain" />
+                        </div>
+                      )}
                       <span className="font-bold text-gray-900 dark:text-white truncate" style={{ fontSize: "16px" }}>{gymName}</span>
                     </div>
                     <button
