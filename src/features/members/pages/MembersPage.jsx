@@ -598,7 +598,7 @@ const MembersPage = () => {
                 </button>
                 <button
                     onClick={() => navigate('/register')}
-                    className="px-4 py-2 rounded-lg bg-brand-50 text-brand-600 font-medium hover:bg-brand-100 transition-all shadow-sm flex items-center gap-2 text-sm"
+                    className="px-4 py-2 rounded-lg bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-all shadow-sm flex items-center gap-2 text-sm"
                 >
                     <FaUserPlus size={12} /> Add member
                 </button>
