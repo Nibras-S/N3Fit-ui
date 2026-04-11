@@ -15,7 +15,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
 
-const COLORS = ['#ef4444', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
+const COLORS = ['#f43f5e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
 
 const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 const formatDate = (d) => d
@@ -136,7 +136,7 @@ const ExpenseDetailPage = () => {
                             <button
                                 onClick={fetchData}
                                 disabled={loading}
-                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
                                 title="Refresh"
                             >
                                 <FaSync size={13} className={loading ? 'animate-spin' : ''} />
@@ -154,7 +154,7 @@ const ExpenseDetailPage = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
                     <KpiTile label="Total Spent" value={formatCurrency(data.kpi.totalExpense)} icon={<FaArrowDown />} color="red" loading={loading} />
                     <KpiTile label="Entries" value={data.kpi.expenseCount.toLocaleString('en-IN')} icon={<FaReceipt />} color="blue" loading={loading} />
-                    <KpiTile label="Avg per Entry" value={formatCurrency(data.kpi.avgExpense)} icon={<FaChartLine />} color="indigo" loading={loading} />
+                    <KpiTile label="Avg per Entry" value={formatCurrency(data.kpi.avgExpense)} icon={<FaChartLine />} color="rose" loading={loading} />
                     <KpiTile label="Top Category" value={data.kpi.largestCategory} icon={<FaTags />} color="amber" loading={loading} />
                     <KpiTile label="Top Vendor" value={data.kpi.largestVendor} icon={<FaStore />} color="violet" loading={loading} />
                 </div>
@@ -173,15 +173,15 @@ const ExpenseDetailPage = () => {
                                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.3} />
                                     <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => v >= 1000 ? `${v / 1000}k` : v} axisLine={false} tickLine={false} />
                                     <Tooltip formatter={(v) => formatCurrency(v)} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                                    <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={2.5} fill="url(#expenseGradient)" />
+                                    <Area type="monotone" dataKey="expense" stroke="#f43f5e" strokeWidth={2.5} fill="url(#expenseGradient)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         ) : <EmptyChart />}
@@ -244,7 +244,7 @@ const ExpenseDetailPage = () => {
                                         <XAxis dataKey="method" tick={{ fontSize: 11, fill: '#64748b' }} />
                                         <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => v >= 1000 ? `${v / 1000}k` : v} />
                                         <Tooltip formatter={(v) => formatCurrency(v)} contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                        <Bar dataKey="total" fill="#ef4444" radius={[6, 6, 0, 0]} maxBarSize={60} />
+                                        <Bar dataKey="total" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={60} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -332,9 +332,9 @@ const ExpenseDetailPage = () => {
 // ─────────────────────────────────────────────────────────────────────────
 
 const KPI_COLORS = {
-    red:    { bg: 'bg-red-50 dark:bg-red-900/20',       text: 'text-red-600 dark:text-red-400' },
-    blue:   { bg: 'bg-blue-50 dark:bg-blue-900/20',     text: 'text-blue-600 dark:text-blue-400' },
-    indigo: { bg: 'bg-indigo-50 dark:bg-indigo-900/20', text: 'text-indigo-600 dark:text-indigo-400' },
+    red:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-red-600 dark:text-red-400' },
+    blue:   { bg: 'bg-zinc-50 dark:bg-zinc-800/50',     text: 'text-red-600 dark:text-red-400' },
+    rose: { bg: 'bg-rose-50 dark:bg-rose-900/20', text: 'text-rose-600 dark:text-rose-400' },
     amber:  { bg: 'bg-amber-50 dark:bg-amber-900/20',   text: 'text-amber-600 dark:text-amber-400' },
     violet: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-600 dark:text-violet-400' },
 };

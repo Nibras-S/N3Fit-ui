@@ -169,7 +169,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                                     />
                                 </div>
                             ) : (
-                                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold ${formData.gender === 'Male' ? 'bg-blue-100 text-blue-600' : 'bg-pink-100 text-pink-600'}`}>
+                                <div className={`w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold ${formData.gender === 'Male' ? 'bg-zinc-100 text-red-600' : 'bg-pink-100 text-pink-600'}`}>
                                     {formData.name?.charAt(0)}
                                 </div>
                             )}
@@ -183,7 +183,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                             type="text"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
                             required
                         />
                     </div>
@@ -208,7 +208,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                         <select
                             value={formData.plan}
                             onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
                         >
                             {plans.map(p => (
                                 <option key={p.value} value={p.value}>{p.label}</option>
@@ -220,7 +220,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 block">Gender</label>
                         <div className="flex gap-4">
-                            <label className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 cursor-pointer text-sm font-medium transition-all ${formData.gender === 'Male' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
+                            <label className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border-2 cursor-pointer text-sm font-medium transition-all ${formData.gender === 'Male' ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400' : 'border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700'}`}>
                                 <input type="radio" value="Male" checked={formData.gender === "Male"} onChange={(e) => setFormData({ ...formData, gender: e.target.value })} className="hidden" />
                                 <FaMale /> Male
                             </label>
@@ -250,7 +250,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                                 <select
                                     value={formData.paymentStatus || 'Paid'}
                                     onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
                                 >
                                     <option value="Paid">Paid</option>
                                     <option value="Pending">Pending</option>
@@ -262,7 +262,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                                 <select
                                     value={formData.paymentMethod || 'Cash'}
                                     onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                                    className="w-full px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10"
                                 >
                                     <option value="Cash">Cash</option>
                                     <option value="UPI">UPI</option>
@@ -279,7 +279,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                                         placeholder="Enter amount"
                                         value={formData.amount || ''}
                                         onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                        className="w-full pl-8 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                        className="w-full pl-8 px-3 py-2 rounded-lg bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
                                     />
                                 </div>
                             </div>
@@ -297,7 +297,7 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors text-sm shadow-lg shadow-blue-500/30"
+                            className="flex-1 py-3 rounded-xl bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors text-sm shadow-lg shadow-red-500/30"
                         >
                             Save Changes
                         </button>

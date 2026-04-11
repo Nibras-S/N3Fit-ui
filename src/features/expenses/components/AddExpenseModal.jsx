@@ -187,7 +187,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
             <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center">
                             <FaFileInvoice />
                         </div>
                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
@@ -203,12 +203,12 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                     {/* Category */}
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
-                            <FaTag className="text-blue-500 text-xs" /> Category
+                            <FaTag className="text-red-500 text-xs" /> Category
                         </label>
                         <select
                             value={formData.category}
                             onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                             required
                         >
                             <option value="">Select Category</option>
@@ -223,7 +223,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                     {isStaffSalary && (
                         <div>
                             <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
-                                <FaUserTie className="text-blue-500 text-xs" /> Staff Member
+                                <FaUserTie className="text-red-500 text-xs" /> Staff Member
                             </label>
                             <select
                                 value={formData.staffId}
@@ -240,7 +240,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                                             : (v === 'other' ? '' : p.vendor),
                                     }));
                                 }}
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                                 required
                             >
                                 <option value="">
@@ -270,7 +270,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                                 type="number"
                                 value={formData.amount}
                                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                                className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                                 placeholder="0.00"
                                 required
                             />
@@ -299,7 +299,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                             <select
                                 value={formData.paymentMethod}
                                 onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
-                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                                 required
                             >
                                 <option value="Cash">Cash</option>
@@ -313,13 +313,13 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                     {/* Vendor */}
                     <div>
                         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block flex items-center gap-2">
-                            <FaUser className="text-indigo-500 text-xs" /> Vendor / Receiver
+                            <FaUser className="text-rose-500 text-xs" /> Vendor / Receiver
                         </label>
                         <input
                             type="text"
                             value={formData.vendor}
                             onChange={(e) => setFormData({ ...formData, vendor: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                             placeholder="e.g. Electric Board, Staff Name"
                         />
                     </div>
@@ -356,7 +356,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                         <textarea
                             value={formData.note}
                             onChange={(e) => setFormData({ ...formData, note: e.target.value })}
-                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all outline-none"
+                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-brand-600 focus:ring-2 focus:ring-brand-100 transition-all outline-none"
                             placeholder="Details about the expense..."
                             rows="2"
                         />
@@ -373,7 +373,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-1 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/30 disabled:opacity-50"
+                            className="flex-1 py-3 rounded-xl bg-brand-50 text-brand-600 font-bold hover:bg-brand-100 transition-colors shadow-sm disabled:opacity-50"
                         >
                             {loading ? 'Saving...' : expense ? 'Update Expense' : 'Add Expense'}
                         </button>

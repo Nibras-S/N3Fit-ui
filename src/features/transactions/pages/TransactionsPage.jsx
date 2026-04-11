@@ -21,7 +21,8 @@ const TransactionsPage = () => {
             setLoading(true);
             try {
                 const response = await api.get(`/transactions`);
-                setTransactions(Array.isArray(response.data) ? response.data : []);
+                const list = response.data?.data ?? response.data;
+                setTransactions(Array.isArray(list) ? list : []);
             } catch (error) {
                 toast.error('Failed to load transactions');
             } finally {
@@ -73,7 +74,7 @@ const TransactionsPage = () => {
             key: 'memberName', label: 'Member', sortable: true,
             render: (row) => (
                 <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">
+                    <div className="w-7 h-7 rounded-full bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400 flex items-center justify-center text-xs font-bold">
                         {row.memberName?.charAt(0)}
                     </div>
                     <span className="font-medium text-gray-800 dark:text-gray-200 text-sm">{row.memberName}</span>
@@ -87,7 +88,7 @@ const TransactionsPage = () => {
             key: 'paymentMethod', label: 'Method',
             render: (row) => (
                 <span className={`text-xs px-2 py-1 rounded-full font-medium ${row.paymentMethod === 'Cash' ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400' :
-                    row.paymentMethod === 'UPI' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300'
+                    row.paymentMethod === 'UPI' ? 'bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400' : 'bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300'
                     }`}>
                     {row.paymentMethod || 'Unknown'}
                 </span>
@@ -109,7 +110,7 @@ const TransactionsPage = () => {
     const renderActions = (row) => (
         <button
             onClick={() => navigate(`/invoice/${row._id}`)}
-            className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium"
+            className="text-red-500 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium"
         >
             Invoice
         </button>
@@ -119,7 +120,7 @@ const TransactionsPage = () => {
         <>
             <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
-                    <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-sm font-bold">
+                    <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400 flex items-center justify-center text-sm font-bold">
                         {row.memberName?.charAt(0)}
                     </div>
                     <div>
@@ -137,12 +138,12 @@ const TransactionsPage = () => {
                 <div className="flex items-center gap-2">
                     <span className="font-bold text-gray-800 dark:text-white">{formatCurrency(row.amount)}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${row.paymentMethod === 'Cash' ? 'bg-green-50 text-green-700' :
-                        row.paymentMethod === 'UPI' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-600'
+                        row.paymentMethod === 'UPI' ? 'bg-zinc-50 text-red-700' : 'bg-gray-100 text-gray-600'
                         }`}>{row.paymentMethod}</span>
                 </div>
                 <button
                     onClick={() => navigate(`/invoice/${row._id}`)}
-                    className="text-blue-500 text-xs font-medium"
+                    className="text-red-500 text-xs font-medium"
                 >
                     Invoice
                 </button>
@@ -178,7 +179,7 @@ const TransactionsPage = () => {
                                 placeholder="Search by member, plan..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm"
+                                className="w-full pl-10 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm"
                             />
                             {searchTerm && <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">✕</button>}
                         </div>
@@ -186,7 +187,7 @@ const TransactionsPage = () => {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                className="px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
                             >
                                 <option value="all">All Status</option>
                                 {statuses.map(s => <option key={s} value={s}>{s}</option>)}
@@ -194,7 +195,7 @@ const TransactionsPage = () => {
                             <select
                                 value={methodFilter}
                                 onChange={(e) => setMethodFilter(e.target.value)}
-                                className="px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                                className="px-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
                             >
                                 <option value="all">All Methods</option>
                                 {methods.map(m => <option key={m} value={m}>{m}</option>)}

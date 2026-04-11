@@ -221,13 +221,13 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
             <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-2xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
                 <div className="flex items-center justify-between p-6 border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-800/50">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center text-white shadow-lg shadow-red-500/20">
                             <FaFileCsv size={20} />
                         </div>
                         <div>
                             <h3 className="font-bold text-gray-900 dark:text-white">Import Members Wizard</h3>
                             <div className="flex items-center gap-2 mt-0.5">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${step === 1 ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>STEP {step} OF 2</span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${step === 1 ? 'bg-zinc-100 text-red-600' : 'bg-green-100 text-green-600'}`}>STEP {step} OF 2</span>
                                 <span className="text-[10px] text-gray-400 font-medium">{step === 1 ? 'Upload & Settings' : 'Column Mapping'}</span>
                             </div>
                         </div>
@@ -244,27 +244,27 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                                 <div className="border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-3xl p-12 text-center bg-gray-50/50 dark:bg-slate-800/10 hover:bg-white dark:hover:bg-slate-700/50 transition-all group relative">
                                     <input type="file" accept=".csv" onChange={handleFileChange} className="hidden" id="csvFile" />
                                     <label htmlFor="csvFile" className="cursor-pointer block">
-                                        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                                            <FaUpload className="text-blue-600 dark:text-blue-400" size={24} />
+                                        <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-700/50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                            <FaUpload className="text-red-600 dark:text-red-400" size={24} />
                                         </div>
                                         <h4 className="font-bold text-gray-900 dark:text-white mb-2">Click to upload CSV</h4>
                                         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 px-10">Select a member list in CSV format to start the import process.</p>
-                                        <span className="px-8 py-3 bg-blue-600 rounded-2xl text-sm font-bold text-white shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all">Choose File</span>
+                                        <span className="px-8 py-3 bg-zinc-900 rounded-2xl text-sm font-bold text-white shadow-xl shadow-red-500/20 hover:bg-zinc-800 transition-all">Choose File</span>
                                     </label>
                                 </div>
                             ) : (
                                 <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                    <div className="flex items-center justify-between p-5 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-900/30 shadow-sm">
+                                    <div className="flex items-center justify-between p-5 bg-zinc-50 dark:bg-zinc-800/30 rounded-2xl border border-red-100 dark:border-red-900/30 shadow-sm">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm border border-blue-100 dark:border-blue-900/20">
-                                                <FaFileCsv className="text-blue-600" size={24} />
+                                            <div className="w-12 h-12 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center shadow-sm border border-red-100 dark:border-red-900/20">
+                                                <FaFileCsv className="text-red-600" size={24} />
                                             </div>
                                             <div>
                                                 <p className="text-sm font-bold text-gray-900 dark:text-white">{file.name}</p>
                                                 <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">{(file.size / 1024).toFixed(1)} KB • {csvRows.length} Rows Detected</p>
                                             </div>
                                         </div>
-                                        <button onClick={() => { setFile(null); setCsvRows([]); }} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Remove File">
+                                        <button onClick={() => { setFile(null); setCsvRows([]); }} className="p-2 text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors" title="Remove File">
                                             <FaTimes size={16} />
                                         </button>
                                     </div>
@@ -279,13 +279,13 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                                             <div className="flex bg-white dark:bg-slate-800 p-1 rounded-xl border border-gray-200 dark:border-slate-700">
                                                 <button
                                                     onClick={() => handleHeaderToggle(true)}
-                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${hasHeaders ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${hasHeaders ? 'bg-zinc-900 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                                                 >
                                                     Yes
                                                 </button>
                                                 <button
                                                     onClick={() => handleHeaderToggle(false)}
-                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${!hasHeaders ? 'bg-blue-600 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
+                                                    className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${!hasHeaders ? 'bg-zinc-900 text-white shadow-md' : 'text-gray-400 hover:text-gray-600'}`}
                                                 >
                                                     No
                                                 </button>
@@ -307,15 +307,15 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                                     onClick={downloadSample}
                                     className="flex flex-col items-center justify-center p-4 bg-gray-50 dark:bg-slate-900/30 rounded-2xl border border-gray-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700 transition-all group"
                                 >
-                                    <FaDownload className="text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
+                                    <FaDownload className="text-red-500 mb-2 group-hover:scale-110 transition-transform" />
                                     <span className="text-[10px] font-bold text-gray-600 dark:text-gray-400 uppercase tracking-widest text-center">Download Sample CSV Template</span>
                                 </button>
                             </div>
                         </div>
                     ) : (
                         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-                            <div className="bg-blue-50/50 dark:bg-blue-900/5 p-4 rounded-2xl border border-blue-100 dark:border-blue-900/20 mb-4">
-                                <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 mb-1">
+                            <div className="bg-zinc-50/50 dark:bg-red-900/5 p-4 rounded-2xl border border-red-100 dark:border-red-900/20 mb-4">
+                                <div className="flex items-center gap-2 text-red-600 dark:text-red-400 mb-1">
                                     <FaTable size={14} />
                                     <h4 className="text-xs font-bold uppercase tracking-wider">Map your columns</h4>
                                 </div>
@@ -324,7 +324,7 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
 
                             <div className="space-y-3 max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar">
                                 {targetFields.map((field) => (
-                                    <div key={field.key} className="flex items-center gap-4 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-blue-200 transition-colors">
+                                    <div key={field.key} className="flex items-center gap-4 p-3 rounded-2xl border border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-red-200 transition-colors">
                                         <div className="w-1/3">
                                             <p className="text-xs font-bold text-gray-800 dark:text-gray-200">
                                                 {field.label} {field.required && <span className="text-red-500">*</span>}
@@ -334,7 +334,7 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                                             <select
                                                 value={mapping[field.key] ?? ''}
                                                 onChange={(e) => setMapping({ ...mapping, [field.key]: e.target.value === '' ? undefined : parseInt(e.target.value) })}
-                                                className="w-full px-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all"
+                                                className="w-full px-4 py-2 text-xs rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 outline-none transition-all"
                                             >
                                                 <option value="">-- Don't Map / Skip --</option>
                                                 {csvHeaders.map((header, idx) => (
@@ -398,7 +398,7 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                         <button
                             onClick={() => file ? setStep(2) : toast.error("Please select a file first")}
                             disabled={!file}
-                            className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 shadow-xl shadow-blue-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-3 rounded-2xl bg-zinc-900 text-white font-bold text-sm hover:bg-zinc-800 shadow-xl shadow-zinc-900/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             Configure Mapping <FaArrowRight />
                         </button>
@@ -406,7 +406,7 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                         <button
                             onClick={handleImport}
                             disabled={importing}
-                            className="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 shadow-xl shadow-blue-500/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-3 rounded-2xl bg-zinc-900 text-white font-bold text-sm hover:bg-zinc-800 shadow-xl shadow-zinc-900/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {importing ? (
                                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

@@ -23,7 +23,7 @@ const Notifications = () => {
                     {notifications.some(n => !n.isRead) && (
                         <button
                             onClick={markAllAsRead}
-                            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/25"
+                            className="bg-zinc-900 hover:bg-zinc-800 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all shadow-lg shadow-zinc-900/25"
                         >
                             <FaCheckDouble size={14} /> Mark All as Read
                         </button>
@@ -48,14 +48,14 @@ const Notifications = () => {
                         notifications.map((n) => (
                             <div
                                 key={n._id}
-                                className={`bg-white dark:bg-slate-800 rounded-2xl border transition-all p-5 flex gap-5 group relative ${!n.isRead ? 'border-blue-200 dark:border-blue-900/30 ring-1 ring-blue-50 dark:ring-blue-900/10 shadow-md' : 'border-gray-100 dark:border-slate-700 opacity-80'}`}
+                                className={`bg-white dark:bg-slate-800 rounded-2xl border transition-all p-5 flex gap-5 group relative ${!n.isRead ? 'border-red-200 dark:border-red-900/30 ring-1 ring-red-50 dark:ring-red-900/10 shadow-md' : 'border-gray-100 dark:border-slate-700 opacity-80'}`}
                             >
-                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${n.type === 'warning' ? 'bg-red-50 text-red-500 dark:bg-red-900/20' : 'bg-blue-50 text-blue-500 dark:bg-blue-900/20'}`}>
+                                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${n.type === 'warning' ? 'bg-zinc-50 text-red-500 dark:bg-zinc-800/50' : 'bg-zinc-50 text-red-500 dark:bg-zinc-800/50'}`}>
                                     {n.type === 'warning' ? <FaExclamationTriangle size={20} /> : <FaBell size={20} />}
                                 </div>
                                 <div className="flex-1 min-w-0">
                                     <div className="flex items-center gap-2 mb-1">
-                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${n.type === 'warning' ? 'bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400'}`}>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${n.type === 'warning' ? 'bg-zinc-100 text-red-600 dark:bg-zinc-700/60 dark:text-red-400' : 'bg-zinc-100 text-red-600 dark:bg-zinc-700/60 dark:text-red-400'}`}>
                                             {n.type}
                                         </span>
                                         <span className="text-[10px] font-bold text-gray-400">
@@ -69,7 +69,7 @@ const Notifications = () => {
                                 {!n.isRead && (
                                     <button
                                         onClick={() => markAsRead(n._id)}
-                                        className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                        className="p-2 text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                         title="Mark as read"
                                     >
                                         <FaCheckDouble size={16} />

@@ -397,7 +397,7 @@ const MembersPage = () => {
         status: {
             key: 'status', label: 'Status',
             render: (row) => (
-                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-red-700 dark:text-red-400'}`}>
                     {row.dews > 0 ? 'Active' : 'Expired'}
                 </span>
             ),
@@ -425,11 +425,11 @@ const MembersPage = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
-                    <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{row.name}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{row.name}</span>
                 </div>
             ),
         };
@@ -473,10 +473,10 @@ const MembersPage = () => {
                     <FaWhatsapp />
                 </button>
             )}
-            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg" title="Edit">
+            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg" title="Edit">
                 <FaEdit />
             </button>
-            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg" title="Delete">
+            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg" title="Delete">
                 <FaTrash />
             </button>
         </div>
@@ -497,7 +497,7 @@ const MembersPage = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
@@ -519,7 +519,7 @@ const MembersPage = () => {
                         </button>
                     )}
                     {activeTab === 'all' && (
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400'}`}>
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-red-700 dark:text-red-400'}`}>
                             {row.dews > 0 ? 'Active' : 'Expired'}
                         </span>
                     )}
@@ -530,13 +530,13 @@ const MembersPage = () => {
                 <span>{formatDate(row.endDate)}</span>
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaRedo size={11} /> Renew
                 </button>
-                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaEdit /> Edit
                 </button>
-                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 text-red-600 dark:text-red-400 font-semibold rounded-lg text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaTrash /> Delete
                 </button>
             </div>
@@ -598,7 +598,7 @@ const MembersPage = () => {
                 </button>
                 <button
                     onClick={() => navigate('/register')}
-                    className="px-4 py-2 rounded-lg bg-blue-600 text-white font-medium hover:bg-blue-700 transition-all shadow-sm flex items-center gap-2 text-sm"
+                    className="px-4 py-2 rounded-lg bg-brand-50 text-brand-600 font-medium hover:bg-brand-100 transition-all shadow-sm flex items-center gap-2 text-sm"
                 >
                     <FaUserPlus size={12} /> Add member
                 </button>
@@ -614,7 +614,7 @@ const MembersPage = () => {
             </div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">No {currentTab.label.toLowerCase()}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-5">There are no members in this category yet.</p>
-            <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-all flex items-center gap-2">
+            <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-lg bg-brand-50 text-brand-600 text-sm font-medium hover:bg-brand-100 transition-all flex items-center gap-2">
                 <FaUserPlus size={12} /> Add member
             </button>
         </div>
@@ -636,14 +636,14 @@ const MembersPage = () => {
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
                                     className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all ${isActive
-                                        ? 'border-blue-600 text-blue-600 dark:text-blue-400 dark:border-blue-400'
+                                        ? 'border-zinc-900 text-red-600 dark:text-red-400 dark:border-red-400'
                                         : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:border-gray-300'
                                         }`}
                                 >
                                     <Icon size={14} />
                                     {tab.label}
                                     {isActive && (
-                                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+                                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-700/50 text-red-700 dark:text-red-300">
                                             {allStats.total}
                                         </span>
                                     )}
@@ -653,8 +653,8 @@ const MembersPage = () => {
                     </div>
                     {/* Right: stats pills */}
                     <div className="flex items-center gap-4 pb-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="flex items-center gap-1.5"><FaUsers size={12} className="text-blue-400" /> {allStats.total} total</span>
-                        <span className="flex items-center gap-1.5"><FaMale size={12} className="text-blue-400" /> {allStats.male} male</span>
+                        <span className="flex items-center gap-1.5"><FaUsers size={12} className="text-red-400" /> {allStats.total} total</span>
+                        <span className="flex items-center gap-1.5"><FaMale size={12} className="text-red-400" /> {allStats.male} male</span>
                         <span className="flex items-center gap-1.5"><FaFemale size={12} className="text-pink-400" /> {allStats.female} female</span>
                     </div>
                 </div>
@@ -670,7 +670,7 @@ const MembersPage = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
-                                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25'
+                                ? 'bg-brand-50 text-brand-600 shadow-md shadow-brand-200/50'
                                 : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700'
                                 }`}
                         >
@@ -695,7 +695,7 @@ const MembersPage = () => {
                             placeholder="Search by name or phone..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                         />
                         {searchTerm && (
                             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -710,7 +710,7 @@ const MembersPage = () => {
                             admins don't have to bounce off into an empty state to enroll. */}
                         <button
                             onClick={() => navigate('/register')}
-                            className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-sm shadow-blue-500/25"
+                            className="flex items-center gap-2 px-3 py-2 bg-brand-50 text-brand-600 rounded-lg text-sm font-bold hover:bg-brand-100 active:scale-95 transition-all shadow-sm shadow-brand-100/50"
                             title="Enroll a new member"
                         >
                             <FaUserPlus size={13} /><span className="hidden sm:inline">New Member</span>
@@ -721,7 +721,7 @@ const MembersPage = () => {
                             <button
                                 onClick={exportSelectedToCSV}
                                 disabled={selectedIds.length === 0}
-                                className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg text-sm font-bold border border-blue-100 dark:border-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 rounded-lg text-sm font-bold border border-red-100 dark:border-red-900/30 hover:bg-zinc-100 dark:hover:bg-red-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 title={selectedIds.length === 0 ? 'Select members to export' : `Export ${selectedIds.length} selected`}
                             >
                                 <FaFileExport size={13} />
@@ -741,7 +741,7 @@ const MembersPage = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setColumnChooserOpen(o => !o)}
-                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-600"
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-600"
                                 title="Choose columns"
                             >
                                 <FaColumns size={13} />
@@ -763,7 +763,7 @@ const MembersPage = () => {
                                                     onChange={(e) => setVisibleColumns(
                                                         e.target.checked ? TOGGLEABLE_COLUMNS.map(c => c.key) : []
                                                     )}
-                                                    className="w-3.5 h-3.5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    className="w-3.5 h-3.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
                                                 />
                                                 Select All
                                             </label>
@@ -771,7 +771,7 @@ const MembersPage = () => {
                                         <div className="max-h-72 overflow-y-auto py-1">
                                             {/* Name is always shown — render disabled checkbox so the user knows */}
                                             <label className="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed">
-                                                <input type="checkbox" checked disabled className="w-4 h-4 rounded border-gray-300 text-blue-600" />
+                                                <input type="checkbox" checked disabled className="w-4 h-4 rounded border-gray-300 text-red-600" />
                                                 <span>Name</span>
                                                 <span className="ml-auto text-[10px] uppercase">Required</span>
                                             </label>
@@ -790,10 +790,10 @@ const MembersPage = () => {
                                                                     ? [...prev, col.key]
                                                                     : prev.filter(k => k !== col.key));
                                                             }}
-                                                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                            className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
                                                         />
                                                         <span>{col.label}</span>
-                                                        {checked && <FaCheck className="ml-auto text-blue-500" size={10} />}
+                                                        {checked && <FaCheck className="ml-auto text-red-500" size={10} />}
                                                     </label>
                                                 );
                                             })}
@@ -807,7 +807,7 @@ const MembersPage = () => {
                                             </button>
                                             <button
                                                 onClick={() => setColumnChooserOpen(false)}
-                                                className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                                                className="text-xs font-medium text-red-600 hover:text-red-700"
                                             >
                                                 Done
                                             </button>
@@ -819,7 +819,7 @@ const MembersPage = () => {
 
                         <button
                             onClick={fetchMembers} disabled={loading}
-                            className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
+                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
                             title="Refresh"
                         >
                             <FaSync size={13} className={loading ? 'animate-spin' : ''} />
@@ -851,7 +851,7 @@ const MembersPage = () => {
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                         />
                         {searchTerm && (
                             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -867,7 +867,7 @@ const MembersPage = () => {
                     </button>
                     <button
                         onClick={() => navigate('/register')}
-                        className="w-[38px] h-[38px] bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-md shadow-blue-500/25 active:scale-95 transition-all shrink-0"
+                        className="w-[38px] h-[38px] bg-zinc-900 rounded-xl flex items-center justify-center text-white shadow-md shadow-zinc-900/25 active:scale-95 transition-all shrink-0"
                     >
                         <FaPlus size={16} />
                     </button>
@@ -893,7 +893,7 @@ const MembersPage = () => {
                         showSelection={activeTab === 'all'}
                         selectedIds={selectedIds}
                         onSelectionChange={setSelectedIds}
-                        hoverColor={activeTab === 'inactive' ? 'hover:bg-red-50 dark:hover:bg-red-900/10' : 'hover:bg-blue-50 dark:hover:bg-blue-900/10'}
+                        hoverColor={activeTab === 'inactive' ? 'hover:bg-zinc-50 dark:hover:bg-red-900/10' : 'hover:bg-zinc-50 dark:hover:bg-red-900/10'}
                         gender={genderFilter}
                         serverSide={true}
                         count={totalRecords}
@@ -915,7 +915,7 @@ const MembersPage = () => {
                 >
                     <FaExclamationTriangle className="text-orange-500 text-xl" />
                     {pendingCount > 0 && (
-                        <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-xs font-bold text-white">
+                        <span className="absolute -top-0.5 -right-0.5 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-zinc-900 px-1 text-xs font-bold text-white">
                             {pendingCount}
                         </span>
                     )}
@@ -928,7 +928,7 @@ const MembersPage = () => {
                     <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
                         <div className="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <FaRedo className="text-blue-500" /> Renew {renewingMember.name}
+                                <FaRedo className="text-red-500" /> Renew {renewingMember.name}
                             </h3>
                             <button onClick={() => setRenewingMemberId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                                 ✕
@@ -948,7 +948,7 @@ const MembersPage = () => {
                                             amount: planObj ? planObj.price : '',
                                         });
                                     }}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                 >
                                     <option value="">Select Plan...</option>
                                     {settings?.plans?.filter(p => p.isActive)?.map((p, i) => (
@@ -970,7 +970,7 @@ const MembersPage = () => {
                                         type="number"
                                         value={renewForm.amount}
                                         onChange={(e) => setRenewForm({ ...renewForm, amount: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                     />
                                 </div>
                             </div>
@@ -979,7 +979,7 @@ const MembersPage = () => {
                                 <select
                                     value={renewForm.paymentMethod}
                                     onChange={(e) => setRenewForm({ ...renewForm, paymentMethod: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
                                 >
                                     <option value="Cash">Cash</option>
                                     <option value="UPI">UPI</option>
@@ -997,7 +997,7 @@ const MembersPage = () => {
                             </button>
                             <button
                                 onClick={() => submitRenewal(renewingMemberId)}
-                                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm transition-colors text-sm"
+                                className="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg shadow-sm transition-colors text-sm"
                             >
                                 Renew Membership
                             </button>
@@ -1053,7 +1053,7 @@ const MembersPage = () => {
                                         setGenderFilter('all');
                                         setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
                                     }}
-                                    className="text-blue-600 font-semibold text-sm"
+                                    className="text-red-600 font-semibold text-sm"
                                 >
                                     Reset all
                                 </button>
@@ -1070,7 +1070,7 @@ const MembersPage = () => {
                                                 key={f}
                                                 onClick={() => setGenderFilter(f)}
                                                 className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${genderFilter === f
-                                                    ? 'bg-blue-600 border border-blue-600 text-white shadow-blue-500/30'
+                                                    ? 'bg-zinc-900 border border-zinc-900 text-white shadow-red-500/30'
                                                     : 'bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-600'
                                                     }`}
                                             >
@@ -1086,7 +1086,7 @@ const MembersPage = () => {
                                     <div className="space-y-1">
                                         {/* Disabled name checkbox */}
                                         <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 cursor-not-allowed">
-                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 text-blue-500 opacity-50">
+                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-zinc-100 dark:bg-zinc-700/50 text-red-500 opacity-50">
                                                 <FaCheck size={10} />
                                             </div>
                                             <span className="text-sm font-semibold text-gray-400 dark:text-gray-500">Name</span>
@@ -1097,7 +1097,7 @@ const MembersPage = () => {
                                             const checked = visibleColumns.includes(col.key);
                                             return (
                                                 <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer border border-transparent dark:hover:border-slate-600">
-                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800'}`}>
+                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800'}`}>
                                                         {checked && <FaCheck size={10} />}
                                                     </div>
                                                     <span className={`text-sm font-semibold ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
@@ -1112,7 +1112,7 @@ const MembersPage = () => {
                             <div className="p-4 border-t border-gray-100 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800">
                                 <button
                                     onClick={() => setIsFilterSheetOpen(false)}
-                                    className="w-full py-3.5 bg-blue-600 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-blue-500/30"
+                                    className="w-full py-3.5 bg-zinc-900 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-red-500/30"
                                 >
                                     Show Results
                                 </button>

@@ -64,12 +64,12 @@ function AdminAuth() {
       <Toaster position="top-right" />
 
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950">
+      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-red-950 to-rose-950">
         {/* Animated Background Orbs */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-cyan-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
+          <div className="absolute top-20 left-20 w-72 h-72 bg-red-600 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-72 h-72 bg-rose-500 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-rose-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
         </div>
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
@@ -89,7 +89,7 @@ function AdminAuth() {
             >
               Manage Your Fit Club,
               <br />
-              <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-red-400 to-rose-300 bg-clip-text text-transparent">
                 Effortlessly.
               </span>
             </motion.h1>
@@ -174,8 +174,8 @@ function AdminAuth() {
                 className="flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-semibold transition-all duration-200"
                 style={{
                   background: activeTab === tab.key ? 'white' : 'transparent',
-                  color: activeTab === tab.key ? '#1f2937' : '#9ca3af',
-                  boxShadow: activeTab === tab.key ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                  color: activeTab === tab.key ? '#f43f5e' : '#9ca3af',
+                  boxShadow: activeTab === tab.key ? '0 1px 3px rgba(244,63,94,0.12)' : 'none',
                 }}
               >
                 {tab.icon}
@@ -204,7 +204,7 @@ function AdminAuth() {
                       type="text"
                       value={gymCode}
                       onChange={(e) => setGymCode(e.target.value.toUpperCase())}
-                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm uppercase tracking-wider"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all text-sm uppercase tracking-wider"
                       placeholder="e.g. GS-1"
                       required
                       autoComplete="off"
@@ -228,7 +228,7 @@ function AdminAuth() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
+                  className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all text-sm"
                   placeholder={activeTab === "staff" ? "staff@fitclub.com" : "admin@fitclub.com"}
                   required
                   autoComplete="email"
@@ -247,7 +247,7 @@ function AdminAuth() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm"
+                  className="w-full pl-11 pr-12 py-3.5 rounded-xl bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all text-sm"
                   placeholder="Enter your password"
                   required
                   autoComplete="current-password"
@@ -266,7 +266,7 @@ function AdminAuth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+              className="w-full py-3.5 rounded-xl bg-rose-500 hover:bg-rose-600 active:bg-rose-700 text-white font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-rose-500/25 hover:shadow-rose-500/30"
             >
               {loading ? (
                 <>

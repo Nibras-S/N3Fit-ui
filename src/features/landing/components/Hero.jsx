@@ -57,7 +57,7 @@ function DashboardMockup() {
       <div className="mockup-body">
         {/* Mini sidebar */}
         <div className="mockup-sidebar">
-          <div className="mockup-sidebar-item" style={{ background: '#3b82f6' }} />
+          <div className="mockup-sidebar-item" style={{ background: '#ef4444' }} />
           <div className="mockup-sidebar-item" />
           <div className="mockup-sidebar-item" />
           <div className="mockup-sidebar-item" />

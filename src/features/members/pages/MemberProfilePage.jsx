@@ -76,7 +76,7 @@ function MemberProfile() {
         return (
             <AppLayout>
                 <div className="flex items-center justify-center h-[80vh]">
-                    <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-12 h-12 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </AppLayout>
         );
@@ -84,7 +84,7 @@ function MemberProfile() {
 
     if (!member) return <AppLayout><div>Member not found</div></AppLayout>;
 
-    const statusColor = member.dews > 0 ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700";
+    const statusColor = member.dews > 0 ? "bg-green-100 text-green-700" : "bg-zinc-100 text-red-700";
     const statusText = member.dews > 0 ? "Active" : "Expired";
 
     return (
@@ -111,14 +111,14 @@ function MemberProfile() {
                                 />
                             </div>
                         ) : (
-                            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${member.gender === 'Male' ? 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
+                            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${member.gender === 'Male' ? 'bg-zinc-100 text-red-600 dark:bg-zinc-700/50 dark:text-red-400' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
                                 {member.name?.charAt(0)}
                             </div>
                         )}
                         <div>
                             <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{member.name}</h1>
                             <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1">
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews > 0 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews > 0 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400"}`}>
                                     {statusText}
                                 </span>
                                 <span className="flex items-center gap-1 text-sm"><FaPhone className="text-xs" /> {member.phone}</span>
@@ -140,17 +140,17 @@ function MemberProfile() {
                 <div className="flex gap-6">
                     <button
                         onClick={() => setActiveTab('overview')}
-                        className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'overview' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                        className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'overview' ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                     >
                         Overview
-                        {activeTab === 'overview' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
+                        {activeTab === 'overview' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-red-400 rounded-t-full"></div>}
                     </button>
                     <button
                         onClick={() => setActiveTab('history')}
-                        className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'history' ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                        className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'history' ? 'text-red-600 dark:text-red-400' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
                     >
                         Transaction History
-                        {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600 dark:bg-blue-400 rounded-t-full"></div>}
+                        {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-red-400 rounded-t-full"></div>}
                     </button>
                 </div>
             </div>
@@ -163,7 +163,7 @@ function MemberProfile() {
                     {activeTab === 'overview' && (
                         <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-gray-100 dark:border-slate-700 shadow-sm space-y-6">
                             <h3 className="font-bold text-gray-800 dark:text-white text-lg flex items-center gap-2">
-                                <FaUser className="text-blue-500" /> Membership Details
+                                <FaUser className="text-red-500" /> Membership Details
                             </h3>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -213,7 +213,7 @@ function MemberProfile() {
                         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
                             <div className="p-4 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center">
                                 <h3 className="font-bold text-gray-800 dark:text-white flex items-center gap-2">
-                                    <FaHistory className="text-blue-500" /> Payment History
+                                    <FaHistory className="text-red-500" /> Payment History
                                 </h3>
                                 <span className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-full">
                                     {transactions.length} Records
@@ -245,7 +245,7 @@ function MemberProfile() {
                                                     <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300">{txn.paymentMethod}</td>
                                                     <td className="px-6 py-4">
                                                         <span className={`text-xs px-2 py-1 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400'
                                                             }`}>
                                                             {txn.paymentStatus}
                                                         </span>
@@ -262,7 +262,7 @@ function MemberProfile() {
                                                             )}
                                                             <button
                                                                 onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                                className="text-blue-500 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                className="text-red-500 hover:text-red-700 dark:hover:text-red-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
                                                                 title="View Invoice"
                                                             >
                                                                 Invoice
@@ -282,7 +282,7 @@ function MemberProfile() {
                                                     <div className="flex items-center gap-2 mb-1">
                                                         <span className="font-medium text-sm text-gray-900 dark:text-white">{txn.plan}</span>
                                                         <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${txn.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
-                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                            txn.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' : 'bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400'
                                                             }`}>
                                                             {txn.paymentStatus}
                                                         </span>
@@ -305,7 +305,7 @@ function MemberProfile() {
                                                     )}
                                                     <button
                                                         onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                        className="text-blue-500 text-xs font-medium"
+                                                        className="text-red-500 text-xs font-medium"
                                                     >
                                                         Invoice
                                                     </button>
@@ -325,7 +325,7 @@ function MemberProfile() {
 
                 {/* Right Column (Stats/Actions) */}
                 <div className="space-y-6">
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-5 text-white shadow-lg">
+                    <div className="bg-gradient-to-br from-rose-500 to-purple-600 rounded-2xl p-5 text-white shadow-lg">
                         <div className="flex items-center gap-2 mb-2 opacity-90">
                             <FaMoneyBillWave /> Total Spent
                         </div>
@@ -346,13 +346,13 @@ function MemberProfile() {
                             </button>
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="w-full py-2.5 px-4 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 rounded-xl hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors text-sm font-medium flex items-center gap-2"
+                                className="w-full py-2.5 px-4 bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400 rounded-xl hover:bg-zinc-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <FaEdit /> Update Details
                             </button>
                             <button
                                 onClick={() => setIsDeleteModalOpen(true)}
-                                className="w-full py-2.5 px-4 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium flex items-center gap-2"
+                                className="w-full py-2.5 px-4 bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400 rounded-xl hover:bg-zinc-100 dark:hover:bg-red-900/30 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <FaExclamationCircle /> Delete Member
                             </button>

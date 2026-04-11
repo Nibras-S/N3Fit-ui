@@ -40,7 +40,7 @@ const PageHeader = ({
                 <div className="min-w-0 flex-1">
                     <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
                         {Icon && (
-                            <span className="text-blue-500 shrink-0">
+                            <span className="text-red-500 shrink-0">
                                 <Icon />
                             </span>
                         )}

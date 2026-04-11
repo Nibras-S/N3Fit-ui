@@ -35,7 +35,8 @@ import {
   FaAngleDoubleLeft,
   FaAngleDoubleRight,
   FaArrowLeft,
-  FaBars
+  FaBars,
+  FaExchangeAlt
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -168,6 +169,7 @@ export function AppLayout({
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
     { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin", "staff"], permission: "expenses" },
+    { path: "/transactions", label: "Transactions", icon: FaExchangeAlt, roles: ["gymadmin", "staff"], permission: "payments" },
     { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "staff", "superadmin"], permission: "reports" },
     {
       path: "/notifications",
@@ -274,7 +276,7 @@ export function AppLayout({
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-9 h-9 rounded-xl shrink-0 bg-blue-600 flex items-center justify-center ring-2 ring-blue-500/30 shadow-lg shadow-blue-500/20">
+              <div className="w-9 h-9 rounded-xl shrink-0 bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-red-500/20">
                 <img src={n3Logo} alt="Fit" className="w-7 h-7 object-contain" />
               </div>
             )}
@@ -282,7 +284,7 @@ export function AppLayout({
               <>
                 <div className="min-w-0 flex-1 text-left">
                   <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate leading-tight">{gymName}</h1>
-                  <p className="text-[11px] text-blue-600 dark:text-blue-400 truncate font-medium">{userRole}</p>
+                  <p className="text-[11px] text-red-600 dark:text-red-400 truncate font-medium">{userRole}</p>
                 </div>
                 <FaAngleDoubleLeft className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 text-xs shrink-0 transition-colors" />
               </>
@@ -312,13 +314,13 @@ export function AppLayout({
                       title={isCollapsed ? label : undefined}
                       className={`w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 justify-between"
                         } ${isItemActive
-                          ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                          ? "bg-brand-50 text-brand-600 shadow-sm dark:bg-brand-900/20 dark:text-brand-400"
                           : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                         }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
-                        <Icon className={`text-[18px] shrink-0 ${isItemActive ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
-                        {!isCollapsed && <span className={`${isItemActive ? "text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
+                        <Icon className={`text-[18px] shrink-0 ${isItemActive ? "text-brand-600 dark:text-brand-400" : "text-gray-400 dark:text-gray-500"}`} />
+                        {!isCollapsed && <span className={`${isItemActive ? "text-brand-600 dark:text-brand-400" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
                       </div>
                       {!isCollapsed && (
                         <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} ${isItemActive ? 'text-white/60' : 'text-gray-600'}`} />
@@ -340,7 +342,7 @@ export function AppLayout({
                                   key={sub.path}
                                   onClick={() => safeNavigate(sub.path)}
                                   className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
-                                    ? "bg-blue-600/80 text-white"
+                                    ? "bg-brand-50/80 text-brand-600 dark:bg-brand-900/15 dark:text-brand-400"
                                     : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                                     }`}
                                 >
@@ -363,20 +365,20 @@ export function AppLayout({
                   title={isCollapsed ? label : undefined}
                   className={`relative w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 gap-3"
                     } ${isActive(path)
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                      ? "bg-brand-50 text-brand-600 shadow-sm dark:bg-brand-900/20 dark:text-brand-400"
                       : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                     }`}
                 >
-                  <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-white" : "text-gray-400 dark:text-gray-500"}`} />
-                  {!isCollapsed && <span className={`flex-1 ${isActive(path) ? "text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
+                  <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-brand-600 dark:text-brand-400" : "text-gray-400 dark:text-gray-500"}`} />
+                  {!isCollapsed && <span className={`flex-1 ${isActive(path) ? "text-brand-600 dark:text-brand-400" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
                   {/* Badge — collapsed: red dot overlay; expanded: pill */}
                   {badge && !isCollapsed && (
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto ${isActive(path) ? "bg-white/20 text-white" : "bg-blue-600/20 text-blue-400"}`}>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto ${isActive(path) ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/20 dark:text-brand-400" : "bg-zinc-900/20 text-red-400"}`}>
                       {badge}
                     </span>
                   )}
                   {badge && isCollapsed && (
-                    <span className="absolute top-1.5 right-1.5 bg-red-500 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    <span className="absolute top-1.5 right-1.5 bg-brand-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                       {badge}
                     </span>
                   )}
@@ -409,7 +411,7 @@ export function AppLayout({
           {/* Left: page title */}
           <div className="flex items-center gap-3">
             {PageIcon && (
-              <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-slate-700/50 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-slate-700/50 text-red-600 dark:text-red-400 flex items-center justify-center">
                 <PageIcon size={20} />
               </div>
             )}
@@ -439,7 +441,7 @@ export function AppLayout({
             >
               <FaBell className="text-[17px]" />
               {unreadCount > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[9px] font-bold text-white flex items-center justify-center shadow-md">
+                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-zinc-900 text-[9px] font-bold text-white flex items-center justify-center shadow-md">
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
@@ -454,7 +456,7 @@ export function AppLayout({
                   : "bg-gray-50 dark:bg-slate-700/50 border-gray-100 dark:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700"
                   }`}
               >
-                <div className="relative w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-xs overflow-hidden shrink-0">
+                <div className="relative w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-xs overflow-hidden shrink-0">
                   {user?.profileImage ? (
                     <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
                   ) : userInitial}
@@ -481,7 +483,7 @@ export function AppLayout({
                       {/* User info header */}
                       <div className="p-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40">
                         <div className="flex items-center gap-3">
-                          <div className="relative w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                          <div className="relative w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
                             {user?.profileImage ? (
                               <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
                             ) : userInitial}
@@ -501,7 +503,7 @@ export function AppLayout({
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
                         >
-                          <FaUserCog className="text-blue-500 text-base shrink-0" />
+                          <FaUserCog className="text-red-500 text-base shrink-0" />
                           Manage Account
                         </button>
                         <button
@@ -514,7 +516,7 @@ export function AppLayout({
                         <div className="h-px bg-gray-100 dark:bg-slate-700 my-1" />
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
                         >
                           <FaSignOutAlt className="text-base shrink-0" />
                           Logout
@@ -557,7 +559,7 @@ export function AppLayout({
           >
             <FaBell size={16} />
             {unreadCount > 0 && (
-              <span className="absolute top-2.5 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-red-500 text-[8px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-slate-800">
+              <span className="absolute top-2.5 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-zinc-900 text-[8px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-slate-800">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -585,7 +587,7 @@ export function AppLayout({
                 <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg outline outline-2 outline-blue-600 bg-blue-600 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg outline outline-2 outline-red-600 bg-zinc-900 flex items-center justify-center">
                         <span className="text-white font-black italic text-xs">N3</span>
                       </div>
                       <span className="font-bold text-gray-900 dark:text-white truncate" style={{ fontSize: "16px" }}>{gymName}</span>
@@ -615,7 +617,7 @@ export function AppLayout({
                                 }
                               }}
                               className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all text-sm ${isItemActive
-                                ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
+                                ? "bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold"
                                 : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                                 }`}
                             >
@@ -635,7 +637,7 @@ export function AppLayout({
                                       setMobileMenuOpen(false);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 text-xs ${isActive(sub.path)
-                                      ? "text-blue-600 dark:text-blue-400 font-bold"
+                                      ? "text-brand-600 dark:text-brand-400 font-bold"
                                       : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                                       }`}
                                   >
@@ -656,7 +658,7 @@ export function AppLayout({
                             setMobileMenuOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 text-sm ${isActive(path)
-                            ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold"
+                            ? "bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold"
                             : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
                             }`}
                         >
@@ -670,7 +672,7 @@ export function AppLayout({
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-zinc-50 dark:hover:bg-red-900/20"
                   >
                     <FaSignOutAlt /> Logout
                   </button>
@@ -726,11 +728,11 @@ export function AppLayout({
                 className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-red-100 dark:border-red-900/30"
               >
                 <div className="p-8 text-center">
-                  <div className="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 animate-bounce">
+                  <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 animate-bounce">
                     <FaExclamationTriangle size={40} />
                   </div>
                   <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2 uppercase tracking-tight">Urgent Message</h2>
-                  <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-6 px-4 py-1 bg-red-50 dark:bg-red-900/30 rounded-full inline-block">Attention Required</p>
+                  <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-6 px-4 py-1 bg-zinc-50 dark:bg-zinc-700/50 rounded-full inline-block">Attention Required</p>
 
                   <div className="bg-gray-50 dark:bg-slate-700/50 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-slate-700 shadow-inner">
                     <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-medium">
@@ -743,7 +745,7 @@ export function AppLayout({
                       markAsRead(activeWarning._id);
                       setShowWarningModal(false);
                     }}
-                    className="w-full py-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black uppercase tracking-wider shadow-xl shadow-red-500/25 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                    className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black uppercase tracking-wider shadow-xl shadow-zinc-900/25 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                   >
                     <FaCheckDouble />
                     Acknowledge & Close
@@ -788,7 +790,7 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
       <div className="relative -top-[1.2rem] flex flex-col items-center justify-center z-30 flex-1">
         <button
           onClick={onClick}
-          className="flex items-center justify-center w-[50px] h-[50px] rounded-full bg-blue-600 shadow-[0_4px_14px_rgba(37,99,235,0.39)] hover:bg-blue-700 transition-all active:scale-95 text-white"
+          className="flex items-center justify-center w-[50px] h-[50px] rounded-full bg-zinc-900 shadow-[0_4px_14px_rgba(37,99,235,0.39)] hover:bg-zinc-800 transition-all active:scale-95 text-white"
           aria-label={label}
         >
           {icon}
@@ -801,14 +803,14 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
     <button
       onClick={onClick}
       className={`flex flex-col items-center justify-center gap-1 min-w-[48px] py-1.5 px-1 rounded-lg transition-colors relative flex-1 ${active
-        ? "text-blue-600 dark:text-blue-400 font-medium"
+        ? "text-red-600 dark:text-red-400 font-medium"
         : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
     >
       <div className="relative">
         {icon}
         {badge && (
-          <span className="absolute -top-1.5 -right-2.5 bg-red-500 text-white text-[8px] font-bold px-1 py-0.5 rounded-full min-w-[14px] text-center leading-none">
+          <span className="absolute -top-1.5 -right-2.5 bg-zinc-900 text-white text-[8px] font-bold px-1 py-0.5 rounded-full min-w-[14px] text-center leading-none">
             {badge}
           </span>
         )}
@@ -825,7 +827,7 @@ function NetworkDot({ status }) {
   const cfg = {
     online: { color: 'bg-green-500', ring: 'bg-green-400', pulse: true, label: 'Online' },
     weak: { color: 'bg-amber-500', ring: 'bg-amber-400', pulse: true, label: 'Weak connection' },
-    offline: { color: 'bg-red-500', ring: 'bg-red-400', pulse: false, label: 'Offline' },
+    offline: { color: 'bg-zinc-900', ring: 'bg-red-400', pulse: false, label: 'Offline' },
   }[status] || { color: 'bg-gray-400', ring: 'bg-gray-300', pulse: false, label: 'Unknown' };
 
   return (

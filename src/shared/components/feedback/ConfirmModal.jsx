@@ -32,9 +32,9 @@ import { Modal } from "../ui/Modal";
 
 const config = {
     danger: {
-        iconBg: "bg-red-100 dark:bg-red-900/30",
+        iconBg: "bg-zinc-100 dark:bg-zinc-700/50",
         iconColor: "text-red-600 dark:text-red-400",
-        btnClass: "bg-red-600 hover:bg-red-700 focus:ring-red-500 text-white",
+        btnClass: "bg-zinc-900 hover:bg-zinc-800 focus:ring-red-500 text-white",
         icon: (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round"

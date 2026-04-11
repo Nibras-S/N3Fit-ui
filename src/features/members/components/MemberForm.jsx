@@ -341,7 +341,7 @@ function NewMember() {
     <div className="flex items-center justify-center gap-3 mb-6">
       {[1, 2, 3].map((s) => (
         <div key={s} className="flex items-center gap-2">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${step === s ? 'bg-blue-600 text-white scale-105 shadow-md' :
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${step === s ? 'bg-zinc-900 text-white scale-105 shadow-md' :
             step > s ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-400'
             }`}>
             {step > s ? <FaCheckCircle size={14} /> : s}
@@ -357,7 +357,7 @@ function NewMember() {
       <Toaster position="top-right" />
       {submitting && (
         <div className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="w-12 h-12 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4"></div>
           <span className="text-white font-bold uppercase tracking-widest text-[10px]">Processing...</span>
         </div>
       )}
@@ -384,7 +384,7 @@ function NewMember() {
                           <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
                           <button
                             onClick={() => { setPhotoPreview(null); setPhotoBlob(null); }}
-                            className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            className="absolute top-2 right-2 p-1.5 bg-zinc-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                           >
                             <FaTrash size={12} />
                           </button>
@@ -401,7 +401,7 @@ function NewMember() {
                       <button
                         onClick={startCamera}
                         type="button"
-                        className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-blue-700 transition-all shadow-md"
+                        className="flex-1 py-2.5 bg-zinc-900 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all shadow-md"
                       >
                         <FaCamera /> Capture
                       </button>
@@ -416,7 +416,7 @@ function NewMember() {
                 {/* Identity Form */}
                 <div className="space-y-4">
                   <h2 className="text-xl font-black text-gray-900 dark:text-white uppercase flex items-center gap-2 mb-4">
-                    <FaUser className="text-blue-600" size={18} /> Identity
+                    <FaUser className="text-red-600" size={18} /> Identity
                   </h2>
 
                   <div>
@@ -425,7 +425,7 @@ function NewMember() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
                       placeholder="e.g. John Doe"
                     />
                   </div>
@@ -438,14 +438,14 @@ function NewMember() {
                           type="text"
                           value={countryCode}
                           onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-r-0 border-gray-100 dark:border-slate-700 rounded-l-xl outline-none focus:border-blue-500 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-r-0 border-gray-100 dark:border-slate-700 rounded-l-xl outline-none focus:border-zinc-900 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
                           placeholder="+91"
                         />
                         <input
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-r-xl outline-none focus:border-blue-500 text-sm font-medium"
+                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-r-xl outline-none focus:border-zinc-900 text-sm font-medium"
                           placeholder="9876543210"
                           maxLength={10}
                         />
@@ -469,7 +469,7 @@ function NewMember() {
                           key={g}
                           type="button"
                           onClick={() => setGender(g)}
-                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20' :
+                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-red-600 dark:bg-zinc-800/50' :
                             'border-gray-50 dark:border-slate-800 text-gray-400 hover:bg-gray-50'
                             }`}
                         >
@@ -488,7 +488,7 @@ function NewMember() {
               <div className="mt-8 pt-6 border-t border-dashed border-gray-100 dark:border-slate-700">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase flex items-center gap-2">
-                    <FaDumbbell className="text-blue-600" size={14} /> Fitness Profile
+                    <FaDumbbell className="text-red-600" size={14} /> Fitness Profile
                   </h3>
                   <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Optional</span>
                 </div>
@@ -505,7 +505,7 @@ function NewMember() {
                       step="0.1"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
                       placeholder="e.g. 72"
                     />
                   </div>
@@ -520,7 +520,7 @@ function NewMember() {
                       step="0.1"
                       value={height}
                       onChange={(e) => setHeight(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
                       placeholder="e.g. 175"
                     />
                   </div>
@@ -539,7 +539,7 @@ function NewMember() {
                           type="button"
                           onClick={() => toggleGoal(g.key)}
                           className={`px-3 py-2 rounded-xl border font-bold text-[10px] uppercase tracking-wide transition-all ${active
-                            ? 'border-blue-500 bg-blue-50 text-blue-600 dark:bg-blue-900/20'
+                            ? 'border-zinc-900 bg-zinc-50 text-red-600 dark:bg-zinc-800/50'
                             : 'border-gray-100 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
                             }`}
                         >
@@ -555,7 +555,7 @@ function NewMember() {
                       value={customGoal}
                       onChange={(e) => setCustomGoal(e.target.value)}
                       maxLength={200}
-                      className="mt-3 w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 font-medium text-sm"
+                      className="mt-3 w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
                       placeholder="Describe the goal in your own words…"
                     />
                   )}
@@ -566,7 +566,7 @@ function NewMember() {
                 <button
                   onClick={nextStep}
                   type="button"
-                  className="px-8 py-3 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 transition-all text-[11px]"
+                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
                 >
                   Continue <FaArrowRight size={12} />
                 </button>
@@ -595,11 +595,11 @@ function NewMember() {
                           key={p.name}
                           type="button"
                           onClick={() => setPlan(p.name)}
-                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-50 dark:border-slate-800'}`}
+                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-slate-800'}`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${plan === p.name ? 'bg-blue-500' : 'bg-gray-200'}`} />
-                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-blue-600' : 'text-gray-400'}`}>{p.name}</span>
+                            <div className={`w-2 h-2 rounded-full ${plan === p.name ? 'bg-zinc-900' : 'bg-gray-200'}`} />
+                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-red-600' : 'text-gray-400'}`}>{p.name}</span>
                           </div>
                           <span className="font-bold text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</span>
                         </button>
@@ -613,11 +613,11 @@ function NewMember() {
                             key={p}
                             type="button"
                             onClick={() => setPlan(p)}
-                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-50 dark:border-slate-800'}`}
+                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-slate-800'}`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`w-2 h-2 rounded-full ${plan === p ? 'bg-blue-500' : 'bg-gray-200'}`} />
-                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-blue-600' : 'text-gray-400'}`}>{p}</span>
+                              <div className={`w-2 h-2 rounded-full ${plan === p ? 'bg-zinc-900' : 'bg-gray-200'}`} />
+                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-red-600' : 'text-gray-400'}`}>{p}</span>
                             </div>
                             <span className="font-bold text-[11px] text-gray-400">₹{price || 0}</span>
                           </button>
@@ -686,8 +686,8 @@ function NewMember() {
                         <span className="text-red-500 font-bold">-₹{discount || 0}</span>
                       </div>
                       <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-end">
-                        <span className="text-[10px] font-black uppercase text-blue-600">Total</span>
-                        <span className="text-2xl font-black text-blue-600">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
+                        <span className="text-[10px] font-black uppercase text-red-600">Total</span>
+                        <span className="text-2xl font-black text-red-600">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
                       </div>
                     </div>
                   </div>
@@ -715,7 +715,7 @@ function NewMember() {
                 <button
                   onClick={nextStep}
                   type="button"
-                  className="px-8 py-3 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-blue-700 transition-all text-[11px]"
+                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
                 >
                   Review <FaArrowRight size={12} />
                 </button>
@@ -739,7 +739,7 @@ function NewMember() {
                     </div>
                     <div className="min-w-0">
                       <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase leading-tight truncate">{name}</h2>
-                      <p className="text-blue-600 font-bold tracking-widest text-[10px] uppercase mt-0.5 truncate">{gender} • {countryCode}{phone}</p>
+                      <p className="text-red-600 font-bold tracking-widest text-[10px] uppercase mt-0.5 truncate">{gender} • {countryCode}{phone}</p>
                     </div>
                   </div>
 
@@ -783,7 +783,7 @@ function NewMember() {
                     </button>
                     <button
                       onClick={Submit}
-                      className="flex-[1.5] py-3.5 bg-blue-600 text-white rounded-xl font-black uppercase tracking-widest hover:bg-blue-700 text-[11px]"
+                      className="flex-[1.5] py-3.5 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 text-[11px]"
                     >
                       Add Member
                     </button>
@@ -807,7 +807,7 @@ function NewMember() {
             <div className="w-full max-w-2xl bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
               <div className="p-4 border-b border-white/5 flex items-center justify-between">
                 <h3 className="text-white font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                  <FaCamera className="text-blue-500" /> Photo Lab
+                  <FaCamera className="text-red-500" /> Photo Lab
                 </h3>
                 <button onClick={stopCamera} className="p-2 text-white/50 hover:text-white transition-colors">
                   <FaTimes size={18} />
@@ -839,7 +839,7 @@ function NewMember() {
                     </button>
                     <button
                       onClick={captureFrame}
-                      className="px-10 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-blue-500/20 flex items-center gap-2"
+                      className="px-10 py-3 bg-zinc-900 text-white hover:bg-zinc-800 rounded-2xl font-black uppercase tracking-widest text-[10px] transition-all shadow-xl shadow-red-500/20 flex items-center gap-2"
                     >
                       <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
                       Snap

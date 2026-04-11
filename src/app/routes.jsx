@@ -82,9 +82,13 @@ export default function AppRoutes() {
                 <Route path="/expenses" element={<ExpensesPage />} />
             </Route>
 
+            {/* ── Gym Admin + Staff with payments permission ──────── */}
+            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                <Route path="/transactions" element={<TransactionsPage />} />
+            </Route>
+
             {/* ── Gym Admin Only ──────────────────────────────────── */}
             <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
-                <Route path="/transactions" element={<TransactionsPage />} />
                 <Route path="/staff" element={<StaffPage />} />
             </Route>
 

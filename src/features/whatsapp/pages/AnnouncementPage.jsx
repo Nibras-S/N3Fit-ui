@@ -224,7 +224,7 @@ const Announcement = () => {
                         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
                             <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
                                 <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    {mode === 'whatsapp' ? <FaBullhorn className="text-blue-500" /> : <FaBell className="text-orange-500" />}
+                                    {mode === 'whatsapp' ? <FaBullhorn className="text-red-500" /> : <FaBell className="text-orange-500" />}
                                     {mode === 'whatsapp' ? 'Draft WhatsApp Message' : 'Draft Internal Message'}
                                 </h2>
                                 {mode === 'whatsapp' ? (
@@ -248,7 +248,7 @@ const Announcement = () => {
                                             type="text"
                                             value={form.heading}
                                             onChange={(e) => setForm(p => ({ ...p, heading: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none"
                                             placeholder="e.g. SPECIAL OFFER! 🎉"
                                         />
                                     </div>
@@ -257,13 +257,13 @@ const Announcement = () => {
                                 {mode === 'internal' && (
                                     <div className="flex gap-3">
                                         {[
-                                            { id: 'notification', label: 'Notification', icon: FaBell, color: 'text-blue-500' },
+                                            { id: 'notification', label: 'Notification', icon: FaBell, color: 'text-red-500' },
                                             { id: 'warning', label: 'Urgent Warning', icon: FaExclamationTriangle, color: 'text-red-500' }
                                         ].map(t => (
                                             <button
                                                 key={t.id}
                                                 onClick={() => setForm(p => ({ ...p, type: t.id }))}
-                                                className={`flex-1 p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${form.type === t.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20' : 'border-gray-100 dark:border-slate-700 text-gray-400'}`}
+                                                className={`flex-1 p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${form.type === t.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/50' : 'border-gray-100 dark:border-slate-700 text-gray-400'}`}
                                             >
                                                 <t.icon className={form.type === t.id ? t.color : ''} size={20} />
                                                 <span className={`text-xs font-bold ${form.type === t.id ? 'text-gray-900 dark:text-white' : ''}`}>{t.label}</span>
@@ -278,7 +278,7 @@ const Announcement = () => {
                                         rows={mode === 'whatsapp' ? 4 : 6}
                                         value={form.caption}
                                         onChange={(e) => setForm(p => ({ ...p, caption: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all outline-none resize-none"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none resize-none"
                                         placeholder={mode === 'whatsapp' ? "Write your announcement message here..." : "Type the update or warning message for the app users..."}
                                     />
                                 </div>
@@ -286,7 +286,7 @@ const Announcement = () => {
                                 {mode === 'whatsapp' && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 text-gray-900 dark:text-white">Announcement Image</label>
-                                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 dark:border-slate-700 border-dashed rounded-2xl hover:border-blue-400 dark:hover:border-blue-500 transition-colors group cursor-pointer"
+                                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 dark:border-slate-700 border-dashed rounded-2xl hover:border-red-400 dark:hover:border-zinc-900 transition-colors group cursor-pointer"
                                             onClick={() => document.getElementById('image-upload').click()}>
                                             <div className="space-y-1 text-center font-bold text-gray-900 dark:text-white">
                                                 {form.imagePreview ? (
@@ -294,16 +294,16 @@ const Announcement = () => {
                                                         <img src={form.imagePreview} alt="Preview" className="max-h-48 rounded-lg shadow-md" />
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); setForm(p => ({ ...p, image: null, imagePreview: null })); }}
-                                                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-lg hover:bg-red-600 transition-colors"
+                                                            className="absolute -top-2 -right-2 bg-zinc-900 text-white rounded-full p-1 shadow-lg hover:bg-zinc-900 transition-colors"
                                                         >
                                                             <FaTimes size={12} />
                                                         </button>
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <FaImage className="mx-auto h-12 w-12 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                                        <FaImage className="mx-auto h-12 w-12 text-gray-400 group-hover:text-red-500 transition-colors" />
                                                         <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                                                            <span className="relative cursor-pointer rounded-md font-medium text-blue-600 hover:text-blue-500">Upload an image</span>
+                                                            <span className="relative cursor-pointer rounded-md font-medium text-red-600 hover:text-red-500">Upload an image</span>
                                                             <p className="pl-1 text-gray-900 dark:text-white">or drag and drop</p>
                                                         </div>
                                                         <p className="text-xs text-gray-500 font-bold text-gray-900 dark:text-white">PNG, JPG up to 5MB</p>
@@ -335,7 +335,7 @@ const Announcement = () => {
                                         { id: 'expired', label: 'Expired Only', desc: 'Only members with expired plans' },
                                         { id: 'selected', label: 'Select Specific', desc: 'Choose members manually' }
                                     ].map(opt => (
-                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
+                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="audience"
@@ -354,7 +354,7 @@ const Announcement = () => {
                                         { id: 'all', label: 'All Fit Clubs', desc: 'Broadcast to every fit club on platform' },
                                         { id: 'selected', label: 'Select Fit Clubs', desc: 'Target specific fit club locations' }
                                     ].map(opt => (
-                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/10' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
+                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="audience"
@@ -388,18 +388,18 @@ const Announcement = () => {
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {fetchingContacts ? (
-                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-blue-500" /></div>
+                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-red-500" /></div>
                                     ) : filteredContacts.map(contact => (
                                         <div
                                             key={contact._id}
                                             onClick={() => toggleMember(contact._id)}
-                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedMembers.includes(contact._id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
+                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedMembers.includes(contact._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
                                         >
                                             <div className="min-w-0">
                                                 <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{contact.name}</p>
                                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{contact.phone}</p>
                                             </div>
-                                            {selectedMembers.includes(contact._id) && <FaCheckCircle className="text-blue-500" size={12} />}
+                                            {selectedMembers.includes(contact._id) && <FaCheckCircle className="text-red-500" size={12} />}
                                         </div>
                                     ))}
                                 </div>
@@ -431,18 +431,18 @@ const Announcement = () => {
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {fetchingGyms ? (
-                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-blue-500" /></div>
+                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-red-500" /></div>
                                     ) : gyms.filter(g => g.name.toLowerCase().includes(searchTerm.toLowerCase())).map(gym => (
                                         <div
                                             key={gym._id}
                                             onClick={() => toggleGym(gym._id)}
-                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedGyms.includes(gym._id) ? 'bg-blue-50 dark:bg-blue-900/20' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
+                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedGyms.includes(gym._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
                                         >
                                             <div className="min-w-0">
                                                 <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{gym.name}</p>
                                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{gym.gymCode}</p>
                                             </div>
-                                            {selectedGyms.includes(gym._id) && <FaCheckCircle className="text-blue-500" size={12} />}
+                                            {selectedGyms.includes(gym._id) && <FaCheckCircle className="text-red-500" size={12} />}
                                         </div>
                                     ))}
                                 </div>
@@ -461,7 +461,7 @@ const Announcement = () => {
                         <button
                             onClick={handleSend}
                             disabled={loading}
-                            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] bg-blue-600 text-white hover:bg-blue-700 shadow-blue-500/25`}
+                            className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all active:scale-[0.98] bg-zinc-900 text-white hover:bg-zinc-800 shadow-zinc-900/25`}
                         >
                             {loading ? (
                                 <>

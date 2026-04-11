@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
@@ -8,11 +8,23 @@ import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
     FaWallet, FaHistory, FaPlus, FaFilter, FaArrowDown,
     FaChartPie, FaMoneyBillWave, FaTrash, FaEdit, FaFileExport,
-    FaPaperclip, FaTimesCircle, FaCheckCircle, FaFilePdf, FaImage, FaEye
+    FaPaperclip, FaTimesCircle, FaCheckCircle, FaFilePdf, FaImage, FaEye, FaTimes
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
+const CATEGORIES = [
+    'Rent', 'Electricity', 'Water', 'Staff Salary', 'Equipment',
+    'Maintenance', 'Marketing', 'Cleaning', 'Internet', 'Software', 'Others'
+];
+
+const PAYMENT_METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer'];
+
+const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+];
 
 const Expenses = () => {
     const { user } = useAuth();
@@ -32,6 +44,11 @@ const Expenses = () => {
     const [editingExpense, setEditingExpense] = useState(null);
     const [viewingExpense, setViewingExpense] = useState(null);
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null });
+
+    // Filters
+    const [filterMonth, setFilterMonth] = useState('');
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterPaymentMethod, setFilterPaymentMethod] = useState('');
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -107,6 +124,24 @@ const Expenses = () => {
 
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 
+    const filteredExpenses = useMemo(() => {
+        return expenses.filter(exp => {
+            const expDate = new Date(exp.date);
+            if (filterMonth !== '' && expDate.getMonth() !== parseInt(filterMonth)) return false;
+            if (filterCategory && exp.category !== filterCategory) return false;
+            if (filterPaymentMethod && exp.paymentMethod !== filterPaymentMethod) return false;
+            return true;
+        });
+    }, [expenses, filterMonth, filterCategory, filterPaymentMethod]);
+
+    const hasActiveFilters = filterMonth !== '' || filterCategory || filterPaymentMethod;
+
+    const clearFilters = () => {
+        setFilterMonth('');
+        setFilterCategory('');
+        setFilterPaymentMethod('');
+    };
+
     const columns = [
         {
             key: 'date',
@@ -119,13 +154,29 @@ const Expenses = () => {
             label: 'Category',
             sortable: true,
             render: (row) => (
-                <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+                <span className="px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400">
                     {row.category}
                 </span>
             )
         },
         { key: 'amount', label: 'Amount', sortable: true, render: (row) => <span className="font-black text-red-600 dark:text-red-400">{formatCurrency(row.amount)}</span> },
         { key: 'vendor', label: 'Vendor/Receiver', render: (row) => <span className="text-sm font-medium">{row.vendor || '-'}</span> },
+        {
+            key: 'paymentMethod', label: 'Type',
+            render: (row) => {
+                const methodStyles = {
+                    Cash: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400',
+                    UPI: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+                    Card: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
+                    'Bank Transfer': 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
+                };
+                return (
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${methodStyles[row.paymentMethod] || 'bg-gray-100 text-gray-600'}`}>
+                        {row.paymentMethod}
+                    </span>
+                );
+            }
+        },
         {
             key: 'receipt',
             label: 'File',
@@ -135,7 +186,7 @@ const Expenses = () => {
                         row.receiptUrl.toLowerCase().endsWith('.pdf') ? (
                             <FaFilePdf size={16} className="text-red-500" title="PDF Receipt" />
                         ) : (
-                            <FaImage size={16} className="text-blue-500" title="Image Receipt" />
+                            <FaImage size={16} className="text-red-500" title="Image Receipt" />
                         )
                     ) : (
                         <FaTimesCircle size={14} className="text-gray-300 dark:text-gray-600" title="No Receipt" />
@@ -161,7 +212,7 @@ const Expenses = () => {
                         )}
                         <button
                             onClick={() => setIsAddModalOpen(true)}
-                            className="bg-blue-600 text-white px-4 py-2.5 rounded-xl font-medium hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg shadow-blue-500/25"
+                            className="bg-brand-50 text-brand-600 px-4 py-2.5 rounded-xl font-bold hover:bg-brand-100 transition-all flex items-center gap-2 shadow-sm"
                         >
                             <FaPlus /> Add Expense
                         </button>
@@ -169,40 +220,16 @@ const Expenses = () => {
                 </div>
 
                 {/* Summary Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
                         <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center justify-center">
+                            <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center">
                                 <FaWallet />
                             </div>
                             <span className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Monthly Expense</span>
                         </div>
                         <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(summary?.monthlyExpense)}</p>
                         <p className="text-xs text-gray-400 mt-1">Total this month</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 flex items-center justify-center">
-                                <FaMoneyBillWave />
-                            </div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Total Revenue</span>
-                        </div>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{formatCurrency(summary?.totalIncome)}</p>
-                        <p className="text-xs text-gray-400 mt-1">Life-time paid earnings</p>
-                    </div>
-
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                                <FaChartPie />
-                            </div>
-                            <span className="text-gray-500 dark:text-gray-400 text-xs font-bold uppercase tracking-wider">Net Profit</span>
-                        </div>
-                        <p className={`text-2xl font-bold ${summary?.netProfit >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
-                            {formatCurrency(summary?.netProfit)}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1">Total revenue minus expenses</p>
                     </div>
 
                     <div className="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm transition-colors">
@@ -221,20 +248,70 @@ const Expenses = () => {
 
                 {/* Table Section */}
                 <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden no-scrollbar">
-                    <div className="p-5 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <FaHistory className="text-gray-400" />
-                            <h3 className="font-bold text-gray-900 dark:text-white">Expense History</h3>
+                    <div className="p-5 border-b border-gray-100 dark:border-slate-700 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <FaHistory className="text-gray-400" />
+                                <h3 className="font-bold text-gray-900 dark:text-white">Expense History</h3>
+                                {filteredExpenses.length !== expenses.length && (
+                                    <span className="text-xs text-gray-400 dark:text-gray-500">({filteredExpenses.length} of {expenses.length})</span>
+                                )}
+                            </div>
+                            {selectedIds.length > 0 && (
+                                <span className="text-xs font-bold text-red-600 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded-full uppercase">
+                                    {selectedIds.length} Selected
+                                </span>
+                            )}
                         </div>
-                        {selectedIds.length > 0 && (
-                            <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full uppercase">
-                                {selectedIds.length} Selected
-                            </span>
-                        )}
+
+                        {/* Filters */}
+                        <div className="flex flex-wrap items-center gap-2">
+                            <select
+                                value={filterMonth}
+                                onChange={(e) => setFilterMonth(e.target.value)}
+                                className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-zinc-400 dark:focus:border-slate-500 transition-colors"
+                            >
+                                <option value="">All Months</option>
+                                {MONTHS.map((m, i) => (
+                                    <option key={m} value={i}>{m}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={filterCategory}
+                                onChange={(e) => setFilterCategory(e.target.value)}
+                                className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-zinc-400 dark:focus:border-slate-500 transition-colors"
+                            >
+                                <option value="">All Categories</option>
+                                {CATEGORIES.map(cat => (
+                                    <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                            </select>
+
+                            <select
+                                value={filterPaymentMethod}
+                                onChange={(e) => setFilterPaymentMethod(e.target.value)}
+                                className="text-xs px-3 py-1.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-700 dark:text-gray-300 focus:outline-none focus:border-zinc-400 dark:focus:border-slate-500 transition-colors"
+                            >
+                                <option value="">All Types</option>
+                                {PAYMENT_METHODS.map(m => (
+                                    <option key={m} value={m}>{m}</option>
+                                ))}
+                            </select>
+
+                            {hasActiveFilters && (
+                                <button
+                                    onClick={clearFilters}
+                                    className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors font-medium"
+                                >
+                                    <FaTimes size={10} /> Clear
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <DataTable
-                        data={expenses}
+                        data={filteredExpenses}
                         columns={columns}
                         loading={loading}
                         showSelection={true}
@@ -251,14 +328,14 @@ const Expenses = () => {
                                 </button>
                                 <button
                                     onClick={() => { setEditingExpense(row); setIsAddModalOpen(true); }}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                                    className="p-2 text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                     title="Edit"
                                 >
                                     <FaEdit size={14} />
                                 </button>
                                 <button
                                     onClick={() => setDeleteModal({ isOpen: true, id: row._id })}
-                                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                    className="p-2 text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                                     title="Delete"
                                 >
                                     <FaTrash size={14} />

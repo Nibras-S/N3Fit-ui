@@ -136,7 +136,7 @@ const GymDetails = () => {
         return (
             <AppLayout showGenderSwitch={false}>
                 <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </AppLayout>
         );
@@ -163,12 +163,12 @@ const GymDetails = () => {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all ${isEditing ? "bg-gray-100 text-gray-600 hover:bg-gray-200" : "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20"}`}
+                            className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all ${isEditing ? "bg-gray-100 text-gray-600 hover:bg-gray-200" : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-red-500/20"}`}
                         >
                             {isEditing ? <><FaLock size={14} /> Cancel Edit</> : <><FaEdit size={14} /> Edit Details</>}
                         </button>
-                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${gym.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"}`}>
-                            <span className={`w-2 h-2 rounded-full ${gym.isActive ? "bg-green-500" : "bg-red-500"}`}></span>
+                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${gym.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400"}`}>
+                            <span className={`w-2 h-2 rounded-full ${gym.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
                             {gym.isActive ? "Active" : "Suspended"}
                         </div>
                     </div>
@@ -184,7 +184,7 @@ const GymDetails = () => {
                             className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-gray-100 dark:border-slate-700 shadow-xl shadow-gray-200/20 dark:shadow-none space-y-6"
                         >
                             <div className="flex items-center gap-3 border-b border-gray-50 dark:border-slate-700 pb-4 mb-2">
-                                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600">
+                                <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-red-600">
                                     <FaBuilding size={20} />
                                 </div>
                                 <div>
@@ -202,7 +202,7 @@ const GymDetails = () => {
                                             required
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                         />
                                     ) : (
                                         <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.name}</p>
@@ -219,7 +219,7 @@ const GymDetails = () => {
                                                     type="email"
                                                     value={form.contactEmail}
                                                     onChange={(e) => setForm({ ...form, contactEmail: e.target.value })}
-                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                                 />
                                             ) : (
                                                 <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactEmail || "No email provided"}</p>
@@ -235,7 +235,7 @@ const GymDetails = () => {
                                                     type="text"
                                                     value={form.contactPhone}
                                                     onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
-                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                                 />
                                             ) : (
                                                 <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactPhone || "No phone provided"}</p>
@@ -253,7 +253,7 @@ const GymDetails = () => {
                                                 rows={2}
                                                 value={form.address}
                                                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                                                className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"
+                                                className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none resize-none"
                                             />
                                         ) : (
                                             <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent leading-relaxed">{form.address || "No address provided"}</p>
@@ -279,7 +279,7 @@ const GymDetails = () => {
                                         <select
                                             value={form.saaSPlan}
                                             onChange={(e) => setForm({ ...form, saaSPlan: e.target.value })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none appearance-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none appearance-none"
                                         >
                                             <option value="">No Plan (Limited Access)</option>
                                             {plans.map(p => (
@@ -299,7 +299,7 @@ const GymDetails = () => {
                                         <select
                                             value={form.isActive}
                                             onChange={(e) => setForm({ ...form, isActive: e.target.value === 'true' })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                         >
                                             <option value="true">Active & Functional</option>
                                             <option value="false">Suspended / Restricted</option>
@@ -322,7 +322,7 @@ const GymDetails = () => {
                                                     key={status}
                                                     type="button"
                                                     onClick={() => setForm({ ...form, subscriptionStatus: status })}
-                                                    className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-xl transition-all ${form.subscriptionStatus === status ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm border border-gray-100 dark:border-slate-700" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                                                    className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-xl transition-all ${form.subscriptionStatus === status ? "bg-white dark:bg-slate-800 text-red-600 shadow-sm border border-gray-100 dark:border-slate-700" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
                                                 >
                                                     {status}
                                                 </button>
@@ -354,7 +354,7 @@ const GymDetails = () => {
                                 <button
                                     type="submit"
                                     disabled={updating}
-                                    className="w-full py-4 mt-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-blue-500/25 transition-all active:scale-[0.98] disabled:opacity-50"
+                                    className="w-full py-4 mt-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-zinc-900/25 transition-all active:scale-[0.98] disabled:opacity-50"
                                 >
                                     {updating ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -378,7 +378,7 @@ const GymDetails = () => {
                         >
                             <div className="flex items-center justify-between border-b border-gray-50 dark:border-slate-700 pb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-2xl text-blue-600">
+                                    <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-red-600">
                                         <FaCogs size={20} />
                                     </div>
                                     <div>
@@ -387,7 +387,7 @@ const GymDetails = () => {
                                     </div>
                                 </div>
                                 {updatingFeatures && (
-                                    <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                                    <div className="w-4 h-4 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                                 )}
                             </div>
 
@@ -406,13 +406,13 @@ const GymDetails = () => {
                                         disabled={updatingFeatures}
                                         onClick={() => handleUpdateFeatures(feature.key)}
                                         className={`flex items-start justify-between p-4 rounded-2xl border transition-all text-left group ${gymFeatures[feature.key]
-                                            ? "bg-blue-50/50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800"
+                                            ? "bg-zinc-50/50 border-red-200 dark:bg-zinc-800/30 dark:border-red-800"
                                             : "bg-gray-50/50 border-gray-100 dark:bg-slate-900/50 dark:border-slate-700"
                                             }`}
                                     >
                                         <div className="flex gap-3">
                                             <div>
-                                                <p className={`font-bold text-sm ${gymFeatures[feature.key] ? "text-blue-700 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"}`}>
+                                                <p className={`font-bold text-sm ${gymFeatures[feature.key] ? "text-red-700 dark:text-red-400" : "text-gray-600 dark:text-gray-400"}`}>
                                                     {feature.label}
                                                 </p>
                                                 <p className="text-[10px] text-gray-400 mt-0.5">{feature.desc}</p>
@@ -420,7 +420,7 @@ const GymDetails = () => {
                                         </div>
                                         <div className="mt-0.5">
                                             {gymFeatures[feature.key] ? (
-                                                <FaToggleOn className="text-blue-600 text-2xl" />
+                                                <FaToggleOn className="text-red-600 text-2xl" />
                                             ) : (
                                                 <FaToggleOff className="text-gray-300 text-2xl" />
                                             )}
@@ -439,7 +439,7 @@ const GymDetails = () => {
                         >
                             <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/30 dark:bg-slate-700/10">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl text-indigo-600">
+                                    <div className="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-2xl text-rose-600">
                                         <FaUsers size={20} />
                                     </div>
                                     <div>
@@ -447,7 +447,7 @@ const GymDetails = () => {
                                         <p className="text-xs text-gray-500">List of active staff accounts for this fit club</p>
                                     </div>
                                 </div>
-                                <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400 px-3 py-1 rounded-full text-xs font-bold">
+                                <span className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-3 py-1 rounded-full text-xs font-bold">
                                     {gym.staff?.length || 0} Accounts
                                 </span>
                             </div>
@@ -497,7 +497,7 @@ const GymDetails = () => {
                             {gym.admin ? (
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xl ring-4 ring-blue-50 dark:ring-blue-900/10">
+                                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-zinc-900 to-zinc-600 flex items-center justify-center text-white font-bold text-xl ring-4 ring-zinc-100 dark:ring-zinc-800/30">
                                             {gym.admin.name.charAt(0)}
                                         </div>
                                         <div>
@@ -522,7 +522,7 @@ const GymDetails = () => {
 
                                     <button
                                         onClick={handleDelete}
-                                        className="w-full py-3 rounded-2xl border border-red-100 dark:border-red-900/30 text-red-500 text-xs font-bold flex items-center justify-center gap-2 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+                                        className="w-full py-3 rounded-2xl border border-red-100 dark:border-red-900/30 text-red-500 text-xs font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
                                     >
                                         <FaTrash size={12} />
                                         Delete Fit Club Account
@@ -541,7 +541,7 @@ const GymDetails = () => {
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <FaUsers size={120} />
                             </div>
-                            <h4 className="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6 relative z-10">Current Statistics</h4>
+                            <h4 className="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 relative z-10">Current Statistics</h4>
 
                             <div className="space-y-6 relative z-10">
                                 <div className="flex justify-between items-center group">
@@ -549,8 +549,8 @@ const GymDetails = () => {
                                         <p className="text-3xl font-black">{gym.stats?.memberCount || 0}</p>
                                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Total Members</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
-                                        <FaUsers size={16} className="text-blue-400" />
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-zinc-900/20 transition-colors">
+                                        <FaUsers size={16} className="text-red-400" />
                                     </div>
                                 </div>
 
@@ -559,43 +559,43 @@ const GymDetails = () => {
                                         <p className="text-3xl font-black">{gym.stats?.staffCount || 0}</p>
                                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Active Staff</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-indigo-500/20 transition-colors">
-                                        <FaUserShield size={16} className="text-indigo-400" />
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
+                                        <FaUserShield size={16} className="text-rose-400" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-4 pt-4 border-t border-white/5 mt-4">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider">
-                                            <div className="flex items-center gap-2 text-blue-400">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>
+                                            <div className="flex items-center gap-2 text-red-400">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-900 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
                                                 Member Capacity
                                             </div>
                                             <span className="text-gray-400">{gym.stats?.memberCount || 0} / {gym.saaSPlan?.maxMembers || "∞"}</span>
                                         </div>
                                         <div className="h-2 bg-white/5 rounded-full overflow-hidden p-[1px]">
                                             <div
-                                                className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out"
+                                                className="h-full bg-gradient-to-r from-zinc-900 to-red-400 rounded-full transition-all duration-1000 ease-out"
                                                 style={{ width: `${Math.min(100, (gym.stats?.memberCount / (gym.saaSPlan?.maxMembers || 1)) * 100)}%` }}
                                             />
                                         </div>
                                         <div className="flex justify-between text-[9px] text-gray-500">
                                             <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-green-500"></span> {gym.stats?.activeMembers || 0} Active</span>
-                                            <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-red-500"></span> {gym.stats?.inactiveMembers || 0} Inactive</span>
+                                            <span className="flex items-center gap-1"><span className="w-1 h-1 rounded-full bg-zinc-900"></span> {gym.stats?.inactiveMembers || 0} Inactive</span>
                                         </div>
                                     </div>
 
                                     <div className="space-y-2 pt-2">
                                         <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider">
-                                            <div className="flex items-center gap-2 text-indigo-400">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
+                                            <div className="flex items-center gap-2 text-rose-400">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
                                                 Staff Capacity
                                             </div>
                                             <span className="text-gray-400">{gym.stats?.staffCount || 0} / {gym.saaSPlan?.maxStaff || "∞"}</span>
                                         </div>
                                         <div className="h-2 bg-white/5 rounded-full overflow-hidden p-[1px]">
                                             <div
-                                                className="h-full bg-gradient-to-r from-indigo-600 to-indigo-400 rounded-full transition-all duration-1000 ease-out"
+                                                className="h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full transition-all duration-1000 ease-out"
                                                 style={{ width: `${Math.min(100, (gym.stats?.staffCount / (gym.saaSPlan?.maxStaff || 1)) * 100)}%` }}
                                             />
                                         </div>

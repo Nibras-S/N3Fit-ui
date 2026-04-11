@@ -123,7 +123,7 @@ export default function DateRangeFilter({ value, onChange }) {
                 onClick={() => setOpen(o => !o)}
                 className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors min-w-[160px]"
             >
-                <FaCalendarAlt size={12} className="text-blue-500 shrink-0" />
+                <FaCalendarAlt size={12} className="text-red-500 shrink-0" />
                 <span className="flex-1 text-left truncate">{currentLabel}</span>
                 <FaChevronDown size={10} className="text-gray-400" />
             </button>
@@ -143,7 +143,7 @@ export default function DateRangeFilter({ value, onChange }) {
                                             onClick={() => pickPreset(p.key)}
                                             className={`px-2.5 py-1.5 rounded-md text-xs font-medium text-left transition-colors ${
                                                 isActive
-                                                    ? 'bg-blue-600 text-white'
+                                                    ? 'bg-zinc-900 text-white'
                                                     : 'bg-gray-50 dark:bg-slate-700/60 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700'
                                             }`}
                                         >
@@ -162,7 +162,7 @@ export default function DateRangeFilter({ value, onChange }) {
                                         type="date"
                                         value={draftStart}
                                         onChange={(e) => setDraftStart(e.target.value)}
-                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
                                     />
                                 </div>
                                 <div>
@@ -171,13 +171,13 @@ export default function DateRangeFilter({ value, onChange }) {
                                         type="date"
                                         value={draftEnd}
                                         onChange={(e) => setDraftEnd(e.target.value)}
-                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
                                     />
                                 </div>
                                 <button
                                     onClick={applyCustom}
                                     disabled={!draftStart || !draftEnd}
-                                    className="w-full mt-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-md transition-colors"
+                                    className="w-full mt-1 px-3 py-1.5 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed text-white text-xs font-semibold rounded-md transition-colors"
                                 >
                                     Apply Custom Range
                                 </button>

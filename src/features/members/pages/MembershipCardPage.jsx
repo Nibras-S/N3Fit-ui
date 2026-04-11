@@ -97,7 +97,7 @@ export default function MembershipCardPage() {
         return (
             <AppLayout>
                 <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin" />
                 </div>
             </AppLayout>
         );
@@ -108,7 +108,7 @@ export default function MembershipCardPage() {
             <AppLayout>
                 <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
                     <p className="text-gray-500">Member not found.</p>
-                    <button onClick={() => navigate('/members')} className="px-6 py-2 bg-blue-600 text-white rounded-xl font-bold text-sm">
+                    <button onClick={() => navigate('/members')} className="px-6 py-2 bg-zinc-900 text-white rounded-xl font-bold text-sm">
                         Back to Members
                     </button>
                 </div>
@@ -145,7 +145,7 @@ export default function MembershipCardPage() {
                     <div className="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
 
                         {/* Top colour band */}
-                        <div className="h-2 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600" />
+                        <div className="h-2 bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-500" />
 
                         <div className="p-6 space-y-5">
                             {/* Gym header */}
@@ -153,7 +153,7 @@ export default function MembershipCardPage() {
                                 {gymLogo ? (
                                     <img src={gymLogo} alt={gymName} className="w-10 h-10 rounded-xl object-contain bg-gray-50 dark:bg-slate-700 p-1" />
                                 ) : (
-                                    <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center">
                                         <FaDumbbell className="text-white" size={16} />
                                     </div>
                                 )}
@@ -174,7 +174,7 @@ export default function MembershipCardPage() {
                                     <img src={profileImg} alt={member.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white dark:border-slate-700 shadow-md" />
                                 ) : (
                                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner ${
-                                        member.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-blue-100 text-blue-600'
+                                        member.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-zinc-100 text-red-600'
                                     }`}>
                                         {member.name?.charAt(0)?.toUpperCase()}
                                     </div>
@@ -246,7 +246,7 @@ export default function MembershipCardPage() {
                         </div>
 
                         {/* Bottom band — gradient matches top */}
-                        <div className="h-1 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 opacity-30" />
+                        <div className="h-1 bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-500 opacity-30" />
                     </div>
 
                     {/* ── Actions ──────────────────────────────────────────── */}
@@ -257,7 +257,7 @@ export default function MembershipCardPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowPayModal(true)}
-                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-red-500/30 flex items-center justify-center gap-2"
                             >
                                 <FaMoneyBillWave size={15} />
                                 Mark as Paid

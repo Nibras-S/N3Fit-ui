@@ -37,7 +37,7 @@ const variants = {
   success:
     "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus:ring-green-500 shadow-sm",
   outline:
-    "bg-transparent text-brand-600 border border-brand-600 hover:bg-brand-50 active:bg-brand-100 focus:ring-brand-500 dark:text-brand-400 dark:border-brand-400 dark:hover:bg-brand-950",
+    "bg-transparent text-gray-800 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus:ring-brand-500 dark:text-gray-100 dark:border-dark-border dark:hover:bg-dark-card",
 };
 
 const sizes = {

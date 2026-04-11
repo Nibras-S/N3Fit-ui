@@ -25,7 +25,7 @@ export const PAYMENT_STATUSES = Object.freeze(['Paid', 'Pending', 'Partial', 'Re
 
 export const PAYMENT_METHOD_COLORS = Object.freeze({
     Cash: '#10b981',
-    UPI: '#3b82f6',
+    UPI: '#6366f1',
     Card: '#8b5cf6',
     'Bank Transfer': '#06b6d4',
 });

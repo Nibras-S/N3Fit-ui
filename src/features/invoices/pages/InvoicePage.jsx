@@ -37,7 +37,7 @@ const Invoice = () => {
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -46,7 +46,7 @@ const Invoice = () => {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
                 <p className="text-gray-500">Invoice not found</p>
-                <button onClick={() => navigate(-1)} className="text-blue-600 hover:underline">
+                <button onClick={() => navigate(-1)} className="text-red-600 hover:underline">
                     Go Back
                 </button>
             </div>
@@ -73,7 +73,7 @@ const Invoice = () => {
                 <div className="flex gap-3">
                     <button
                         onClick={handlePrint}
-                        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm"
                     >
                         <FaPrint /> Print Invoice
                     </button>
@@ -95,7 +95,7 @@ const Invoice = () => {
                                 className="w-16 h-16 object-contain rounded-lg bg-gray-50"
                             />
                         ) : (
-                            <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
+                            <div className="w-16 h-16 bg-zinc-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">
                                 {gym?.name?.charAt(0) || "G"}
                             </div>
                         )}
@@ -114,7 +114,7 @@ const Invoice = () => {
                             <p className="text-sm text-gray-500">Invoice No: <span className="font-mono font-medium text-gray-900">#{_id.slice(-6).toUpperCase()}</span></p>
                             <p className="text-sm text-gray-500">Date: <span className="font-medium text-gray-900">{invoiceDate}</span></p>
                             <p className="text-sm text-gray-500">Status:
-                                <span className={`ml-2 px-2 py-0.5 rounded text-xs font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                                <span className={`ml-2 px-2 py-0.5 rounded text-xs font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-red-700'
                                     }`}>
                                     {paymentStatus}
                                 </span>

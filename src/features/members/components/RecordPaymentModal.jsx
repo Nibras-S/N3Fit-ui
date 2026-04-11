@@ -112,8 +112,8 @@ export default function RecordPaymentModal({
                 {/* Header */}
                 <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-slate-700 shrink-0">
                     <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <FaCreditCard className="text-blue-600" size={16} />
+                        <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
+                            <FaCreditCard className="text-red-600" size={16} />
                         </div>
                         <div>
                             <h3 className="font-black text-gray-900 dark:text-white text-base">Record Payment</h3>
@@ -149,8 +149,8 @@ export default function RecordPaymentModal({
                                         onClick={() => updateSplit(0, 'paymentMethod', m)}
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase transition-all border ${
                                             splits[0].paymentMethod === m
-                                                ? 'bg-blue-600 text-white border-blue-600'
-                                                : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-slate-600 hover:border-blue-300'
+                                                ? 'bg-zinc-900 text-white border-zinc-900'
+                                                : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-slate-600 hover:border-red-300'
                                         }`}
                                     >
                                         {m}
@@ -159,7 +159,7 @@ export default function RecordPaymentModal({
                             </div>
 
                             {/* Amount input */}
-                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 focus-within:border-blue-500 transition-colors">
+                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
                                 <span className="text-gray-400 font-bold text-sm">₹</span>
                                 <input
                                     type="number"
@@ -173,7 +173,7 @@ export default function RecordPaymentModal({
                                 <button
                                     type="button"
                                     onClick={() => fillFull(0)}
-                                    className="text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded-md hover:bg-blue-100 transition-colors"
+                                    className="text-[10px] font-black text-red-600 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded-md hover:bg-zinc-100 transition-colors"
                                 >
                                     Full
                                 </button>
@@ -207,7 +207,7 @@ export default function RecordPaymentModal({
                                                     onClick={() => updateSplit(idx, 'paymentMethod', m)}
                                                     className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border ${
                                                         split.paymentMethod === m
-                                                            ? 'bg-blue-600 text-white border-blue-600'
+                                                            ? 'bg-zinc-900 text-white border-zinc-900'
                                                             : 'bg-white dark:bg-slate-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-600'
                                                     }`}
                                                 >
@@ -217,7 +217,7 @@ export default function RecordPaymentModal({
                                         </div>
 
                                         {/* Amount */}
-                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-blue-500 transition-colors">
+                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-zinc-900 transition-colors">
                                             <span className="text-gray-400 font-bold text-sm">₹</span>
                                             <input
                                                 type="number"
@@ -231,7 +231,7 @@ export default function RecordPaymentModal({
                                             <button
                                                 type="button"
                                                 onClick={() => fillFull(idx)}
-                                                className="text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-md hover:bg-blue-100 transition-colors"
+                                                className="text-[10px] font-black text-red-600 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-md hover:bg-zinc-100 transition-colors"
                                             >
                                                 Full
                                             </button>
@@ -253,7 +253,7 @@ export default function RecordPaymentModal({
                     <button
                         type="button"
                         onClick={addSplit}
-                        className="w-full py-2.5 border border-dashed border-gray-200 dark:border-slate-600 rounded-xl text-[11px] font-black text-gray-400 hover:text-blue-600 hover:border-blue-300 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 border border-dashed border-gray-200 dark:border-slate-600 rounded-xl text-[11px] font-black text-gray-400 hover:text-red-600 hover:border-red-300 transition-colors flex items-center justify-center gap-2"
                     >
                         <FaPlus size={10} /> Add Split Payment
                     </button>
@@ -268,7 +268,7 @@ export default function RecordPaymentModal({
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="e.g. Cash collected by trainer"
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-blue-500 text-sm transition-colors"
+                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 text-sm transition-colors"
                         />
                     </div>
 
@@ -329,7 +329,7 @@ export default function RecordPaymentModal({
                         disabled={submitting || isOver || splitTotal <= 0}
                         className={`flex-2 flex-grow py-3 rounded-xl font-black text-[11px] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                             isFull
-                                ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                                ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
                                 : 'bg-amber-500 hover:bg-amber-600 text-white'
                         }`}
                     >

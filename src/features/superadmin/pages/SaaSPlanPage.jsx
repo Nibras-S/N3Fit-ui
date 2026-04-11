@@ -86,7 +86,7 @@ const SaaSPlanManagement = () => {
     const formatCurrency = (v) => `₹${(v || 0).toLocaleString("en-IN")}`;
 
     const tierColors = [
-        { bg: "from-blue-500 to-blue-600", light: "bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400" },
+        { bg: "from-zinc-800 to-red-600", light: "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400" },
         { bg: "from-purple-500 to-purple-600", light: "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" },
         { bg: "from-amber-500 to-amber-600", light: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400" },
         { bg: "from-emerald-500 to-emerald-600", light: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400" },
@@ -96,7 +96,7 @@ const SaaSPlanManagement = () => {
         return (
             <AppLayout showGenderSwitch={false}>
                 <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </AppLayout>
         );
@@ -114,7 +114,7 @@ const SaaSPlanManagement = () => {
                     </div>
                     <button
                         onClick={openCreate}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 active:scale-95 transition-all shadow-lg shadow-zinc-900/25 text-sm"
                     >
                         <FaPlus size={12} /> New Plan
                     </button>
@@ -227,7 +227,7 @@ const SaaSPlanManagement = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Plan Name *</label>
                                     <input type="text" value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="Pro" required />
                                 </div>
 
@@ -235,13 +235,13 @@ const SaaSPlanManagement = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Price (₹) *</label>
                                         <input type="number" value={form.price} onChange={(e) => setForm(p => ({ ...p, price: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             placeholder="999" required min="0" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Billing Cycle</label>
                                         <select value={form.billingCycle} onChange={(e) => setForm(p => ({ ...p, billingCycle: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all">
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all">
                                             <option value="monthly">Monthly</option>
                                             <option value="yearly">Yearly</option>
                                         </select>
@@ -252,13 +252,13 @@ const SaaSPlanManagement = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Max Staff</label>
                                         <input type="number" value={form.maxStaff} onChange={(e) => setForm(p => ({ ...p, maxStaff: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             min="1" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Max Members</label>
                                         <input type="number" value={form.maxMembers} onChange={(e) => setForm(p => ({ ...p, maxMembers: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             min="1" />
                                     </div>
                                 </div>
@@ -266,7 +266,7 @@ const SaaSPlanManagement = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Features</label>
                                     <textarea value={form.features} onChange={(e) => setForm(p => ({ ...p, features: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all resize-none"
                                         rows={3} placeholder="Dashboard, Reports, SMS Reminders (comma-separated)" />
                                     <p className="text-xs text-gray-400 mt-1">Separate features with commas</p>
                                 </div>
@@ -277,7 +277,7 @@ const SaaSPlanManagement = () => {
                                         Cancel
                                     </button>
                                     <button type="submit" disabled={submitting}
-                                        className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
+                                        className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
                                         {submitting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                             : editing ? "Save Changes" : "Create Plan"}
                                     </button>

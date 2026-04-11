@@ -45,14 +45,14 @@ export class ErrorBoundary extends React.Component {
                             If it keeps happening, please contact support.
                         </p>
                         {process.env.NODE_ENV !== 'production' && this.state.error && (
-                            <pre className="text-xs text-left text-red-600 bg-red-50 p-3 rounded mb-6 overflow-auto max-h-40">
+                            <pre className="text-xs text-left text-red-600 bg-zinc-50 p-3 rounded mb-6 overflow-auto max-h-40">
                                 {String(this.state.error?.message || this.state.error)}
                             </pre>
                         )}
                         <button
                             type="button"
                             onClick={this.handleReload}
-                            className="inline-flex items-center px-6 py-2 bg-indigo-600 text-white font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="inline-flex items-center px-6 py-2 bg-zinc-900 text-white font-medium rounded-md hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-red-500"
                         >
                             Reload
                         </button>

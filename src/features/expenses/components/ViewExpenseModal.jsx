@@ -23,7 +23,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center">
                             <FaEye />
                         </div>
                         <div>
@@ -44,7 +44,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                             <div>
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Category</label>
                                 <div className="flex items-center gap-2 text-gray-900 dark:text-white font-medium">
-                                    <FaTag className="text-blue-500" /> {expense.category}
+                                    <FaTag className="text-red-500" /> {expense.category}
                                 </div>
                             </div>
                             <div>
@@ -70,7 +70,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                         <div>
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Vendor / Receiver</label>
                             <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                                <FaUser className="text-indigo-500" /> {expense.vendor || 'N/A'}
+                                <FaUser className="text-rose-500" /> {expense.vendor || 'N/A'}
                             </div>
                         </div>
 
@@ -103,7 +103,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                                             href={fileUrl}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="w-10 h-10 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-colors"
+                                            className="w-10 h-10 rounded-full bg-white text-gray-900 flex items-center justify-center hover:bg-zinc-900 hover:text-white transition-colors"
                                             title="View Full"
                                         >
                                             <FaEye />
@@ -118,7 +118,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                                         </a>
                                     </div>
                                 </div>
-                                <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg flex items-center gap-2 text-xs text-blue-700 dark:text-blue-300">
+                                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg flex items-center gap-2 text-xs text-red-700 dark:text-red-300">
                                     <FaCheckCircle className="flex-shrink-0" />
                                     <span>Attachment Verified</span>
                                 </div>

@@ -32,7 +32,7 @@ export function Input({
 }) {
   const inputBase =
     "w-full px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors font-sans";
-  const errorClass = error ? "border-red-500 focus:ring-red-500/20" : "";
+  const errorClass = error ? "border-zinc-900 focus:ring-zinc-900/10" : "";
   const errorText = coerceErrorMessage(error);
 
   return (

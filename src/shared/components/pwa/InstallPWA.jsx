@@ -60,11 +60,11 @@ export default function InstallPWA() {
             `}</style>
 
             <div className="relative w-72 rounded-2xl overflow-hidden shadow-2xl border border-white/10"
-                style={{ background: 'linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 100%)' }}
+                style={{ background: 'linear-gradient(135deg, #7f1d1d 0%, #b91c1c 100%)' }}
             >
                 {/* Decorative glow */}
                 <div className="absolute -top-6 -right-6 w-24 h-24 rounded-full opacity-20"
-                    style={{ background: 'radial-gradient(circle, #60a5fa, transparent)' }} />
+                    style={{ background: 'radial-gradient(circle, #f87171, transparent)' }} />
 
                 {/* Dismiss button */}
                 <button
@@ -84,15 +84,15 @@ export default function InstallPWA() {
                         </div>
                         <div>
                             <p className="text-white font-bold text-sm leading-tight">Install Fit App</p>
-                            <p className="text-blue-200 text-[11px] mt-0.5">Faster &amp; works offline</p>
+                            <p className="text-red-200 text-[11px] mt-0.5">Faster &amp; works offline</p>
                         </div>
                     </div>
 
                     {/* Features */}
                     <ul className="space-y-1 mb-4">
                         {['Instant access from home screen', 'Works without internet', 'No browser chrome'].map(f => (
-                            <li key={f} className="flex items-center gap-2 text-[11px] text-blue-100">
-                                <span className="w-1 h-1 rounded-full bg-blue-300 shrink-0" />
+                            <li key={f} className="flex items-center gap-2 text-[11px] text-red-100">
+                                <span className="w-1 h-1 rounded-full bg-red-300 shrink-0" />
                                 {f}
                             </li>
                         ))}
@@ -101,7 +101,7 @@ export default function InstallPWA() {
                     {/* CTA */}
                     <button
                         onClick={handleInstall}
-                        className="w-full py-2.5 rounded-xl bg-white text-blue-700 text-sm font-bold flex items-center justify-center gap-2 hover:bg-blue-50 active:scale-95 transition-all shadow-lg shadow-blue-900/30"
+                        className="w-full py-2.5 rounded-xl bg-white text-red-700 text-sm font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 active:scale-95 transition-all shadow-lg shadow-red-900/30"
                     >
                         <FaDownload size={12} />
                         Install Now

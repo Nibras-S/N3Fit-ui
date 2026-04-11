@@ -67,7 +67,7 @@ const SuperAdminSettings = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 mt-8">
                     {/* Navigation Sidebar */}
                     <div className="lg:col-span-1 space-y-2">
-                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 font-bold text-sm text-left transition-all">
+                        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 font-bold text-sm text-left transition-all">
                             <FaTrash size={14} />
                             Recycling Bin
                         </button>
@@ -96,7 +96,7 @@ const SuperAdminSettings = () => {
                                         placeholder="Search deleted gyms..."
                                         value={search}
                                         onChange={(e) => setSearch(e.target.value)}
-                                        className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-blue-500/20 outline-none w-full md:w-64 transition-all"
+                                        className="pl-10 pr-4 py-2 bg-gray-50 dark:bg-slate-900 border border-gray-100 dark:border-slate-700 rounded-xl text-xs focus:ring-2 focus:ring-zinc-900/10 outline-none w-full md:w-64 transition-all"
                                     />
                                 </div>
                             </div>
@@ -140,7 +140,7 @@ const SuperAdminSettings = () => {
                                                                 setGymToRestore(gym);
                                                                 setIsRestoreModalOpen(true);
                                                             }}
-                                                            className="px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs font-bold hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-all flex items-center gap-2 ml-auto"
+                                                            className="px-4 py-2 rounded-xl bg-zinc-50 dark:bg-zinc-700/50 text-red-600 dark:text-red-400 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-red-900/50 transition-all flex items-center gap-2 ml-auto"
                                                         >
                                                             <FaTrashRestore size={12} />
                                                             Restore

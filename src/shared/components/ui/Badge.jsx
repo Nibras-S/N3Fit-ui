@@ -19,23 +19,23 @@ import React from "react";
  */
 
 const variants = {
-  brand: "bg-brand-50  text-brand-700  ring-brand-700/10  dark:bg-brand-900/30  dark:text-brand-300",
+  brand: "bg-rose-50    text-rose-700    ring-rose-700/10   dark:bg-rose-900/20   dark:text-rose-300",
   success: "bg-green-50  text-green-700  ring-green-700/10  dark:bg-green-900/30  dark:text-green-300",
   warning: "bg-yellow-50 text-yellow-700 ring-yellow-700/10 dark:bg-yellow-900/30 dark:text-yellow-300",
-  error: "bg-red-50    text-red-700    ring-red-700/10    dark:bg-red-900/30    dark:text-red-300",
+  error: "bg-red-50     text-red-700    ring-red-700/10    dark:bg-red-900/30    dark:text-red-300",
   gray: "bg-gray-100  text-gray-600   ring-gray-500/10   dark:bg-dark-border   dark:text-gray-300",
-  blue: "bg-blue-50   text-blue-700   ring-blue-700/10   dark:bg-blue-900/30   dark:text-blue-300",
+  blue: "bg-gray-100  text-gray-700   ring-gray-500/10   dark:bg-gray-700/50   dark:text-gray-300",
   purple: "bg-purple-50 text-purple-700 ring-purple-700/10 dark:bg-purple-900/30 dark:text-purple-300",
   orange: "bg-orange-50 text-orange-700 ring-orange-700/10 dark:bg-orange-900/30 dark:text-orange-300",
 };
 
 const dotColors = {
-  brand: "bg-brand-500",
+  brand: "bg-rose-500",
   success: "bg-green-500",
   warning: "bg-yellow-500",
   error: "bg-red-500",
   gray: "bg-gray-400",
-  blue: "bg-blue-500",
+  blue: "bg-gray-500",
   purple: "bg-purple-500",
   orange: "bg-orange-500",
 };

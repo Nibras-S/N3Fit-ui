@@ -103,7 +103,7 @@ const SuperAdminDashboard = () => {
         return (
             <AppLayout showGenderSwitch={false}>
                 <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </AppLayout>
         );
@@ -121,14 +121,14 @@ const SuperAdminDashboard = () => {
                     </div>
                     <button
                         onClick={() => setModalOpen(true)}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 active:scale-95 transition-all shadow-lg shadow-zinc-900/25 text-sm"
                     >
                         <FaPlus size={12} /> Create Gym
                     </button>
                 </div>
 
                 {/* Stats Banner */}
-                <div className="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 p-6 rounded-2xl text-white shadow-lg">
+                <div className="bg-gradient-to-r from-slate-900 via-red-950 to-rose-950 p-6 rounded-2xl text-white shadow-lg">
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                         <div className="bg-white/10 backdrop-blur rounded-xl p-4">
                             <div className="flex items-center gap-2 mb-2 opacity-75">
@@ -194,7 +194,7 @@ const SuperAdminDashboard = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search fit clubs..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                     />
                 </div>
 
@@ -223,7 +223,7 @@ const SuperAdminDashboard = () => {
                                     >
                                         <td className="px-5 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold ${gym.isActive ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold ${gym.isActive ? "bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
                                                     {gym.name?.charAt(0)?.toUpperCase()}
                                                 </div>
                                                 <div>
@@ -241,9 +241,9 @@ const SuperAdminDashboard = () => {
                                         <td className="px-5 py-4">
                                             <span className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium ${gym.isActive
                                                 ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                                                : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                                                : "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400"
                                                 }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${gym.isActive ? "bg-green-500" : "bg-red-500"}`}></span>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${gym.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
                                                 {gym.isActive ? "Active" : "Inactive"}
                                             </span>
                                         </td>
@@ -264,7 +264,7 @@ const SuperAdminDashboard = () => {
                                                         setGymToDelete(gym);
                                                         setIsDeleteModalOpen(true);
                                                     }}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
                                                     title="Delete Fit Club"
                                                 >
                                                     <FaTrash size={16} />
@@ -272,7 +272,7 @@ const SuperAdminDashboard = () => {
                                                 <div className="w-[1px] h-4 bg-gray-100 dark:bg-slate-700 mx-1"></div>
                                                 <button
                                                     onClick={() => navigate(`/superadmin/gyms/${gym._id}#features`)}
-                                                    className="p-2 rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                                    className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
                                                     title="Manage Features"
                                                 >
                                                     <FaCogs size={16} />
@@ -281,7 +281,7 @@ const SuperAdminDashboard = () => {
                                                     onClick={() => toggleGym(gym)}
                                                     className={`p-2 rounded-lg transition-colors ${gym.isActive
                                                         ? "text-green-500 hover:bg-green-50 dark:hover:bg-green-900/20"
-                                                        : "text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                        : "text-red-400 hover:bg-zinc-50 dark:hover:bg-red-900/20"
                                                         }`}
                                                     title={gym.isActive ? "Deactivate" : "Activate"}
                                                 >
@@ -341,7 +341,7 @@ const SuperAdminDashboard = () => {
                                         type="text"
                                         value={form.name}
                                         onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="FitZone Gym"
                                         required
                                     />
@@ -353,7 +353,7 @@ const SuperAdminDashboard = () => {
                                             type="email"
                                             value={form.contactEmail}
                                             onChange={(e) => setForm(p => ({ ...p, contactEmail: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             placeholder="info@gym.com"
                                         />
                                     </div>
@@ -363,7 +363,7 @@ const SuperAdminDashboard = () => {
                                             type="text"
                                             value={form.contactPhone}
                                             onChange={(e) => setForm(p => ({ ...p, contactPhone: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             placeholder="9876543210"
                                         />
                                     </div>
@@ -374,7 +374,7 @@ const SuperAdminDashboard = () => {
                                         type="text"
                                         value={form.address}
                                         onChange={(e) => setForm(p => ({ ...p, address: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="123 Main Street, City"
                                     />
                                 </div>
@@ -383,7 +383,7 @@ const SuperAdminDashboard = () => {
                                     <select
                                         value={form.saaSPlanId}
                                         onChange={(e) => setForm(p => ({ ...p, saaSPlanId: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                     >
                                         <option value="">No plan (free trial)</option>
                                         {plans.map(p => (
@@ -402,7 +402,7 @@ const SuperAdminDashboard = () => {
                                         type="text"
                                         value={form.adminName}
                                         onChange={(e) => setForm(p => ({ ...p, adminName: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="Gym Owner Name"
                                     />
                                 </div>
@@ -412,7 +412,7 @@ const SuperAdminDashboard = () => {
                                         type="email"
                                         value={form.adminEmail}
                                         onChange={(e) => setForm(p => ({ ...p, adminEmail: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="admin@newgym.com"
                                         required
                                     />
@@ -424,7 +424,7 @@ const SuperAdminDashboard = () => {
                                             type={showPassword ? "text" : "password"}
                                             value={form.adminPassword}
                                             onChange={(e) => setForm(p => ({ ...p, adminPassword: e.target.value }))}
-                                            className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                            className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             placeholder="Enter password"
                                             required
                                         />
@@ -449,7 +449,7 @@ const SuperAdminDashboard = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {submitting ? (
                                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>

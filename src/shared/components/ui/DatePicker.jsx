@@ -11,7 +11,7 @@ export const DatePicker = ({ value, onChange, className = '', ...props }) => {
                 type="date"
                 value={value || ''}
                 onChange={onChange}
-                className={`custom-date-input w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white sm:text-sm transition-all text-left ${className}`}
+                className={`custom-date-input w-full pl-9 pr-3 py-2 border border-gray-200 dark:border-slate-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 bg-white dark:bg-slate-700 text-gray-900 dark:text-white sm:text-sm transition-all text-left ${className}`}
                 {...props}
             />
         </div>

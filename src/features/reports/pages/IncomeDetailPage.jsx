@@ -15,7 +15,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
 
-const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#6366f1'];
+const COLORS = ['#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f43f5e'];
 
 const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 const formatDate = (d) => d
@@ -156,7 +156,7 @@ const IncomeDetailPage = () => {
                             <button
                                 onClick={fetchData}
                                 disabled={loading}
-                                className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
+                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
                                 title="Refresh"
                             >
                                 <FaSync size={13} className={loading ? 'animate-spin' : ''} />
@@ -190,7 +190,7 @@ const IncomeDetailPage = () => {
                         label="Avg per Transaction"
                         value={formatCurrency(data.kpi.avgTransaction)}
                         icon={<FaChartLine />}
-                        color="indigo"
+                        color="rose"
                         loading={loading}
                     />
                     <KpiTile
@@ -392,7 +392,7 @@ const IncomeDetailPage = () => {
                                             <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
                                                 t.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                                                 t.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400'
+                                                'bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400'
                                             }`}>
                                                 {t.paymentStatus}
                                             </span>
@@ -415,8 +415,8 @@ const IncomeDetailPage = () => {
 
 const KPI_COLORS = {
     green:   { bg: 'bg-green-50 dark:bg-green-900/20',     text: 'text-green-600 dark:text-green-400' },
-    blue:    { bg: 'bg-blue-50 dark:bg-blue-900/20',       text: 'text-blue-600 dark:text-blue-400' },
-    indigo:  { bg: 'bg-indigo-50 dark:bg-indigo-900/20',   text: 'text-indigo-600 dark:text-indigo-400' },
+    blue:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-red-600 dark:text-red-400' },
+    rose:    { bg: 'bg-rose-50 dark:bg-rose-900/20',     text: 'text-rose-600 dark:text-rose-400' },
     emerald: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400' },
     amber:   { bg: 'bg-amber-50 dark:bg-amber-900/20',     text: 'text-amber-600 dark:text-amber-400' },
 };

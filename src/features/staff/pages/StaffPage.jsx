@@ -274,7 +274,7 @@ const StaffManagement = () => {
         return (
             <AppLayout showGenderSwitch={false}>
                 <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
                 </div>
             </AppLayout>
         );
@@ -297,7 +297,7 @@ const StaffManagement = () => {
                     {view === 'active' && (
                         <button
                             onClick={openCreateModal}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-500/25 text-sm"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 active:scale-95 transition-all shadow-lg shadow-zinc-900/25 text-sm"
                         >
                             <FaPlus size={12} /> Add Staff
                         </button>
@@ -310,7 +310,7 @@ const StaffManagement = () => {
                         onClick={() => setView('active')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                             view === 'active'
-                                ? 'bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm'
+                                ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-sm'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                         }`}
                     >
@@ -341,8 +341,8 @@ const StaffManagement = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                                <FaUsers className="text-blue-600 dark:text-blue-400" />
+                            <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
+                                <FaUsers className="text-red-600 dark:text-red-400" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeStaff.length}</p>
@@ -366,7 +366,7 @@ const StaffManagement = () => {
                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                                 view === 'archived'
                                     ? 'bg-amber-100 dark:bg-amber-900/30'
-                                    : 'bg-red-100 dark:bg-red-900/30'
+                                    : 'bg-zinc-100 dark:bg-zinc-700/50'
                             }`}>
                                 {view === 'archived'
                                     ? <FaArchive className="text-amber-600 dark:text-amber-400" />
@@ -397,7 +397,7 @@ const StaffManagement = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search staff..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                     />
                 </div>
 
@@ -421,7 +421,7 @@ const StaffManagement = () => {
                                     <tr key={member._id} className="border-b border-gray-50 dark:border-slate-700/50 hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors">
                                         <td className="px-5 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
                                                     {member.name?.charAt(0)?.toUpperCase()}
                                                 </div>
                                                 <span className="font-medium text-gray-900 dark:text-white text-sm">{member.name}</span>
@@ -438,10 +438,10 @@ const StaffManagement = () => {
                                                     onClick={() => toggleActive(member)}
                                                     className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium cursor-pointer transition-colors ${member.isActive
                                                         ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                                        : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
+                                                        : "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400 hover:bg-zinc-100 dark:hover:bg-red-900/30"
                                                         }`}
                                                 >
-                                                    <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-red-500"}`}></span>
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
                                                     {member.isActive ? "Active" : "Inactive"}
                                                 </button>
                                             )}
@@ -485,7 +485,7 @@ const StaffManagement = () => {
                                                         <button
                                                             onClick={() => handleDelete(member._id)}
                                                             disabled={deletingId === member._id}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
                                                             title="Delete permanently"
                                                         >
                                                             {deletingId === member._id ? (
@@ -499,7 +499,7 @@ const StaffManagement = () => {
                                                     <>
                                                         <button
                                                             onClick={() => openEditModal(member)}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
                                                             title="Edit"
                                                         >
                                                             <FaEdit size={14} />
@@ -568,7 +568,7 @@ const StaffManagement = () => {
                                 <div key={member._id} className="p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive && view === 'active' ? "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive && view === 'active' ? "bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
                                                 {member.name?.charAt(0)?.toUpperCase()}
                                             </div>
                                             <div>
@@ -591,7 +591,7 @@ const StaffManagement = () => {
                                                 onClick={() => toggleActive(member)}
                                                 className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
                                                     ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                                                    : "bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400"
+                                                    : "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400"
                                                     }`}
                                             >
                                                 {member.isActive ? "Active" : "Inactive"}
@@ -612,13 +612,13 @@ const StaffManagement = () => {
                                                         {restoringId === member._id ? <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div> : <FaUndo size={13} />}
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
-                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
                                                         {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div> : <FaTrash size={13} />}
                                                     </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors">
+                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors">
                                                         <FaEdit size={14} />
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
@@ -674,7 +674,7 @@ const StaffManagement = () => {
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="John Doe"
                                         required
                                     />
@@ -688,7 +688,7 @@ const StaffManagement = () => {
                                                 type="email"
                                                 value={formData.email}
                                                 onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
-                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                                 placeholder="staff@example.com"
                                                 required
                                             />
@@ -700,7 +700,7 @@ const StaffManagement = () => {
                                                     type={showPassword ? "text" : "password"}
                                                     value={formData.password}
                                                     onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
-                                                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                                     placeholder="Enter password"
                                                     required
                                                 />
@@ -719,7 +719,7 @@ const StaffManagement = () => {
                                 {/* Joining Date — optional reference for HR records */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
-                                        <FaCalendarAlt className="text-blue-500 text-xs" /> Joining Date
+                                        <FaCalendarAlt className="text-red-500 text-xs" /> Joining Date
                                         <span className="text-xs font-normal text-gray-400">(optional)</span>
                                     </label>
                                     <input
@@ -727,7 +727,7 @@ const StaffManagement = () => {
                                         value={formData.joiningDate}
                                         onChange={(e) => setFormData(p => ({ ...p, joiningDate: e.target.value }))}
                                         max={new Date().toISOString().split('T')[0]}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                     />
                                     <p className="text-[11px] text-gray-400 mt-1">
                                         When this person actually joined the team — distinct from when their app account was created.
@@ -737,7 +737,7 @@ const StaffManagement = () => {
                                 {/* ID Proof Upload — PDF or image */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
-                                        <FaPaperclip className="text-blue-500 text-xs" /> ID Proof Document
+                                        <FaPaperclip className="text-red-500 text-xs" /> ID Proof Document
                                         <span className="text-xs font-normal text-gray-400">(PDF / JPG / PNG, max 5 MB)</span>
                                     </label>
 
@@ -747,7 +747,7 @@ const StaffManagement = () => {
                                                 href={idProofHref(existingIdProofUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-400 hover:underline truncate"
+                                                className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400 hover:underline truncate"
                                             >
                                                 {existingIdProofUrl.toLowerCase().endsWith('.pdf')
                                                     ? <FaFilePdf className="shrink-0" />
@@ -758,14 +758,14 @@ const StaffManagement = () => {
                                         </div>
                                     )}
 
-                                    <label className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-300 dark:border-slate-600 cursor-pointer hover:border-blue-400 dark:hover:border-blue-500 transition-colors">
+                                    <label className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-300 dark:border-slate-600 cursor-pointer hover:border-red-400 dark:hover:border-zinc-900 transition-colors">
                                         <input
                                             type="file"
                                             accept=".pdf,image/jpeg,image/jpg,image/png"
                                             onChange={handleIdProofChange}
                                             className="hidden"
                                         />
-                                        <div className="w-9 h-9 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+                                        <div className="w-9 h-9 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
                                             {idProofFile?.type === 'application/pdf'
                                                 ? <FaFilePdf />
                                                 : idProofFile
@@ -786,7 +786,7 @@ const StaffManagement = () => {
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.preventDefault(); setIdProofFile(null); }}
-                                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
                                                 title="Remove"
                                             >
                                                 <FaTimes size={12} />
@@ -803,7 +803,7 @@ const StaffManagement = () => {
                                             <label
                                                 key={perm.key}
                                                 className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.key)
-                                                    ? "border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-900/10"
+                                                    ? "border-red-200 dark:border-red-800 bg-zinc-50/50 dark:bg-zinc-800/30"
                                                     : "border-gray-100 dark:border-slate-700 hover:border-gray-200 dark:hover:border-slate-600"
                                                     }`}
                                             >
@@ -811,7 +811,7 @@ const StaffManagement = () => {
                                                     type="checkbox"
                                                     checked={formData.permissions.includes(perm.key)}
                                                     onChange={() => togglePermission(perm.key)}
-                                                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                                    className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
                                                 />
                                                 <div>
                                                     <p className="text-sm font-medium text-gray-900 dark:text-white">{perm.label}</p>
@@ -834,7 +834,7 @@ const StaffManagement = () => {
                                     <button
                                         type="submit"
                                         disabled={submitting}
-                                        className="flex-1 py-2.5 rounded-xl bg-blue-600 text-white font-medium text-sm hover:bg-blue-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                                        className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {submitting ? (
                                             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
