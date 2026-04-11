@@ -66,9 +66,9 @@ function NewMember() {
   const canvasRef = useRef(null);
 
   // Payment State
-  const [amount, setAmount] = useState(0);
-  const [admissionFee, setAdmissionFee] = useState(0);
-  const [discount, setDiscount] = useState(0);
+  const [amount, setAmount] = useState('');
+  const [admissionFee, setAdmissionFee] = useState('');
+  const [discount, setDiscount] = useState('');
   const [paymentMethod, setPaymentMethod] = useState("Cash");
   const [paymentStatus, setPaymentStatus] = useState("Paid");
   const [settings, setSettings] = useState(null);
@@ -142,7 +142,7 @@ function NewMember() {
       photoBlob !== null ||
       gender !== "" ||
       dob !== "" ||
-      discount !== 0 ||
+      discount !== '' ||
       weight !== "" ||
       height !== "" ||
       goals.length > 0 ||

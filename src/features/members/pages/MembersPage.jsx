@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import useGymSocket from '../../../shared/hooks/useGymSocket';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
@@ -170,6 +171,8 @@ const MembersPage = () => {
     useEffect(() => {
         fetchMembers();
     }, [backendUrl, page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
+
+    useGymSocket(['member:created', 'member:updated', 'member:deleted'], fetchMembers);
 
     // ── Fetch settings for plans ────────────────────────────────
     useEffect(() => {

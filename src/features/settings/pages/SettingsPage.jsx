@@ -113,7 +113,17 @@ const Settings = () => {
     const saveSettings = async () => {
         try {
             setSaving(true);
-            await api.put("/settings", settings);
+            // Convert any empty-string inputs back to numbers before sending to the API
+            const payload = {
+                ...settings,
+                admissionFee: settings.admissionFee === '' ? 0 : Number(settings.admissionFee),
+                plans: settings.plans.map(p => ({
+                    ...p,
+                    duration: p.duration === '' ? 0 : Number(p.duration),
+                    price:    p.price    === '' ? 0 : Number(p.price),
+                })),
+            };
+            await api.put("/settings", payload);
             toast.success("Pricing updated successfully!");
             setIsEditingPricing(false);
         } catch (error) {
@@ -709,8 +719,8 @@ const Settings = () => {
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 font-medium">₹</span>
                                         <input
                                             type="number"
-                                            value={settings.admissionFee || 0}
-                                            onChange={(e) => setSettings(prev => ({ ...prev, admissionFee: parseInt(e.target.value) || 0 }))}
+                                            value={settings.admissionFee ?? ''}
+                                            onChange={(e) => setSettings(prev => ({ ...prev, admissionFee: e.target.value === '' ? '' : parseInt(e.target.value, 10) }))}
                                             className="w-full pl-8 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 transition-all outline-none font-semibold text-gray-900 dark:text-white"
                                             placeholder="0"
                                         />
@@ -718,7 +728,7 @@ const Settings = () => {
                                 ) : (
                                     <p className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-1">
                                         <span className="text-gray-400 font-medium">₹</span>
-                                        {settings.admissionFee ? settings.admissionFee.toLocaleString('en-IN') : 0}
+                                        {settings.admissionFee ? Number(settings.admissionFee).toLocaleString('en-IN') : 0}
                                     </p>
                                 )}
                             </div>
@@ -782,7 +792,7 @@ const Settings = () => {
                                                                 value={plan.duration}
                                                                 onChange={(e) => {
                                                                     const newPlans = [...settings.plans];
-                                                                    newPlans[index].duration = parseInt(e.target.value) || 0;
+                                                                    newPlans[index].duration = e.target.value === '' ? '' : parseInt(e.target.value, 10);
                                                                     setSettings({ ...settings, plans: newPlans });
                                                                 }}
                                                                 className="w-16 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
@@ -809,7 +819,7 @@ const Settings = () => {
                                                             value={plan.price}
                                                             onChange={(e) => {
                                                                 const newPlans = [...settings.plans];
-                                                                newPlans[index].price = parseInt(e.target.value) || 0;
+                                                                newPlans[index].price = e.target.value === '' ? '' : parseInt(e.target.value, 10);
                                                                 setSettings({ ...settings, plans: newPlans });
                                                             }}
                                                             className="w-full pl-5 pr-2 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"

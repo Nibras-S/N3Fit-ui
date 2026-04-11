@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
 import { FaSearch, FaArrowLeft } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import useGymSocket from '../../../shared/hooks/useGymSocket';
 
 const STATUS_TABS = [
     { key: 'all', label: 'All' },
@@ -24,21 +25,22 @@ const TransactionsPage = () => {
     const [methodFilter, setMethodFilter] = useState('all');
     const [sortConfig, setSortConfig] = useState({ key: 'transactionDate', direction: 'desc' });
 
-    useEffect(() => {
-        const fetchTransactions = async () => {
-            setLoading(true);
-            try {
-                const response = await api.get('/transactions');
-                const list = response.data?.data ?? response.data;
-                setTransactions(Array.isArray(list) ? list : []);
-            } catch {
-                toast.error('Failed to load transactions');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchTransactions();
+    const fetchTransactions = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await api.get('/transactions');
+            const list = response.data?.data ?? response.data;
+            setTransactions(Array.isArray(list) ? list : []);
+        } catch {
+            toast.error('Failed to load transactions');
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
+
+    useGymSocket(['transaction:created', 'transaction:updated'], fetchTransactions);
 
     const filteredTransactions = useMemo(() => {
         let filtered = transactions;

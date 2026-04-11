@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
@@ -13,6 +13,7 @@ import {
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import useGymSocket from '../../../shared/hooks/useGymSocket';
 
 const CATEGORIES = [
     'Rent', 'Electricity', 'Water', 'Staff Salary', 'Equipment',
@@ -52,7 +53,7 @@ const Expenses = () => {
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setLoading(true);
         try {
             const [expensesRes, summaryRes] = await Promise.all([
@@ -66,11 +67,11 @@ const Expenses = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    useEffect(() => {
-        fetchData();
-    }, [backendUrl]);
+    useEffect(() => { fetchData(); }, [fetchData]);
+
+    useGymSocket(['expense:created', 'expense:updated', 'expense:deleted'], fetchData);
 
     const handleDelete = async () => {
         try {

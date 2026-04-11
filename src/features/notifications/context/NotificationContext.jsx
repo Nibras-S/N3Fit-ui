@@ -143,7 +143,8 @@ export const NotificationProvider = ({ children }) => {
         fetchNotifications,
         markAsRead,
         markAllAsRead,
-        setActiveWarning
+        setActiveWarning,
+        socket, // expose for useGymSocket hook
     };
 
     return (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import useGymSocket from '../../../shared/hooks/useGymSocket';
 import {
     FaWallet, FaUsers, FaChartPie, FaCalendarAlt,
     FaMoneyCheckAlt, FaUserPlus, FaChartLine,
@@ -26,6 +27,12 @@ const Dashboard = () => {
         }
         fetchStats();
     }, [user]);
+
+    // Refetch whenever any member, transaction, or expense changes in this gym
+    useGymSocket(
+        ['member:created', 'member:updated', 'member:deleted', 'transaction:created', 'transaction:updated', 'expense:created', 'expense:updated', 'expense:deleted'],
+        fetchStats,
+    );
 
     const fetchStats = async () => {
         try {
