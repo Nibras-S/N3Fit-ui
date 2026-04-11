@@ -341,7 +341,7 @@ function NewMember() {
     <div className="flex items-center justify-center gap-3 mb-6">
       {[1, 2, 3].map((s) => (
         <div key={s} className="flex items-center gap-2">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${step === s ? 'bg-zinc-900 text-white scale-105 shadow-md' :
+          <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${step === s ? 'bg-brand-50 text-brand-600 scale-105 shadow-md shadow-brand-100/50' :
             step > s ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-slate-700 text-gray-400'
             }`}>
             {step > s ? <FaCheckCircle size={14} /> : s}
@@ -357,7 +357,7 @@ function NewMember() {
       <Toaster position="top-right" />
       {submitting && (
         <div className="fixed inset-0 bg-black/60 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
-          <div className="w-12 h-12 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <div className="w-12 h-12 border-4 border-brand-600 border-t-transparent rounded-full animate-spin mb-4"></div>
           <span className="text-white font-bold uppercase tracking-widest text-[10px]">Processing...</span>
         </div>
       )}
@@ -384,7 +384,7 @@ function NewMember() {
                           <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
                           <button
                             onClick={() => { setPhotoPreview(null); setPhotoBlob(null); }}
-                            className="absolute top-2 right-2 p-1.5 bg-zinc-900 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                            className="absolute top-2 right-2 p-1.5 bg-brand-50 text-brand-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
                           >
                             <FaTrash size={12} />
                           </button>
@@ -401,7 +401,7 @@ function NewMember() {
                       <button
                         onClick={startCamera}
                         type="button"
-                        className="flex-1 py-2.5 bg-zinc-900 text-white rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-zinc-800 transition-all shadow-md"
+                        className="flex-1 py-2.5 bg-brand-50 text-brand-600 rounded-xl font-bold text-[10px] flex items-center justify-center gap-2 hover:bg-brand-100 transition-all shadow-md"
                       >
                         <FaCamera /> Capture
                       </button>
@@ -425,7 +425,7 @@ function NewMember() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 font-medium text-sm transition-all"
                       placeholder="e.g. John Doe"
                     />
                   </div>
@@ -438,14 +438,14 @@ function NewMember() {
                           type="text"
                           value={countryCode}
                           onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-r-0 border-gray-100 dark:border-slate-700 rounded-l-xl outline-none focus:border-zinc-900 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-r-0 border-gray-100 dark:border-slate-700 rounded-l-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 text-sm font-bold text-center text-gray-600 dark:text-gray-300 transition-all"
                           placeholder="+91"
                         />
                         <input
                           type="tel"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-r-xl outline-none focus:border-zinc-900 text-sm font-medium"
+                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-r-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 text-sm font-medium transition-all"
                           placeholder="9876543210"
                           maxLength={10}
                         />
@@ -469,7 +469,7 @@ function NewMember() {
                           key={g}
                           type="button"
                           onClick={() => setGender(g)}
-                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-red-600 dark:bg-zinc-800/50' :
+                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-brand-600 bg-brand-50 text-brand-600' :
                             'border-gray-50 dark:border-slate-800 text-gray-400 hover:bg-gray-50'
                             }`}
                         >
@@ -505,7 +505,7 @@ function NewMember() {
                       step="0.1"
                       value={weight}
                       onChange={(e) => setWeight(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 font-medium text-sm transition-all"
                       placeholder="e.g. 72"
                     />
                   </div>
@@ -520,7 +520,7 @@ function NewMember() {
                       step="0.1"
                       value={height}
                       onChange={(e) => setHeight(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
+                      className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 font-medium text-sm transition-all"
                       placeholder="e.g. 175"
                     />
                   </div>
@@ -539,7 +539,7 @@ function NewMember() {
                           type="button"
                           onClick={() => toggleGoal(g.key)}
                           className={`px-3 py-2 rounded-xl border font-bold text-[10px] uppercase tracking-wide transition-all ${active
-                            ? 'border-zinc-900 bg-zinc-50 text-red-600 dark:bg-zinc-800/50'
+                            ? 'border-brand-600 bg-brand-50 text-brand-600'
                             : 'border-gray-100 dark:border-slate-700 text-gray-500 dark:text-gray-400 hover:border-gray-200 dark:hover:border-slate-600'
                             }`}
                         >
@@ -555,7 +555,7 @@ function NewMember() {
                       value={customGoal}
                       onChange={(e) => setCustomGoal(e.target.value)}
                       maxLength={200}
-                      className="mt-3 w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 font-medium text-sm"
+                      className="mt-3 w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 font-medium text-sm transition-all"
                       placeholder="Describe the goal in your own words…"
                     />
                   )}
@@ -566,7 +566,7 @@ function NewMember() {
                 <button
                   onClick={nextStep}
                   type="button"
-                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+                  className="px-8 py-3 bg-brand-50 text-brand-600 rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-brand-100 transition-all text-[11px] shadow-sm"
                 >
                   Continue <FaArrowRight size={12} />
                 </button>
@@ -595,11 +595,11 @@ function NewMember() {
                           key={p.name}
                           type="button"
                           onClick={() => setPlan(p.name)}
-                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-slate-800'}`}
+                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-brand-600 bg-brand-50' : 'border-gray-50 dark:border-slate-800'}`}
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-2 h-2 rounded-full ${plan === p.name ? 'bg-zinc-900' : 'bg-gray-200'}`} />
-                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-red-600' : 'text-gray-400'}`}>{p.name}</span>
+                            <div className={`w-2 h-2 rounded-full ${plan === p.name ? 'bg-brand-600' : 'bg-gray-200'}`} />
+                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-brand-600' : 'text-gray-400'}`}>{p.name}</span>
                           </div>
                           <span className="font-bold text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</span>
                         </button>
@@ -613,11 +613,11 @@ function NewMember() {
                             key={p}
                             type="button"
                             onClick={() => setPlan(p)}
-                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-slate-800'}`}
+                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-brand-600 bg-brand-50' : 'border-gray-50 dark:border-slate-800'}`}
                           >
                             <div className="flex items-center gap-3">
-                              <div className={`w-2 h-2 rounded-full ${plan === p ? 'bg-zinc-900' : 'bg-gray-200'}`} />
-                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-red-600' : 'text-gray-400'}`}>{p}</span>
+                              <div className={`w-2 h-2 rounded-full ${plan === p ? 'bg-brand-600' : 'bg-gray-200'}`} />
+                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-brand-600' : 'text-gray-400'}`}>{p}</span>
                             </div>
                             <span className="font-bold text-[11px] text-gray-400">₹{price || 0}</span>
                           </button>
@@ -686,8 +686,8 @@ function NewMember() {
                         <span className="text-red-500 font-bold">-₹{discount || 0}</span>
                       </div>
                       <div className="pt-2 border-t border-gray-100 dark:border-slate-700 flex justify-between items-end">
-                        <span className="text-[10px] font-black uppercase text-red-600">Total</span>
-                        <span className="text-2xl font-black text-red-600">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
+                        <span className="text-[10px] font-black uppercase text-brand-600">Total</span>
+                        <span className="text-2xl font-black text-brand-600">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
                       </div>
                     </div>
                   </div>
@@ -715,7 +715,7 @@ function NewMember() {
                 <button
                   onClick={nextStep}
                   type="button"
-                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+                  className="px-8 py-3 bg-brand-50 text-brand-600 rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-brand-100 transition-all text-[11px] shadow-sm"
                 >
                   Review <FaArrowRight size={12} />
                 </button>
@@ -739,7 +739,7 @@ function NewMember() {
                     </div>
                     <div className="min-w-0">
                       <h2 className="text-2xl font-black text-gray-900 dark:text-white uppercase leading-tight truncate">{name}</h2>
-                      <p className="text-red-600 font-bold tracking-widest text-[10px] uppercase mt-0.5 truncate">{gender} • {countryCode}{phone}</p>
+                      <p className="text-brand-600 font-bold tracking-widest text-[10px] uppercase mt-0.5 truncate">{gender} • {countryCode}{phone}</p>
                     </div>
                   </div>
 
@@ -783,7 +783,7 @@ function NewMember() {
                     </button>
                     <button
                       onClick={Submit}
-                      className="flex-[1.5] py-3.5 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 text-[11px]"
+                      className="flex-[1.5] py-3.5 bg-brand-50 text-brand-600 rounded-xl font-black uppercase tracking-widest hover:bg-brand-100 text-[11px] shadow-sm"
                     >
                       Add Member
                     </button>
