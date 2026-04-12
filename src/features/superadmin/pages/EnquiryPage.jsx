@@ -47,7 +47,8 @@ export default function EnquiryPage() {
             const params = { page, limit: 20 };
             if (statusFilter !== 'all') params.status = statusFilter;
             const res = await api.get('/enquiries', { params });
-            setEnquiries(res.data.data ?? res.data);
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            setEnquiries(Array.isArray(res.data) ? res.data : []);
             setTotalPages(res.data.meta?.totalPages ?? 1);
         } catch {
             toast.error('Failed to load enquiries');

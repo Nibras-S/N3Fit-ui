@@ -115,8 +115,8 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
         api.get('/gym/staff')
             .then((res) => {
                 if (cancelled) return;
-                const data = Array.isArray(res.data?.data) ? res.data.data
-                    : Array.isArray(res.data) ? res.data : [];
+                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+                const data = Array.isArray(res.data) ? res.data : [];
                 setStaffOptions(data.filter((s) => s.isActive !== false));
             })
             .catch(() => { /* surfaced via global interceptor */ })

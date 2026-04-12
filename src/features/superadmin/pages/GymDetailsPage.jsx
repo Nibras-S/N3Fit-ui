@@ -11,7 +11,8 @@ import {
     FaArrowLeft, FaSave, FaBuilding, FaEnvelope, FaPhone,
     FaMapMarkerAlt, FaCalendarAlt, FaCrown, FaCheckCircle,
     FaTimesCircle, FaUsers, FaUserShield, FaExclamationTriangle,
-    FaEdit, FaTrash, FaLock, FaGlobe, FaToggleOn, FaToggleOff, FaCogs
+    FaEdit, FaTrash, FaLock, FaGlobe, FaToggleOn, FaToggleOff, FaCogs,
+    FaLink, FaUserPlus
 } from "react-icons/fa";
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import { motion, AnimatePresence } from "framer-motion";
@@ -42,9 +43,16 @@ const GymDetails = () => {
         archiveExpired: true,
         whatsappNotifications: false,
         memberImport: false,
-        memberExport: false
+        memberExport: false,
+        autoWhatsappReminders: false,
     });
     const [updatingFeatures, setUpdatingFeatures] = useState(false);
+
+    // Linked admins state
+    const [linkedAdmins, setLinkedAdmins] = useState([]);
+    const [linkEmail, setLinkEmail] = useState('');
+    const [linkLoading, setLinkLoading] = useState(false);
+    const [linkedAdminsLoading, setLinkedAdminsLoading] = useState(false);
 
     const [form, setForm] = useState({
         name: "",
@@ -94,6 +102,38 @@ const GymDetails = () => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const fetchLinkedAdmins = useCallback(async () => {
+        setLinkedAdminsLoading(true);
+        try {
+            const res = await api.get(`/superadmin/gyms/${id}/linked-admins`);
+            setLinkedAdmins(res.data || []);
+        } catch (err) {
+            // non-critical
+        } finally {
+            setLinkedAdminsLoading(false);
+        }
+    }, [api, id]);
+
+    useEffect(() => {
+        fetchLinkedAdmins();
+    }, [fetchLinkedAdmins]);
+
+    const handleLinkAdmin = async (e) => {
+        e.preventDefault();
+        if (!linkEmail.trim()) return;
+        setLinkLoading(true);
+        try {
+            await api.post(`/superadmin/gyms/${id}/link-admin`, { email: linkEmail.trim().toLowerCase() });
+            toast.success('Admin linked successfully');
+            setLinkEmail('');
+            fetchLinkedAdmins();
+        } catch (err) {
+            toast.error(err.response?.data?.message || 'Failed to link admin');
+        } finally {
+            setLinkLoading(false);
+        }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -399,7 +439,8 @@ const GymDetails = () => {
                                     { key: 'archiveExpired', label: 'Auto-Archive Expired', icon: '📦', desc: 'Automatically archive memberships' },
                                     { key: 'whatsappNotifications', label: 'WhatsApp Notifications', icon: '💬', desc: 'Auto-send payment & expiry reminders' },
                                     { key: 'memberImport', label: 'CSV Member Import', icon: '📤', desc: 'Allow bulk importing members via CSV wizard' },
-                                    { key: 'memberExport', label: 'CSV Member Export', icon: '📥', desc: 'Allow exporting selected members to a CSV file' }
+                                    { key: 'memberExport', label: 'CSV Member Export', icon: '📥', desc: 'Allow exporting selected members to a CSV file' },
+                                    { key: 'autoWhatsappReminders', label: 'Auto WhatsApp Reminders', icon: '🔔', desc: 'Auto-send at 3 days before, on expiry day, and 3 days after' },
                                 ].map((feature) => (
                                     <button
                                         key={feature.key}
@@ -427,6 +468,79 @@ const GymDetails = () => {
                                         </div>
                                     </button>
                                 ))}
+                            </div>
+                        </motion.div>
+
+                        {/* Linked Admins */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800 shadow-xl shadow-gray-200/20 dark:shadow-none overflow-hidden"
+                        >
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 bg-gray-50/30 dark:bg-zinc-800/10">
+                                <div className="flex items-center gap-3 mb-5">
+                                    <div className="p-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl text-zinc-900">
+                                        <FaLink size={18} />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-gray-900 dark:text-white">Linked Admins</h3>
+                                        <p className="text-xs text-gray-500">Gym admins with access to this fit club (multi-gym)</p>
+                                    </div>
+                                </div>
+                                <form onSubmit={handleLinkAdmin} className="flex gap-2">
+                                    <input
+                                        type="email"
+                                        placeholder="Enter admin email to link..."
+                                        value={linkEmail}
+                                        onChange={(e) => setLinkEmail(e.target.value)}
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-zinc-950 border border-gray-200 dark:border-zinc-700 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-400 dark:focus:border-zinc-600 transition-all"
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={linkLoading || !linkEmail.trim()}
+                                        className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold flex items-center gap-2 disabled:opacity-40 transition-all"
+                                    >
+                                        {linkLoading ? <ButtonSpinner /> : <FaUserPlus size={12} />}
+                                        Link
+                                    </button>
+                                </form>
+                            </div>
+                            <div className="divide-y divide-gray-50 dark:divide-zinc-800">
+                                {linkedAdminsLoading ? (
+                                    <div className="p-6 text-center text-sm text-gray-400">Loading...</div>
+                                ) : linkedAdmins.length === 0 ? (
+                                    <div className="p-8 text-center">
+                                        <p className="text-sm text-gray-400">No linked admins yet.</p>
+                                    </div>
+                                ) : (
+                                    linkedAdmins.map((user) => {
+                                        const isPrimary = user.gymId?.toString() === id;
+                                        return (
+                                            <div key={user._id} className="p-5 flex items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-colors">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-700 dark:text-zinc-300 text-sm uppercase shrink-0">
+                                                        {user.name?.charAt(0)}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-gray-900 dark:text-white leading-tight">{user.name}</p>
+                                                        <p className="text-xs text-gray-400">{user.email}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2 shrink-0">
+                                                    {isPrimary && (
+                                                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40">
+                                                            Primary
+                                                        </span>
+                                                    )}
+                                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 uppercase tracking-wide">
+                                                        {user.role}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })
+                                )}
                             </div>
                         </motion.div>
 

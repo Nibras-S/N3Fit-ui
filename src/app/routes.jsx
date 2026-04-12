@@ -1,40 +1,51 @@
+import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../shared/components/guards/ProtectedRoute';
 import LoginGuard from '../features/auth/components/LoginGuard';
+import { PageSkeleton } from '../shared/components/ui/Skeleton';
+import AppLayout from '../shared/components/layout/AppLayout';
 
-// ── Feature Pages ────────────────────────────────────────────────
-import LandingPage from '../features/landing/pages/LandingPage';
+/** Fallback shown while a lazy page chunk loads — keeps sidebar visible */
+const LayoutSkeleton = () => (
+    <AppLayout showGenderSwitch={false}>
+        <PageSkeleton />
+    </AppLayout>
+);
+
+// ── Feature Pages (lazy-loaded for code splitting) ───────────────
+const LandingPage = lazy(() => import('../features/landing/pages/LandingPage'));
 
 // Members
-import MembersPage from '../features/members/pages/MembersPage';
-import MemberProfilePage from '../features/members/pages/MemberProfilePage';
-import RegisterMemberPage from '../features/members/pages/RegisterMemberPage';
-import InactiveSoonPage from '../features/members/pages/InactiveSoonPage';
-import MembershipCardPage from '../features/members/pages/MembershipCardPage';
+const MembersPage = lazy(() => import('../features/members/pages/MembersPage'));
+const MemberProfilePage = lazy(() => import('../features/members/pages/MemberProfilePage'));
+const RegisterMemberPage = lazy(() => import('../features/members/pages/RegisterMemberPage'));
+const InactiveSoonPage = lazy(() => import('../features/members/pages/InactiveSoonPage'));
+const MembershipCardPage = lazy(() => import('../features/members/pages/MembershipCardPage'));
 
 // Dashboard & Analytics
-import DashboardPage from '../features/dashboard/pages/DashboardPage';
-import ExpensesPage from '../features/expenses/pages/ExpensesPage';
-import TransactionsPage from '../features/transactions/pages/TransactionsPage';
-import ReportsPage from '../features/reports/pages/ReportsPage';
-import IncomeDetailPage from '../features/reports/pages/IncomeDetailPage';
-import ExpenseDetailPage from '../features/reports/pages/ExpenseDetailPage';
+const DashboardPage = lazy(() => import('../features/dashboard/pages/DashboardPage'));
+const ExpensesPage = lazy(() => import('../features/expenses/pages/ExpensesPage'));
+const TransactionsPage = lazy(() => import('../features/transactions/pages/TransactionsPage'));
+const ReportsPage = lazy(() => import('../features/reports/pages/ReportsPage'));
+const IncomeDetailPage = lazy(() => import('../features/reports/pages/IncomeDetailPage'));
+const ExpenseDetailPage = lazy(() => import('../features/reports/pages/ExpenseDetailPage'));
 
 // Staff, Settings, Notifications, Whatsapp
-import StaffPage from '../features/staff/pages/StaffPage';
-import SettingsPage from '../features/settings/pages/SettingsPage';
-import NotificationsPage from '../features/notifications/pages/NotificationsPage';
-import AnnouncementPage from '../features/whatsapp/pages/AnnouncementPage';
+const StaffPage = lazy(() => import('../features/staff/pages/StaffPage'));
+const SettingsPage = lazy(() => import('../features/settings/pages/SettingsPage'));
+const NotificationsPage = lazy(() => import('../features/notifications/pages/NotificationsPage'));
+const AnnouncementPage = lazy(() => import('../features/whatsapp/pages/AnnouncementPage'));
 
 // Invoices
-import InvoicePage from '../features/invoices/pages/InvoicePage';
+const InvoicePage = lazy(() => import('../features/invoices/pages/InvoicePage'));
 
 // Super Admin
-import SuperAdminDashboard from '../features/superadmin/pages/SuperAdminDashboard';
-import GymDetailsPage from '../features/superadmin/pages/GymDetailsPage';
-import SuperAdminSettingsPage from '../features/superadmin/pages/SuperAdminSettingsPage';
-import SaaSPlanPage from '../features/superadmin/pages/SaaSPlanPage';
-import EnquiryPage from '../features/superadmin/pages/EnquiryPage';
+const SuperAdminDashboard = lazy(() => import('../features/superadmin/pages/SuperAdminDashboard'));
+const GymDetailsPage = lazy(() => import('../features/superadmin/pages/GymDetailsPage'));
+const SuperAdminSettingsPage = lazy(() => import('../features/superadmin/pages/SuperAdminSettingsPage'));
+const SaaSPlanPage = lazy(() => import('../features/superadmin/pages/SaaSPlanPage'));
+const EnquiryPage = lazy(() => import('../features/superadmin/pages/EnquiryPage'));
+const ManageAccountPage = lazy(() => import('../features/account/pages/ManageAccountPage'));
 
 // Detect if running as installed PWA (standalone mode)
 const isPWA = window.matchMedia('(display-mode: standalone)').matches
@@ -43,74 +54,78 @@ const isPWA = window.matchMedia('(display-mode: standalone)').matches
 /**
  * Centralized route configuration.
  * All routes are organized by access level.
+ * Pages are lazy-loaded for optimal bundle splitting.
  */
 export default function AppRoutes() {
     return (
-        <Routes>
-            {/* ── Public ──────────────────────────────────────────── */}
-            <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />
-            <Route path="/login" element={<LoginGuard />} />
-            <Route path="/admin" element={<LoginGuard />} />
+        <Suspense fallback={<LayoutSkeleton />}>
+            <Routes>
+                {/* ── Public ──────────────────────────────────────────── */}
+                <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />
+                <Route path="/login" element={<LoginGuard />} />
+                <Route path="/admin" element={<LoginGuard />} />
 
-            {/* ── All Authenticated Users ─────────────────────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
-                <Route path="/announcement" element={<AnnouncementPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-            </Route>
+                {/* ── All Authenticated Users ─────────────────────────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
+                    <Route path="/announcement" element={<AnnouncementPage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/account" element={<ManageAccountPage />} />
+                </Route>
 
-            {/* ── Gym Admin + Staff ───────────────────────────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-                <Route path="/members" element={<MembersPage />} />
-                <Route path="/members/:id" element={<MemberProfilePage />} />
-                <Route path="/members/:id/card" element={<MembershipCardPage />} />
-                <Route path="/register" element={<RegisterMemberPage />} />
-                <Route path="/inactivesoon" element={<InactiveSoonPage />} />
-                <Route path="/invoice/:id" element={<InvoicePage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                {/* Legacy redirects */}
-                <Route path="/active" element={<Navigate to="/members?tab=active" replace />} />
-                <Route path="/inactive" element={<Navigate to="/members?tab=expired" replace />} />
-                <Route path="/manageUsers" element={<Navigate to="/members?tab=all" replace />} />
-            </Route>
+                {/* ── Gym Admin + Staff ───────────────────────────────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                    <Route path="/members" element={<MembersPage />} />
+                    <Route path="/members/:id" element={<MemberProfilePage />} />
+                    <Route path="/members/:id/card" element={<MembershipCardPage />} />
+                    <Route path="/register" element={<RegisterMemberPage />} />
+                    <Route path="/inactivesoon" element={<InactiveSoonPage />} />
+                    <Route path="/invoice/:id" element={<InvoicePage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    {/* Legacy redirects */}
+                    <Route path="/active" element={<Navigate to="/members?tab=active" replace />} />
+                    <Route path="/inactive" element={<Navigate to="/members?tab=expired" replace />} />
+                    <Route path="/manageUsers" element={<Navigate to="/members?tab=all" replace />} />
+                </Route>
 
-            {/* ── Gym Admin + Staff with dashboard permission ─────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-            </Route>
+                {/* ── Gym Admin + Staff with dashboard permission ─────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                    <Route path="/dashboard" element={<DashboardPage />} />
+                </Route>
 
-            {/* ── Gym Admin + Staff with expenses permission ──────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-                <Route path="/expenses" element={<ExpensesPage />} />
-            </Route>
+                {/* ── Gym Admin + Staff with expenses permission ──────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                    <Route path="/expenses" element={<ExpensesPage />} />
+                </Route>
 
-            {/* ── Gym Admin + Staff with payments permission ──────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
-                <Route path="/transactions" element={<TransactionsPage />} />
-            </Route>
+                {/* ── Gym Admin + Staff with payments permission ──────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff']} />}>
+                    <Route path="/transactions" element={<TransactionsPage />} />
+                </Route>
 
-            {/* ── Gym Admin Only ──────────────────────────────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
-                <Route path="/staff" element={<StaffPage />} />
-            </Route>
+                {/* ── Gym Admin Only ──────────────────────────────────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin']} />}>
+                    <Route path="/staff" element={<StaffPage />} />
+                </Route>
 
-            {/* ── Analytics (Admin / Staff / Superadmin) ──────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
-                <Route path="/reports" element={<ReportsPage />} />
-                <Route path="/reports/income" element={<IncomeDetailPage />} />
-                <Route path="/reports/expense" element={<ExpenseDetailPage />} />
-            </Route>
+                {/* ── Analytics (Admin / Staff / Superadmin) ──────────── */}
+                <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
+                    <Route path="/reports" element={<ReportsPage />} />
+                    <Route path="/reports/income" element={<IncomeDetailPage />} />
+                    <Route path="/reports/expense" element={<ExpenseDetailPage />} />
+                </Route>
 
-            {/* ── Super Admin ─────────────────────────────────────── */}
-            <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
-                <Route path="/superadmin" element={<SuperAdminDashboard />} />
-                <Route path="/superadmin/gyms/:id" element={<GymDetailsPage />} />
-                <Route path="/superadmin/settings" element={<SuperAdminSettingsPage />} />
-                <Route path="/superadmin/plans" element={<SaaSPlanPage />} />
-                <Route path="/superadmin/enquiries" element={<EnquiryPage />} />
-            </Route>
+                {/* ── Super Admin ─────────────────────────────────────── */}
+                <Route element={<ProtectedRoute allowedRoles={['superadmin']} />}>
+                    <Route path="/superadmin" element={<SuperAdminDashboard />} />
+                    <Route path="/superadmin/gyms/:id" element={<GymDetailsPage />} />
+                    <Route path="/superadmin/settings" element={<SuperAdminSettingsPage />} />
+                    <Route path="/superadmin/plans" element={<SaaSPlanPage />} />
+                    <Route path="/superadmin/enquiries" element={<EnquiryPage />} />
+                </Route>
 
-            {/* ── Catch-all ───────────────────────────────────────── */}
-            <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+                {/* ── Catch-all ───────────────────────────────────────── */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+        </Suspense>
     );
 }

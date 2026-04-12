@@ -194,7 +194,8 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
                 contacts,
                 dateFormat
             });
-            const { success, duplicates, errors } = response.data.data;
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const { success, duplicates, errors } = response.data;
 
             toast.success(
                 <div className="flex flex-col gap-1">

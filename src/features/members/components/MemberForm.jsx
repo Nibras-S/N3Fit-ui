@@ -88,8 +88,8 @@ function NewMember() {
   useEffect(() => {
     api.get(`/settings`)
       .then(res => {
-        // Handle both new { success, data: {...} } and old direct object shapes
-        const data = res.data?.data ?? res.data;
+        // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+        const data = res.data;
         setAdmissionFee(data?.admissionFee || 0);
         setSettings(data);
         // Set default plan to first active plan

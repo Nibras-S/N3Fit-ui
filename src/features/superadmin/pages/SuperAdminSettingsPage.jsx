@@ -24,9 +24,8 @@ const SuperAdminSettings = () => {
         setLoading(true);
         try {
             const res = await api.get('/superadmin/gyms/deleted');
-            const data = Array.isArray(res.data?.data) ? res.data.data
-                : Array.isArray(res.data?.gyms) ? res.data.gyms
-                    : Array.isArray(res.data) ? res.data : [];
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const data = Array.isArray(res.data) ? res.data : [];
             setDeletedGyms(data);
         } catch (err) {
             toast.error("Failed to load deleted gyms");

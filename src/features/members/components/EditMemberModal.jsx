@@ -54,10 +54,10 @@ const EditMemberModal = ({ memberId, onClose, onUpdate }) => {
                 setFormData(memberData);
                 setOriginalData({ ...memberData });
 
-                const settingsData = settingsRes.data?.data ?? settingsRes.data;
-                setSettings(settingsData);
+                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+                setSettings(settingsRes.data);
             } catch (error) {
-                toast.error('Failed to load member data');
+                console.error('Failed to load member data', error);
                 onClose();
             } finally {
                 setLoading(false);

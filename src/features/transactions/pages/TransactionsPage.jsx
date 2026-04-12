@@ -2,11 +2,13 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
-import { FaSearch, FaArrowLeft, FaSlidersH, FaTimes } from 'react-icons/fa';
+import { FaSearch, FaSlidersH, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
 import { AnimatePresence, motion } from 'framer-motion';
+import usePersistedFilters from '../../../shared/hooks/usePersistedFilters';
+import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 
 const STATUS_OPTS  = ['All Statuses', 'Paid', 'Partial', 'Pending'];
 const METHOD_OPTS  = ['All Methods', 'Cash', 'UPI', 'Card', 'Bank Transfer'];
@@ -25,8 +27,8 @@ const TransactionsPage = () => {
     const [loading, setLoading] = useState(true);
     const [sortConfig, setSortConfig] = useState({ key: 'transactionDate', direction: 'desc' });
 
-    // Unified filter state
-    const [filters, setFilters]       = useState(DEFAULT_FILTERS);
+    // Unified filter state — persisted to DB via usePersistedFilters
+    const [filters, setFilters, clearFilters] = usePersistedFilters('transactions:filters', DEFAULT_FILTERS);
     // Draft filters inside the mobile sheet
     const [draft, setDraft]           = useState(DEFAULT_FILTERS);
     const [sheetOpen, setSheetOpen]   = useState(false);
@@ -43,11 +45,19 @@ const TransactionsPage = () => {
         return n;
     }, [filters]);
 
+    // Record payment modal state
+    const [payModal, setPayModal] = useState(null); // null or transaction object
+
+    const openPayModal = (tx) => setPayModal(tx);
+    const closePayModal = () => setPayModal(null);
+    const handlePaid = () => { closePayModal(); fetchTransactions(); };
+
     const fetchTransactions = useCallback(async () => {
         setLoading(true);
         try {
             const response = await api.get('/transactions');
-            const list = response.data?.data ?? response.data;
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const list = response.data?.data;
             setTransactions(Array.isArray(list) ? list : []);
         } catch {
             toast.error('Failed to load transactions');
@@ -180,12 +190,22 @@ const TransactionsPage = () => {
     ];
 
     const renderActions = (row) => (
-        <button
-            onClick={() => navigate(`/invoice/${row._id}`)}
-            className="text-zinc-900 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-white text-sm font-medium"
-        >
-            Invoice
-        </button>
+        <div className="flex items-center gap-2">
+            {row.paymentStatus !== 'Paid' && row.paymentStatus !== 'Refunded' && (
+                <button
+                    onClick={() => openPayModal(row)}
+                    className="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors"
+                >
+                    Mark as Paid
+                </button>
+            )}
+            <button
+                onClick={() => navigate(`/invoice/${row._id}`)}
+                className="text-zinc-900 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-white text-sm font-medium"
+            >
+                Invoice
+            </button>
+        </div>
     );
 
     const renderMobileCard = (row) => (
@@ -207,12 +227,22 @@ const TransactionsPage = () => {
                     <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(row.amount)}</span>
                     {methodBadge(row.paymentMethod)}
                 </div>
-                <button
-                    onClick={() => navigate(`/invoice/${row._id}`)}
-                    className="text-zinc-900 dark:text-zinc-300 text-xs font-medium"
-                >
-                    Invoice →
-                </button>
+                <div className="flex items-center gap-3">
+                    {row.paymentStatus !== 'Paid' && row.paymentStatus !== 'Refunded' && (
+                        <button
+                            onClick={() => openPayModal(row)}
+                            className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors"
+                        >
+                            Mark as Paid
+                        </button>
+                    )}
+                    <button
+                        onClick={() => navigate(`/invoice/${row._id}`)}
+                        className="text-zinc-900 dark:text-zinc-300 text-xs font-medium"
+                    >
+                        Invoice →
+                    </button>
+                </div>
             </div>
         </>
     );
@@ -236,19 +266,11 @@ const TransactionsPage = () => {
         <AppLayout showGenderSwitch={false}>
             <div className="space-y-4">
                 {/* Header */}
-                <div className="flex items-center gap-3">
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-gray-500 dark:text-gray-400"
-                    >
-                        <FaArrowLeft />
-                    </button>
-                    <div>
-                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
-                        <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                            {filteredTransactions.length} of {transactions.length} records
-                        </p>
-                    </div>
+                <div>
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                        {filteredTransactions.length} of {transactions.length} records
+                    </p>
                 </div>
 
                 {/* ── DESKTOP filter bar (hidden on mobile) ── */}
@@ -318,7 +340,7 @@ const TransactionsPage = () => {
                     {/* Reset */}
                     {activeFilterCount > 0 && (
                         <button
-                            onClick={() => setFilters(DEFAULT_FILTERS)}
+                            onClick={() => clearFilters()}
                             className="text-xs text-gray-500 dark:text-gray-400 hover:text-zinc-900 dark:hover:text-white font-medium flex items-center gap-1 transition-colors shrink-0"
                         >
                             <FaTimes size={10} /> Reset
@@ -381,6 +403,18 @@ const TransactionsPage = () => {
                     />
                 </div>
             </div>
+
+            {/* ── RECORD PAYMENT MODAL ── */}
+            {payModal && (
+                <RecordPaymentModal
+                    transactionId={payModal._id}
+                    totalAmount={payModal.amount}
+                    paidSoFar={payModal.paidAmount || 0}
+                    memberName={payModal.memberName}
+                    onClose={closePayModal}
+                    onPaid={handlePaid}
+                />
+            )}
 
             {/* ── MOBILE BOTTOM SHEET ── */}
             <AnimatePresence>

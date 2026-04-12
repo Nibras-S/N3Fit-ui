@@ -141,8 +141,8 @@ const Settings = () => {
         setSaving(true);
         try {
             const res = await api.put("/gym/profile", gymForm);
-            // Handle both new { success, data: {...} } and old direct object shapes
-            const gymData = res.data?.data ?? res.data;
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const gymData = res.data;
             if (gymData && gymData._id) setGym(gymData);
             toast.success("Gym profile updated!");
             setIsEditingBranding(false);

@@ -53,6 +53,7 @@ export function AppLayout({
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [gymSwitcherOpen, setGymSwitcherOpen] = useState(false);
 
   // Network indicator + page-title source for the mobile header.
   const { status: networkStatus } = useOnlineStatus();
@@ -81,7 +82,7 @@ export function AppLayout({
 
   const { theme, toggleTheme } = useTheme();
   const { isDirty, setDirty } = useFormState();
-  const { user, logout, hasFeature, api } = useAuth();
+  const { user, logout, hasFeature, switchGym, api } = useAuth();
   const {
     unreadCount,
     activeWarning,
@@ -315,6 +316,57 @@ export function AppLayout({
 
 
 
+          {/* Gym Switcher (multi-gym admins only) */}
+          {!isCollapsed && user?.allGyms?.length > 1 && (
+            <div className="relative mb-4">
+              <button
+                type="button"
+                onClick={() => setGymSwitcherOpen(o => !o)}
+                className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 transition-all text-left"
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <FaBuilding className="text-gray-400 dark:text-zinc-500 shrink-0 text-xs" />
+                  <span className="text-xs font-medium text-gray-700 dark:text-gray-300 truncate">{gymName}</span>
+                </div>
+                <FaExchangeAlt className={`text-gray-400 dark:text-zinc-500 text-xs shrink-0 transition-transform ${gymSwitcherOpen ? 'rotate-90' : ''}`} />
+              </button>
+              <AnimatePresence>
+                {gymSwitcherOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -4, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                    className="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden"
+                  >
+                    {user.allGyms.map((gym) => {
+                      const isActive = (gym._id?.toString()) === ((user.activeGymId || user.gymId)?.toString());
+                      return (
+                        <button
+                          key={gym._id}
+                          type="button"
+                          onClick={async () => {
+                            setGymSwitcherOpen(false);
+                            if (!isActive) {
+                              try { await switchGym(gym._id?.toString()); window.location.href = '/dashboard'; }
+                              catch (_) { }
+                            }
+                          }}
+                          className={`w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800 ${isActive ? 'bg-gray-50 dark:bg-zinc-800/60' : ''}`}
+                        >
+                          <div className="w-6 h-6 rounded-lg overflow-hidden bg-gray-100 dark:bg-zinc-700 flex items-center justify-center shrink-0">
+                            {gym.logo ? <img src={gym.logo} alt="" className="w-full h-full object-cover" /> : <FaBuilding className="text-gray-400 text-[8px]" />}
+                          </div>
+                          <span className={`text-xs font-medium truncate flex-1 ${isActive ? 'text-zinc-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{gym.name}</span>
+                          {isActive && <div className="w-1.5 h-1.5 rounded-full bg-zinc-900 dark:bg-white shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
           {/* Navigation */}
           <nav className="flex-1 space-y-0.5 overflow-y-auto custom-scrollbar">
             {!isCollapsed && (
@@ -520,7 +572,7 @@ export function AppLayout({
                       <div className="p-2 space-y-0.5">
                         <button
                           onClick={() => {
-                            safeNavigate(user?.role === 'superadmin' ? '/superadmin/settings' : '/settings');
+                            safeNavigate('/account');
                             setProfileModalOpen(false);
                           }}
                           className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"

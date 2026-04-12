@@ -27,7 +27,13 @@ const SuperAdminDashboard = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [form, setForm] = useState({
         name: "", contactEmail: "", contactPhone: "", address: "",
-        adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: ""
+        adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: "",
+        maxLoginStaff: 1,
+        features: {
+            profilePhoto: true, expenses: true, announcements: true,
+            whatsappNotifications: false, memberImport: false, memberExport: false,
+            autoWhatsappReminders: false,
+        },
     });
 
     // Deletion Modal State
@@ -79,7 +85,16 @@ const SuperAdminDashboard = () => {
             await api.post('/superadmin/gyms', form);
             toast.success("Gym created successfully!");
             setModalOpen(false);
-            setForm({ name: "", contactEmail: "", contactPhone: "", address: "", adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: "" });
+            setForm({
+                name: "", contactEmail: "", contactPhone: "", address: "",
+                adminName: "", adminEmail: "", adminPassword: "", saaSPlanId: "",
+                maxLoginStaff: 1,
+                features: {
+                    profilePhoto: true, expenses: true, announcements: true,
+                    whatsappNotifications: false, memberImport: false, memberExport: false,
+                    autoWhatsappReminders: false,
+                },
+            });
             fetchAll();
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to create gym");
@@ -436,6 +451,44 @@ const SuperAdminDashboard = () => {
                                             {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                                         </button>
                                     </div>
+                                </div>
+
+                                {/* Access & Features */}
+                                <div className="border-t border-gray-100 dark:border-zinc-800 pt-4 mt-4">
+                                    <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Access & Features</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Max Login Staff</label>
+                                    <input
+                                        type="number"
+                                        min={1}
+                                        max={20}
+                                        value={form.maxLoginStaff}
+                                        onChange={(e) => setForm(p => ({ ...p, maxLoginStaff: Math.max(1, parseInt(e.target.value, 10) || 1) }))}
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                    />
+                                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Number of staff members who can log in to the app</p>
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {[
+                                        { key: 'profilePhoto', label: 'Profile Photos' },
+                                        { key: 'expenses', label: 'Expenses' },
+                                        { key: 'announcements', label: 'Announcements' },
+                                        { key: 'whatsappNotifications', label: 'WhatsApp Notify' },
+                                        { key: 'memberImport', label: 'Member Import' },
+                                        { key: 'memberExport', label: 'Member Export' },
+                                        { key: 'autoWhatsappReminders', label: 'Auto WA Reminders' },
+                                    ].map(({ key, label }) => (
+                                        <label key={key} className="flex items-center gap-2 p-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/40 border border-gray-100 dark:border-zinc-700/50 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={form.features[key]}
+                                                onChange={(e) => setForm(p => ({ ...p, features: { ...p.features, [key]: e.target.checked } }))}
+                                                className="w-3.5 h-3.5 rounded accent-zinc-900"
+                                            />
+                                            <span className="text-xs text-gray-700 dark:text-gray-300 font-medium">{label}</span>
+                                        </label>
+                                    ))}
                                 </div>
 
                                 <div className="flex gap-3 pt-2">

@@ -45,9 +45,8 @@ const Announcement = () => {
         setFetchingGyms(true);
         try {
             const res = await api.get('/superadmin/gyms');
-            const data = Array.isArray(res.data?.data) ? res.data.data
-                : Array.isArray(res.data?.gyms) ? res.data.gyms
-                    : Array.isArray(res.data) ? res.data : [];
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const data = Array.isArray(res.data) ? res.data : [];
             setGyms(data);
         } catch (err) {
             toast.error('Failed to load gyms');
@@ -59,9 +58,8 @@ const Announcement = () => {
     const fetchContacts = async () => {
         try {
             const res = await api.get('/contacts/');
-            const data = Array.isArray(res.data?.data) ? res.data.data
-                : Array.isArray(res.data?.contacts) ? res.data.contacts
-                    : Array.isArray(res.data) ? res.data : [];
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const data = Array.isArray(res.data?.data) ? res.data.data : Array.isArray(res.data) ? res.data : [];
             setContacts(data);
         } catch (err) {
             toast.error('Failed to load contacts');
@@ -217,7 +215,26 @@ const Announcement = () => {
             <div className="mx-auto pb-10">
                 <Toaster position="top-right" />
 
-                {/* No more toggle - feature is strictly role-based */}
+                {/* Auto-reminder status info card (gym users only) */}
+                {user?.role !== 'superadmin' && (
+                    <div className={`mt-4 flex items-start gap-3 px-4 py-3 rounded-xl border text-sm ${
+                        user?.gym?.features?.autoWhatsappReminders
+                            ? 'bg-green-50 dark:bg-green-900/10 border-green-200 dark:border-green-900/40 text-green-800 dark:text-green-300'
+                            : 'bg-gray-50 dark:bg-zinc-800/50 border-gray-200 dark:border-zinc-700 text-gray-600 dark:text-gray-400'
+                    }`}>
+                        <FaBell className={`mt-0.5 shrink-0 ${user?.gym?.features?.autoWhatsappReminders ? 'text-green-500' : 'text-gray-400 dark:text-zinc-500'}`} />
+                        <div>
+                            <span className="font-medium">
+                                Auto reminders are {user?.gym?.features?.autoWhatsappReminders ? 'ON' : 'OFF'}
+                            </span>
+                            <span className="ml-1">
+                                {user?.gym?.features?.autoWhatsappReminders
+                                    ? '— Members receive automatic WhatsApp messages 3 days before, on expiry day, and 3 days after expiry.'
+                                    : '— Enable "Auto WhatsApp Reminders" from your gym settings to send automatic expiry reminders.'}
+                            </span>
+                        </div>
+                    </div>
+                )}
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                     {/* Draft Section */}

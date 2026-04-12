@@ -47,7 +47,7 @@ const StaffManagement = () => {
     const [modalOpen, setModalOpen] = useState(false);
     const [editingStaff, setEditingStaff] = useState(null); // null = create, object = edit
     const [formData, setFormData] = useState({
-        name: "", email: "", password: "", permissions: ["members", "payments"], joiningDate: ""
+        name: "", email: "", password: "", permissions: ["members", "payments"], joiningDate: "", hasLogin: true,
     });
     const [idProofFile, setIdProofFile] = useState(null); // newly selected File
     const [existingIdProofUrl, setExistingIdProofUrl] = useState(null); // already saved
@@ -66,13 +66,12 @@ const StaffManagement = () => {
                 api.get('/gym/staff'),
                 api.get('/gym/staff', { params: { archived: 'true' } }),
             ]);
-            const unwrap = (res) => Array.isArray(res.data?.data) ? res.data.data
-                : Array.isArray(res.data?.staff) ? res.data.staff
-                    : Array.isArray(res.data) ? res.data : [];
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const unwrap = (res) => Array.isArray(res.data) ? res.data : [];
             setActiveStaff(unwrap(activeRes));
             setArchivedStaff(unwrap(archivedRes));
         } catch (err) {
-            toast.error("Failed to load staff");
+            console.error('Failed to load staff', err);
         } finally {
             setLoading(false);
         }
@@ -98,6 +97,7 @@ const StaffManagement = () => {
             name: "", email: "", password: "",
             permissions: ["members", "payments"],
             joiningDate: "",
+            hasLogin: true,
         });
         setIdProofFile(null);
         setExistingIdProofUrl(null);
@@ -172,8 +172,11 @@ const StaffManagement = () => {
                 if (idProofFile) {
                     const fd = new FormData();
                     fd.append('name', formData.name);
-                    fd.append('email', formData.email);
-                    fd.append('password', formData.password);
+                    fd.append('hasLogin', formData.hasLogin ? 'true' : 'false');
+                    if (formData.hasLogin) {
+                        fd.append('email', formData.email);
+                        fd.append('password', formData.password);
+                    }
                     fd.append('role', 'staff');
                     fd.append('permissions', JSON.stringify(formData.permissions));
                     fd.append('joiningDate', formData.joiningDate || '');
@@ -184,8 +187,9 @@ const StaffManagement = () => {
                 } else {
                     await api.post('/auth/register', {
                         name: formData.name,
-                        email: formData.email,
-                        password: formData.password,
+                        hasLogin: formData.hasLogin,
+                        email: formData.hasLogin ? formData.email : undefined,
+                        password: formData.hasLogin ? formData.password : undefined,
                         role: 'staff',
                         permissions: formData.permissions,
                         joiningDate: formData.joiningDate || null,
@@ -424,10 +428,15 @@ const StaffManagement = () => {
                                                 <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500" : "bg-gray-100 dark:bg-zinc-800 text-gray-400"}`}>
                                                     {member.name?.charAt(0)?.toUpperCase()}
                                                 </div>
-                                                <span className="font-medium text-gray-900 dark:text-white text-sm">{member.name}</span>
+                                                <div>
+                                                    <span className="font-medium text-gray-900 dark:text-white text-sm">{member.name}</span>
+                                                    {member.hasLogin === false && (
+                                                        <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 font-medium">No Login</span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
-                                        <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{member.email}</td>
+                                        <td className="px-5 py-4 text-sm text-gray-500 dark:text-gray-400">{member.email || <span className="italic text-gray-300 dark:text-zinc-700">—</span>}</td>
                                         <td className="px-5 py-4">
                                             {view === 'archived' ? (
                                                 <span className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400">
@@ -572,8 +581,13 @@ const StaffManagement = () => {
                                                 {member.name?.charAt(0)?.toUpperCase()}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-gray-900 dark:text-white text-sm">{member.name}</p>
-                                                <p className="text-xs text-gray-500 dark:text-gray-400">{member.email}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="font-semibold text-gray-900 dark:text-white text-sm">{member.name}</p>
+                                                    {member.hasLogin === false && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-gray-100 dark:bg-zinc-800 text-gray-500 dark:text-gray-400 font-medium">No Login</span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{member.email || <span className="italic">No email</span>}</p>
                                                 {member.joiningDate && (
                                                     <p className="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
                                                         <FaCalendarAlt size={8} />
@@ -682,37 +696,58 @@ const StaffManagement = () => {
 
                                 {!editingStaff && (
                                     <>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
-                                            <input
-                                                type="email"
-                                                value={formData.email}
-                                                onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
-                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
-                                                placeholder="staff@example.com"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
-                                            <div className="relative">
-                                                <input
-                                                    type={showPassword ? "text" : "password"}
-                                                    value={formData.password}
-                                                    onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
-                                                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
-                                                    placeholder="Enter password"
-                                                    required
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowPassword(!showPassword)}
-                                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                                                >
-                                                    {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
-                                                </button>
+                                        {/* Login Access Toggle */}
+                                        <div className="flex items-center justify-between p-3 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700">
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">App Login Access</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                    {formData.hasLogin ? 'Staff can log in to the app' : 'Roster-only — no app access'}
+                                                </p>
                                             </div>
+                                            <button
+                                                type="button"
+                                                onClick={() => setFormData(p => ({ ...p, hasLogin: !p.hasLogin, email: '', password: '' }))}
+                                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.hasLogin ? 'bg-zinc-900 dark:bg-white' : 'bg-gray-300 dark:bg-zinc-700'}`}
+                                            >
+                                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-zinc-900 shadow transition-transform ${formData.hasLogin ? 'translate-x-6' : 'translate-x-1'}`} />
+                                            </button>
                                         </div>
+
+                                        {formData.hasLogin && (
+                                            <>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
+                                                    <input
+                                                        type="email"
+                                                        value={formData.email}
+                                                        onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
+                                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                                        placeholder="staff@example.com"
+                                                        required
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
+                                                    <div className="relative">
+                                                        <input
+                                                            type={showPassword ? "text" : "password"}
+                                                            value={formData.password}
+                                                            onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
+                                                            className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                                            placeholder="Enter password"
+                                                            required
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setShowPassword(!showPassword)}
+                                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                                        >
+                                                            {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
                                     </>
                                 )}
 

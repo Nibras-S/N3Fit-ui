@@ -59,7 +59,7 @@ const AllMembers = () => {
 
             const response = await api.get(`/contacts/`, { params });
 
-            // Response is auto-unwrapped to: { data: [], pagination: {} }
+            // response.data IS already the unwrapped payload — { data: [], pagination: {} }
             const data = response.data?.data || [];
             const pagination = response.data?.pagination || {};
 
@@ -97,7 +97,7 @@ const AllMembers = () => {
             await api.delete(`/contacts/${id}`);
             setMembers(prev => prev.filter(u => u._id !== id));
             toast.success('Member deleted');
-        } catch { toast.error('Failed to delete'); }
+        } catch (err) { console.error('Failed to delete member', err); }
     };
 
     const handleEditClick = (userId) => {

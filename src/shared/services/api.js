@@ -68,7 +68,8 @@ function extractErrorString(data) {
 
 api.interceptors.response.use(
     (response) => {
-        // Auto-unwrap standardized { success: true, data: ... } envelope
+        // Auto-unwrap standardized { success: true, data: ... } envelope.
+        // response.data IS already the unwrapped payload — don't re-unwrap in feature code.
         if (
             response.data &&
             typeof response.data === 'object' &&

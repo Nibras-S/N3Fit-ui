@@ -108,6 +108,25 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     /**
+     * Switch active gym context (multi-gym admins only).
+     * Calls the backend which re-issues the cookie with updated activeGymId.
+     * Returns the updated user object.
+     */
+    const switchGym = useCallback(async (gymId) => {
+        const res = await api.post('/auth/switch-gym', { gymId });
+        // After switching, reload the full user profile so all context is fresh
+        const meRes = await api.get('/auth/me');
+        const userData = meRes.data;
+        if (userData?.role || userData?.email) {
+            setUser(userData);
+            if (userData?.gym?.features) {
+                setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
+            }
+        }
+        return res.data;
+    }, []);
+
+    /**
      * Check if a feature toggle is enabled for the current gym.
      */
     const hasFeature = useCallback((featureName) => {
@@ -120,10 +139,12 @@ export const AuthProvider = ({ children }) => {
         login,
         refreshUser,
         logout,
+        switchGym,
         isAuthenticated: !!user,
         isSuperAdmin: user?.role === 'superadmin',
         isGymAdmin: user?.role === 'gymadmin',
         isStaff: user?.role === 'staff',
+        isMultiGym: (user?.allGyms?.length ?? 0) > 1,
         gymFeatures,
         hasFeature,
         api, // Pre-configured axios instance

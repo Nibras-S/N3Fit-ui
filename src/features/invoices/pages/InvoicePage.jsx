@@ -1,9 +1,26 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from '../../auth/context/AuthContext';
-import { FaPrint, FaArrowLeft, FaDownload, FaWhatsapp } from "react-icons/fa";
+import { FaPrint, FaArrowLeft } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
 import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
+
+const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
+
+const STATUS_STYLE = {
+    Paid:    'bg-green-100 text-green-700',
+    Partial: 'bg-amber-100 text-amber-700',
+    Pending: 'bg-zinc-100 text-zinc-700',
+    Refunded:'bg-red-100 text-red-700',
+};
+
+const METHOD_COLOR = {
+    Cash:           'text-green-700',
+    UPI:            'text-violet-700',
+    Card:           'text-sky-700',
+    'Bank Transfer':'text-amber-700',
+    Split:          'text-zinc-700',
+};
 
 const Invoice = () => {
     const { id } = useParams();
@@ -18,12 +35,9 @@ const Invoice = () => {
         const fetchInvoice = async () => {
             try {
                 const res = await api.get(`/transactions/${id}`);
-                // Handle both new { success, data: {...} } and old direct object shapes
-                const txData = res.data?.data ?? res.data;
-                setTransaction(txData);
+                setTransaction(res.data);
             } catch (err) {
                 toast.error("Failed to load invoice");
-                console.error(err);
             } finally {
                 setLoading(false);
             }
@@ -31,13 +45,11 @@ const Invoice = () => {
         fetchInvoice();
     }, [api, id]);
 
-    const handlePrint = () => {
-        window.print();
-    };
-
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d] p-6"><CardSkeleton className="max-w-2xl mx-auto" /></div>
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d] p-6">
+                <CardSkeleton className="max-w-2xl mx-auto" />
+            </div>
         );
     }
 
@@ -45,14 +57,33 @@ const Invoice = () => {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
                 <p className="text-gray-500">Invoice not found</p>
-                <button onClick={() => navigate(-1)} className="text-zinc-900 hover:underline">
-                    Go Back
-                </button>
+                <button onClick={() => navigate(-1)} className="text-zinc-900 hover:underline">Go Back</button>
             </div>
         );
     }
 
-    const { gymId: gym, memberId: member, amount, plan, paymentMethod, paymentStatus, transactionDate, _id } = transaction;
+    const {
+        gymId: gym,
+        memberName,
+        phone,
+        amount = 0,
+        discount = 0,
+        plan,
+        paymentMethod,
+        paymentStatus,
+        paidAmount = 0,
+        splits = [],
+        remarks,
+        transactionDate,
+        _id,
+    } = transaction;
+
+    const total = amount - discount;
+    const balanceDue = Math.max(0, total - paidAmount);
+    const isPartial = paymentStatus === 'Partial';
+    const isPending = paymentStatus === 'Pending';
+    const isSplit = paymentMethod === 'Split' && splits.length > 0;
+
     const invoiceDate = new Date(transactionDate).toLocaleDateString("en-IN", {
         day: "numeric", month: "long", year: "numeric"
     });
@@ -70,7 +101,7 @@ const Invoice = () => {
                     <FaArrowLeft /> Back
                 </button>
                 <button
-                    onClick={handlePrint}
+                    onClick={() => window.print()}
                     className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm text-sm"
                 >
                     <FaPrint /> <span className="hidden sm:inline">Print Invoice</span><span className="sm:hidden">Print</span>
@@ -82,9 +113,8 @@ const Invoice = () => {
                 ref={invoiceRef}
                 className="max-w-2xl mx-auto bg-white p-5 sm:p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100 print:shadow-none print:border-none print:w-full"
             >
-                {/* Header */}
+                {/* ── Header ── */}
                 <div className="border-b border-gray-100 pb-5 mb-6">
-                    {/* Top row: logo+name | INVOICE label */}
                     <div className="flex justify-between items-start gap-4 mb-4">
                         <div className="flex gap-3 items-center min-w-0">
                             {gym?.logo ? (
@@ -108,7 +138,6 @@ const Invoice = () => {
                         </div>
                     </div>
 
-                    {/* Contact + invoice meta in a grid */}
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
                         <div>
                             {gym?.contactPhone && <p>Tel: {gym.contactPhone}</p>}
@@ -118,7 +147,7 @@ const Invoice = () => {
                             <p>Invoice No: <span className="font-mono font-semibold text-gray-900">#{_id.slice(-6).toUpperCase()}</span></p>
                             <p>Date: <span className="font-medium text-gray-900">{invoiceDate}</span></p>
                             <p>Status:
-                                <span className={`ml-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-800'}`}>
+                                <span className={`ml-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${STATUS_STYLE[paymentStatus] || 'bg-zinc-100 text-zinc-700'}`}>
                                     {paymentStatus}
                                 </span>
                             </p>
@@ -126,14 +155,14 @@ const Invoice = () => {
                     </div>
                 </div>
 
-                {/* Bill To */}
+                {/* ── Bill To ── */}
                 <div className="mb-6">
                     <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Bill To</h3>
-                    <p className="font-bold text-base sm:text-lg text-gray-900">{transaction.memberName}</p>
-                    {transaction.phone && <p className="text-sm text-gray-500">Phone: {transaction.phone}</p>}
+                    <p className="font-bold text-base sm:text-lg text-gray-900">{memberName}</p>
+                    {phone && <p className="text-sm text-gray-500">Phone: {phone}</p>}
                 </div>
 
-                {/* Table */}
+                {/* ── Line Items ── */}
                 <div className="mb-6 overflow-x-auto">
                     <table className="w-full min-w-[300px]">
                         <thead>
@@ -150,31 +179,93 @@ const Invoice = () => {
                                     <p className="text-xs text-gray-500 mt-0.5">{plan} Plan</p>
                                 </td>
                                 <td className="py-3 px-3 text-sm text-gray-600 text-right whitespace-nowrap">{plan}</td>
-                                <td className="py-3 px-3 text-sm font-bold text-gray-900 text-right whitespace-nowrap">₹{amount.toLocaleString('en-IN')}</td>
+                                <td className="py-3 px-3 text-sm font-bold text-gray-900 text-right whitespace-nowrap">₹{fmt(amount)}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                {/* Totals */}
-                <div className="flex justify-end mb-8">
-                    <div className="w-full max-w-[220px] space-y-2.5">
+                {/* ── Totals + Payment Summary ── */}
+                <div className="flex flex-col sm:flex-row sm:justify-between gap-6 mb-8">
+
+                    {/* Payment Details (left column) */}
+                    <div className="flex-1">
+                        <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-3">Payment Details</h3>
+
+                        {/* Split breakdown */}
+                        {isSplit ? (
+                            <div className="space-y-1.5">
+                                {splits.map((s, i) => (
+                                    <div key={i} className="flex items-center justify-between text-sm">
+                                        <span className={`font-semibold ${METHOD_COLOR[s.paymentMethod] || 'text-gray-700'}`}>
+                                            {s.paymentMethod}
+                                        </span>
+                                        <span className="font-bold text-gray-900">₹{fmt(s.amount)}</span>
+                                    </div>
+                                ))}
+                                <div className="flex items-center justify-between text-xs text-gray-400 pt-1 border-t border-gray-100">
+                                    <span>Split across {splits.length} methods</span>
+                                    <span className="font-semibold text-gray-700">₹{fmt(paidAmount)}</span>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-2 text-sm">
+                                <span className={`font-semibold ${METHOD_COLOR[paymentMethod] || 'text-gray-700'}`}>
+                                    {paymentMethod || '—'}
+                                </span>
+                                {(isPartial || isPending) && paidAmount > 0 && (
+                                    <span className="text-gray-400 text-xs">· ₹{fmt(paidAmount)} paid</span>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Remarks/notes */}
+                        {remarks && (
+                            <p className="text-xs text-gray-400 mt-3 italic">Note: {remarks}</p>
+                        )}
+                    </div>
+
+                    {/* Totals (right column) */}
+                    <div className="w-full sm:w-[220px] space-y-2.5">
                         <div className="flex justify-between text-sm text-gray-600">
                             <span>Subtotal</span>
-                            <span>₹{amount.toLocaleString('en-IN')}</span>
+                            <span>₹{fmt(amount)}</span>
                         </div>
-                        <div className="flex justify-between text-sm text-gray-600">
-                            <span>Discount</span>
-                            <span>₹{transaction.discount || 0}</span>
-                        </div>
-                        <div className="flex justify-between text-base font-bold text-gray-900 pt-2.5 border-t border-gray-100">
+                        {discount > 0 && (
+                            <div className="flex justify-between text-sm text-green-700">
+                                <span>Discount</span>
+                                <span>− ₹{fmt(discount)}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between text-base font-bold text-gray-900 pt-2.5 border-t border-gray-200">
                             <span>Total</span>
-                            <span>₹{(amount - (transaction.discount || 0)).toLocaleString('en-IN')}</span>
+                            <span>₹{fmt(total)}</span>
                         </div>
+
+                        {/* Paid / Balance rows for partial/pending */}
+                        {(isPartial || isPending) && (
+                            <>
+                                <div className="flex justify-between text-sm text-green-700 pt-1">
+                                    <span className="font-medium">Paid</span>
+                                    <span className="font-bold">₹{fmt(paidAmount)}</span>
+                                </div>
+                                <div className="flex justify-between text-sm font-bold text-amber-700 pt-1 border-t border-gray-200">
+                                    <span>Balance Due</span>
+                                    <span>₹{fmt(balanceDue)}</span>
+                                </div>
+                            </>
+                        )}
+
+                        {/* Fully paid stamp */}
+                        {paymentStatus === 'Paid' && (
+                            <div className="mt-2 text-center py-1 rounded border border-green-200 bg-green-50 text-[10px] font-black text-green-700 uppercase tracking-widest">
+                                Paid in Full
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Footer */}
+                {/* ── Footer ── */}
                 <div className="border-t border-gray-100 pt-5 text-center text-sm text-gray-400">
                     <p>Thank you for your business!</p>
                     <p className="mt-1 text-xs">Generated via Fit Management Software</p>

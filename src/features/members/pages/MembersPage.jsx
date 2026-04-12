@@ -6,6 +6,7 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import EditMemberModal from '../components/EditMemberModal';
+import RecordPaymentModal from '../components/RecordPaymentModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
 import PageHeader from '../../../shared/components/layout/PageHeader';
@@ -30,6 +31,7 @@ const TOGGLEABLE_COLUMNS = [
     { key: 'dews', label: 'Days Left' },
     { key: 'endDate', label: 'End Date' },
     { key: 'createdAt', label: 'Joined On' },
+    { key: 'msgCount', label: 'Messages Sent' },
 ];
 
 // Sensible defaults — what shows out of the box. Start Date is intentionally
@@ -102,13 +104,8 @@ const MembersPage = () => {
 
     // ── Inline Renewal State ────────────────────────────────────
     const [renewingMemberId, setRenewingMemberId] = useState(null);
-    const [renewForm, setRenewForm] = useState({
-        plan: '',
-        date: '',
-        amount: '',
-        paymentMethod: 'Cash',
-        paymentStatus: 'Paid',
-    });
+    const [renewForm, setRenewForm] = useState({ plan: '', date: '', amount: '' });
+    const [renewalTxn, setRenewalTxn] = useState(null); // transaction awaiting payment recording
     const [settings, setSettings] = useState(null);
 
     // ── Expiring Soon count (for warning FAB) ───────────────────
@@ -153,16 +150,15 @@ const MembersPage = () => {
             if (tabCfg.key === 'all') params.includeExpired = true;
 
             const response = await api.get(`/contacts/`, { params });
-            // API returns { success, data: { data: [...], pagination: {...} } }
-            const payload = response.data?.data || response.data || {};
-            const data = payload.data || payload || [];
-            const pagination = payload.pagination || {};
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const data = response.data?.data || [];
+            const pagination = response.data?.pagination || {};
 
             setMembers(Array.isArray(data) ? data : []);
             setTotalRecords(pagination.total || 0);
             setPaginationMeta(pagination);
         } catch (error) {
-            toast.error('Failed to load members');
+            console.error('Failed to load members', error);
         } finally {
             setLoading(false);
         }
@@ -179,7 +175,8 @@ const MembersPage = () => {
     useEffect(() => {
         api.get(`/settings`)
             .then(res => {
-                const settingsData = res.data?.data ?? res.data;
+                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+                const settingsData = res.data;
                 setSettings(settingsData);
             })
             .catch(err => console.error('Failed to load settings', err));
@@ -209,7 +206,8 @@ const MembersPage = () => {
         const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
         api.get('/contacts/', { params: { status: tabCfg.status, page: 1, limit: 1 } })
             .then(res => {
-                const p = res.data?.data?.pagination || res.data?.pagination || {};
+                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+                const p = res.data?.pagination || {};
                 setAllStats({
                     total: p.total || 0,
                     male: p.male || 0,
@@ -241,48 +239,42 @@ const MembersPage = () => {
     // ── Renew ───────────────────────────────────────────────────
     const handleRenew = (memberId) => {
         if (renewingMemberId === memberId) {
-            setRenewingMemberId(null); // toggle off
+            setRenewingMemberId(null);
         } else {
-            setRenewForm({
-                plan: '',
-                date: '',
-                amount: '',
-                paymentMethod: 'Cash',
-                paymentStatus: 'Paid',
-            });
+            setRenewForm({ plan: '', date: '', amount: '' });
             setRenewingMemberId(memberId);
         }
     };
 
+    // Step 1: select plan+date+amount → backend creates Pending transaction
     const submitRenewal = async (memberId) => {
         if (!renewForm.plan || !renewForm.amount) {
             toast.error('Please select a plan and enter an amount');
             return;
         }
-
-        // Build a clean payload — drop empty strings and coerce numerics
-        // so the backend Joi schema accepts the request even when the user
-        // didn't pick a date.
-        const payload = { _isRenewal: true };
-        if (renewForm.plan) payload.plan = renewForm.plan;
+        const payload = { _isRenewal: true, plan: renewForm.plan, amount: Number(renewForm.amount) };
         if (renewForm.date) payload.date = renewForm.date;
-        if (renewForm.amount !== '' && renewForm.amount !== null) {
-            payload.amount = Number(renewForm.amount);
-        }
-        if (renewForm.paymentMethod) payload.paymentMethod = renewForm.paymentMethod;
-        if (renewForm.paymentStatus) payload.paymentStatus = renewForm.paymentStatus;
 
         try {
-            await api.put(`/contacts/${memberId}`, payload);
-            toast.success('Membership renewed successfully');
+            const res = await api.put(`/contacts/${memberId}`, payload);
+            // Backend returns { member, transaction } for renewal
+            const txn = res.data?.transaction || res.data;
             setRenewingMemberId(null);
-            fetchMembers(); // refresh
+            setRenewalTxn(txn); // open Step 2: RecordPaymentModal
         } catch (error) {
-            const detail = error.response?.data?.message
-                || error.response?.data?.error?.message
-                || 'Failed to renew membership';
-            toast.error(detail);
+            toast.error(
+                error.response?.data?.message ||
+                error.response?.data?.error?.message ||
+                'Failed to renew membership'
+            );
         }
+    };
+
+    // Step 2 completion: payment recorded → refresh list
+    const handleRenewalPaid = () => {
+        setRenewalTxn(null);
+        fetchMembers();
+        toast.success('Membership renewed and payment recorded!');
     };
 
     // ── WhatsApp ────────────────────────────────────────────────
@@ -412,6 +404,18 @@ const MembersPage = () => {
         },
         endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
         createdAt: { key: 'createdAt', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.createdAt)}</span> },
+        msgCount: {
+            key: 'msgCount', label: 'Messages Sent', sortable: false,
+            render: (row) => (
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    (row.msgCount ?? 0) > 0
+                        ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300'
+                        : 'text-gray-400 dark:text-gray-600'
+                }`}>
+                    {(row.msgCount ?? 0) > 0 ? `${row.msgCount} sent` : '0'}
+                </span>
+            ),
+        },
     }), []);
 
     const columns = useMemo(() => {
@@ -916,88 +920,119 @@ const MembersPage = () => {
                 </button>
             </div>
 
-            {/* Modals */}
+            {/* ── STEP 1: Plan + Date + Amount ── */}
             {renewingMemberId && renewingMember && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
-                        <div className="p-6 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-gray-50 dark:bg-zinc-900/50">
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <FaRedo className="text-zinc-700" /> Renew {renewingMember.name}
-                            </h3>
-                            <button onClick={() => setRenewingMemberId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+                <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
+                    <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl overflow-hidden">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                                    <FaRedo className="text-zinc-900 dark:text-white" size={14} />
+                                </div>
+                                <div>
+                                    <h3 className="font-black text-gray-900 dark:text-white text-base">Renew Membership</h3>
+                                    <p className="text-[11px] text-gray-500 dark:text-gray-400">{renewingMember.name}</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setRenewingMemberId(null)}
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-gray-400"
+                            >
                                 ✕
                             </button>
                         </div>
-                        <div className="p-6 space-y-4">
+
+                        {/* Body */}
+                        <div className="p-5 space-y-4">
+                            {/* Plan selector */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Plan</label>
-                                <select
-                                    value={renewForm.plan}
-                                    onChange={(e) => {
-                                        const newPlan = e.target.value;
-                                        const planObj = settings?.plans?.find(p => p.name === newPlan);
-                                        setRenewForm({
-                                            ...renewForm,
-                                            plan: newPlan,
-                                            amount: planObj ? planObj.price : '',
-                                        });
-                                    }}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                                >
-                                    <option value="">Select Plan...</option>
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Plan</label>
+                                <div className="grid grid-cols-2 gap-2">
                                     {settings?.plans?.filter(p => p.isActive)?.map((p, i) => (
-                                        <option key={i} value={p.name}>{p.name} (₹{p.price})</option>
+                                        <button
+                                            key={i}
+                                            type="button"
+                                            onClick={() => setRenewForm(f => ({ ...f, plan: p.name, amount: p.price }))}
+                                            className={`flex flex-col items-start px-4 py-3 rounded-xl border text-left transition-all ${
+                                                renewForm.plan === p.name
+                                                    ? 'bg-zinc-900 border-zinc-900 text-white'
+                                                    : 'bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:border-zinc-400'
+                                            }`}
+                                        >
+                                            <span className="text-xs font-black">{p.name}</span>
+                                            <span className={`text-[11px] font-semibold mt-0.5 ${renewForm.plan === p.name ? 'text-zinc-300' : 'text-gray-400'}`}>
+                                                ₹{Number(p.price).toLocaleString('en-IN')}
+                                            </span>
+                                        </button>
                                     ))}
-                                </select>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Start Date</label>
-                                    <DatePicker
-                                        value={renewForm.date}
-                                        onChange={(e) => setRenewForm({ ...renewForm, date: e.target.value })}
-                                    />
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount (₹)</label>
+                                {!settings?.plans?.length && (
+                                    <p className="text-xs text-gray-400 text-center py-3">No plans configured. Go to Settings to add plans.</p>
+                                )}
+                            </div>
+
+                            {/* Amount override */}
+                            <div>
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Amount (₹)</label>
+                                <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
+                                    <span className="text-gray-400 font-bold text-sm">₹</span>
                                     <input
                                         type="number"
+                                        min="0"
+                                        step="1"
                                         value={renewForm.amount}
-                                        onChange={(e) => setRenewForm({ ...renewForm, amount: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
+                                        onChange={(e) => setRenewForm(f => ({ ...f, amount: e.target.value }))}
+                                        placeholder="0"
+                                        className="flex-1 bg-transparent outline-none font-black text-lg text-gray-900 dark:text-white"
                                     />
                                 </div>
                             </div>
+
+                            {/* Start date (optional) */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Payment Method</label>
-                                <select
-                                    value={renewForm.paymentMethod}
-                                    onChange={(e) => setRenewForm({ ...renewForm, paymentMethod: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
-                                >
-                                    <option value="Cash">Cash</option>
-                                    <option value="UPI">UPI</option>
-                                    <option value="Card">Card</option>
-                                    <option value="Bank Transfer">Bank Transfer</option>
-                                </select>
+                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
+                                    Start Date <span className="text-gray-300 normal-case font-normal">(optional — defaults to today)</span>
+                                </label>
+                                <DatePicker
+                                    value={renewForm.date}
+                                    onChange={(e) => setRenewForm(f => ({ ...f, date: e.target.value }))}
+                                />
                             </div>
                         </div>
-                        <div className="p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 flex gap-3 dark:bg-zinc-900/50 justify-end">
+
+                        {/* Footer */}
+                        <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-zinc-800">
                             <button
+                                type="button"
                                 onClick={() => setRenewingMemberId(null)}
-                                className="px-6 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors font-medium text-sm"
+                                className="flex-1 py-3 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-100 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
+                                type="button"
                                 onClick={() => submitRenewal(renewingMemberId)}
-                                className="px-6 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-medium rounded-lg shadow-sm transition-colors text-sm"
+                                disabled={!renewForm.plan || !renewForm.amount}
+                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-zinc-900 hover:bg-zinc-800 text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                Renew Membership
+                                Continue to Payment →
                             </button>
                         </div>
                     </div>
                 </div>
+            )}
+
+            {/* ── STEP 2: Record Payment (RecordPaymentModal) ── */}
+            {renewalTxn && (
+                <RecordPaymentModal
+                    transactionId={renewalTxn._id}
+                    totalAmount={renewalTxn.amount}
+                    paidSoFar={0}
+                    memberName={renewalTxn.memberName}
+                    onClose={() => { setRenewalTxn(null); fetchMembers(); }}
+                    onPaid={handleRenewalPaid}
+                />
             )}
 
             <ConfirmModal

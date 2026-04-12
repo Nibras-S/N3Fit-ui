@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
+import socket from '../../../shared/hooks/useSocket';
 
 const NotificationContext = createContext(null);
 
@@ -11,17 +11,15 @@ export const NotificationProvider = ({ children }) => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [activeWarning, setActiveWarning] = useState(null);
     const [loading, setLoading] = useState(false);
-    const socket = useRef(null);
+    const socketRef = useRef(null);
 
     const fetchNotifications = async () => {
         if (!user || user.role === 'superadmin') return;
         setLoading(true);
         try {
             const res = await api.get('/notifications/my');
-            // Handle both new { success, data: [] } and old { success, notifications: [] } shapes
-            const data = Array.isArray(res.data?.data) ? res.data.data
-                : Array.isArray(res.data?.notifications) ? res.data.notifications
-                    : Array.isArray(res.data) ? res.data : [];
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const data = Array.isArray(res.data) ? res.data : [];
             setNotifications(data);
             setUnreadCount(data.filter(n => !n.isRead).length);
         } catch (err) {
@@ -36,8 +34,8 @@ export const NotificationProvider = ({ children }) => {
         if (!user || user.role === 'superadmin') return;
         try {
             const res = await api.get('/notifications/active-warning');
-            // Handle both new { success, data: {...} } and old direct object shapes
-            const warning = res.data?.data ?? res.data?.warning ?? (res.data?.success === undefined ? res.data : null);
+            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
+            const warning = res.data;
             if (warning && warning._id) {
                 setActiveWarning(warning);
             }
@@ -51,7 +49,6 @@ export const NotificationProvider = ({ children }) => {
             await api.patch(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
 
-            // Clear active warning if this was it
             if (activeWarning && activeWarning._id === id) {
                 setActiveWarning(null);
             }
@@ -73,16 +70,13 @@ export const NotificationProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        // Always tear down any existing socket before deciding what to do.
-        // Prevents accumulating connections when `user` changes (e.g. login,
-        // role swap, profile refresh).
-        if (socket.current) {
-            socket.current.removeAllListeners();
-            socket.current.disconnect();
-            socket.current = null;
+        // Disconnect the singleton from any previous session before re-connecting.
+        if (socketRef.current) {
+            socketRef.current.removeAllListeners();
+            socketRef.current.disconnect();
+            socketRef.current = null;
         }
 
-        // Only run for non-superadmin users
         if (!user || user.role === 'superadmin') {
             setNotifications([]);
             setUnreadCount(0);
@@ -93,18 +87,15 @@ export const NotificationProvider = ({ children }) => {
         fetchNotifications();
         checkWarning();
 
-        const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:4000';
-        const sock = io(backendUrl, {
-            withCredentials: true,
-            transports: ['websocket', 'polling'],
-        });
-        socket.current = sock;
+        // Use the singleton socket — never call io() directly in feature code
+        socket.connect();
+        socketRef.current = socket;
 
-        sock.on('connect', () => {
-            if (user.gymId) sock.emit('join_gym', user.gymId);
+        socket.on('connect', () => {
+            if (user.gymId) socket.emit('join_gym', user.gymId);
         });
 
-        sock.on('new_notification', (notif) => {
+        socket.on('new_notification', (notif) => {
             setNotifications((prev) => {
                 if (prev.some((n) => n._id === notif._id)) return prev;
                 return [notif, ...prev];
@@ -115,7 +106,7 @@ export const NotificationProvider = ({ children }) => {
             toast.success('New notification received!', { icon: '🔔', duration: 4000 });
         });
 
-        sock.on('notification_read', ({ notificationId, userId }) => {
+        socket.on('notification_read', ({ notificationId, userId }) => {
             if (userId === user._id) {
                 setNotifications((prev) => prev.map((n) =>
                     n._id === notificationId ? { ...n, isRead: true } : n,
@@ -124,9 +115,9 @@ export const NotificationProvider = ({ children }) => {
         });
 
         return () => {
-            sock.removeAllListeners();
-            sock.disconnect();
-            if (socket.current === sock) socket.current = null;
+            socket.removeAllListeners();
+            socket.disconnect();
+            socketRef.current = null;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
@@ -144,7 +135,7 @@ export const NotificationProvider = ({ children }) => {
         markAsRead,
         markAllAsRead,
         setActiveWarning,
-        socket, // expose for useGymSocket hook
+        socket: socketRef, // expose ref for useGymSocket hook
     };
 
     return (
