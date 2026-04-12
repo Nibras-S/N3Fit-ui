@@ -30,7 +30,7 @@ const sizes = {
 // Generate a stable background color based on the name
 function getColor(name = "") {
     const colors = [
-        "bg-brand-500", "bg-purple-500", "bg-pink-500", "bg-green-500",
+        "bg-zinc-1000", "bg-purple-500", "bg-pink-500", "bg-green-500",
         "bg-teal-500", "bg-orange-500", "bg-zinc-900", "bg-indigo-500",
         "bg-yellow-500", "bg-cyan-500",
     ];

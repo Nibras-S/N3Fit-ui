@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
 import api from '../../../shared/services/api';
@@ -137,7 +137,7 @@ const MembersPage = () => {
     }, [activeTab]);
 
     // ── Fetch members ───────────────────────────────────────────
-    const fetchMembers = async () => {
+    const fetchMembers = useCallback(async () => {
         setLoading(true);
         try {
             const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
@@ -166,11 +166,12 @@ const MembersPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
 
     useEffect(() => {
         fetchMembers();
-    }, [backendUrl, page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
+    }, [fetchMembers]);
 
     useGymSocket(['member:created', 'member:updated', 'member:deleted'], fetchMembers);
 
@@ -400,14 +401,14 @@ const MembersPage = () => {
         status: {
             key: 'status', label: 'Status',
             render: (row) => (
-                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-red-700 dark:text-red-400'}`}>
+                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
                     {row.dews > 0 ? 'Active' : 'Expired'}
                 </span>
             ),
         },
         dews: {
             key: 'dews', label: 'Days Left', sortable: true,
-            render: (row) => <span className={row.dews <= 0 ? 'text-red-500 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>,
+            render: (row) => <span className={row.dews <= 0 ? 'text-zinc-700 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>,
         },
         endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
         createdAt: { key: 'createdAt', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.createdAt)}</span> },
@@ -419,7 +420,7 @@ const MembersPage = () => {
             render: (row) => (
                 <div className="flex items-center gap-3 group">
                     {row.profileImage ? (
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
+                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm">
                             <img
                                 src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
                                 alt={row.name}
@@ -428,11 +429,11 @@ const MembersPage = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
-                    <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{row.name}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-zinc-900 dark:group-hover:text-zinc-500 transition-colors">{row.name}</span>
                 </div>
             ),
         };
@@ -476,10 +477,10 @@ const MembersPage = () => {
                     <FaWhatsapp />
                 </button>
             )}
-            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg" title="Edit">
+            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg" title="Edit">
                 <FaEdit />
             </button>
-            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg" title="Delete">
+            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg" title="Delete">
                 <FaTrash />
             </button>
         </div>
@@ -491,7 +492,7 @@ const MembersPage = () => {
             <div className="flex justify-between items-start mb-3 relative">
                 <div className="flex items-center gap-3">
                     {row.profileImage ? (
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-slate-600 shadow-sm">
+                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm">
                             <img
                                 src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
                                 alt={row.name}
@@ -500,7 +501,7 @@ const MembersPage = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
@@ -522,24 +523,24 @@ const MembersPage = () => {
                         </button>
                     )}
                     {activeTab === 'all' && (
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-red-700 dark:text-red-400'}`}>
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
                             {row.dews > 0 ? 'Active' : 'Expired'}
                         </span>
                     )}
                 </div>
             </div>
             <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
-                <span className={row.dews <= 0 ? 'text-red-500 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
+                <span className={row.dews <= 0 ? 'text-zinc-700 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
                 <span>{formatDate(row.endDate)}</span>
             </div>
-            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-slate-700" onClick={(e) => e.stopPropagation()}>
+            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800" onClick={(e) => e.stopPropagation()}>
                 <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaRedo size={11} /> Renew
                 </button>
-                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaEdit /> Edit
                 </button>
-                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
                     <FaTrash /> Delete
                 </button>
             </div>
@@ -556,31 +557,31 @@ const MembersPage = () => {
         <div className="flex flex-col items-center justify-center py-24 px-6 relative overflow-hidden">
             {/* Concentric rings background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60 dark:opacity-40">
-                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-slate-700" />
-                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-slate-700" />
-                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-slate-700 shadow-sm" />
-                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-zinc-800" />
+                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-zinc-800" />
+                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-zinc-800 shadow-sm" />
+                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-zinc-800" />
             </div>
 
             {/* Scattered Avatars on the rings */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 {/* Inner Ring Avatars */}
-                <img src="https://i.pravatar.cc/150?img=1" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 translate-x-[80px] -translate-y-[80px]" alt="avatar" />
-                <img src="https://i.pravatar.cc/150?img=2" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[90px] translate-y-[40px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=1" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-zinc-800 translate-x-[80px] -translate-y-[80px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=2" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-zinc-800 -translate-x-[90px] translate-y-[40px]" alt="avatar" />
 
                 {/* Middle Ring Avatars */}
-                <img src="https://i.pravatar.cc/150?img=3" className="absolute w-10 h-10 rounded-full border-2 border-white dark:border-slate-800 translate-x-[150px] translate-y-[60px]" alt="avatar" />
-                <img src="https://i.pravatar.cc/150?img=4" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[160px] -translate-y-[100px]" alt="avatar" />
-                <img src="https://i.pravatar.cc/150?img=5" className="absolute w-9 h-9 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[40px] translate-y-[160px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=3" className="absolute w-10 h-10 rounded-full border-2 border-white dark:border-zinc-800 translate-x-[150px] translate-y-[60px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=4" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-zinc-800 -translate-x-[160px] -translate-y-[100px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=5" className="absolute w-9 h-9 rounded-full border-2 border-white dark:border-zinc-800 -translate-x-[40px] translate-y-[160px]" alt="avatar" />
 
                 {/* Outer Ring Avatars */}
-                <img src="https://i.pravatar.cc/150?img=6" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-slate-800 translate-x-[220px] -translate-y-[150px]" alt="avatar" />
-                <img src="https://i.pravatar.cc/150?img=7" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-slate-800 -translate-x-[240px] translate-y-[120px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=6" className="absolute w-8 h-8 rounded-full border-2 border-white dark:border-zinc-800 translate-x-[220px] -translate-y-[150px]" alt="avatar" />
+                <img src="https://i.pravatar.cc/150?img=7" className="absolute w-7 h-7 rounded-full border-2 border-white dark:border-zinc-800 -translate-x-[240px] translate-y-[120px]" alt="avatar" />
             </div>
 
             {/* Center Icon */}
-            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 flex items-center justify-center mb-6 shadow-sm z-10">
-                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center">
+            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 flex items-center justify-center mb-6 shadow-sm z-10">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-center">
                     <FaSearch className="text-gray-400" size={18} />
                 </div>
             </div>
@@ -595,7 +596,7 @@ const MembersPage = () => {
             <div className="flex items-center gap-3 z-10">
                 <button
                     onClick={() => setSearchTerm('')}
-                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
                 >
                     Clear search
                 </button>
@@ -612,12 +613,12 @@ const MembersPage = () => {
     // Empty state (no members at all in tab)
     const EmptyTabState = () => (
         <div className="flex flex-col items-center justify-center py-20 px-6">
-            <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-slate-700 flex items-center justify-center mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center mb-4">
                 {activeTab === 'inactive' ? <FaUserTimes className="text-gray-400" size={22} /> : <FaUsers className="text-gray-400" size={22} />}
             </div>
             <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">No {currentTab.label.toLowerCase()}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 text-center mb-5">There are no members in this category yet.</p>
-            <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-lg bg-brand-50 text-brand-600 text-sm font-medium hover:bg-brand-100 transition-all flex items-center gap-2">
+            <button onClick={() => navigate('/register')} className="px-4 py-2 rounded-lg bg-zinc-100 text-zinc-900 text-sm font-medium hover:bg-zinc-200 transition-all flex items-center gap-2">
                 <FaUserPlus size={12} /> Add member
             </button>
         </div>
@@ -628,7 +629,7 @@ const MembersPage = () => {
             <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
             {/* ── Desktop Tab Bar ─────────────────────────────── */}
             <div className="hidden lg:block mb-6">
-                <div className="flex items-end justify-between border-b border-gray-200 dark:border-slate-700">
+                <div className="flex items-end justify-between border-b border-gray-200 dark:border-zinc-800">
                     {/* Tabs */}
                     <div className="flex gap-1">
                         {TAB_CONFIG.map(tab => {
@@ -639,14 +640,14 @@ const MembersPage = () => {
                                     key={tab.key}
                                     onClick={() => setActiveTab(tab.key)}
                                     className={`flex items-center gap-2 px-5 py-3 text-sm font-semibold border-b-2 transition-all ${isActive
-                                        ? 'border-zinc-900 text-red-600 dark:text-red-400 dark:border-red-400'
+                                        ? 'border-zinc-900 text-zinc-900 dark:text-zinc-500 dark:border-white'
                                         : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-white hover:border-gray-300'
                                         }`}
                                 >
                                     <Icon size={14} />
                                     {tab.label}
                                     {isActive && (
-                                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-700/50 text-red-700 dark:text-red-300">
+                                        <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 dark:text-zinc-300">
                                             {allStats.total}
                                         </span>
                                     )}
@@ -656,8 +657,8 @@ const MembersPage = () => {
                     </div>
                     {/* Right: stats pills */}
                     <div className="flex items-center gap-4 pb-2 text-sm text-gray-500 dark:text-gray-400">
-                        <span className="flex items-center gap-1.5"><FaUsers size={12} className="text-red-400" /> {allStats.total} total</span>
-                        <span className="flex items-center gap-1.5"><FaMale size={12} className="text-red-400" /> {allStats.male} male</span>
+                        <span className="flex items-center gap-1.5"><FaUsers size={12} className="text-zinc-500" /> {allStats.total} total</span>
+                        <span className="flex items-center gap-1.5"><FaMale size={12} className="text-zinc-500" /> {allStats.male} male</span>
                         <span className="flex items-center gap-1.5"><FaFemale size={12} className="text-pink-400" /> {allStats.female} female</span>
                     </div>
                 </div>
@@ -673,8 +674,8 @@ const MembersPage = () => {
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${isActive
-                                ? 'bg-brand-50 text-brand-600 shadow-md shadow-brand-200/50'
-                                : 'bg-white dark:bg-slate-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-slate-700'
+                                ? 'bg-zinc-100 text-zinc-900 shadow-md shadow-zinc-200/50'
+                                : 'bg-white dark:bg-zinc-900 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-zinc-800'
                                 }`}
                         >
                             <Icon size={11} />
@@ -686,10 +687,10 @@ const MembersPage = () => {
             </div>
 
             {/* ── Toolbar & Table Card (Combined Full Size) ── */}
-            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col mb-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col mb-4">
 
                 {/* Desktop Toolbar Header section */}
-                <div className="hidden lg:flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-slate-700">
+                <div className="hidden lg:flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
                     {/* Search */}
                     <div className="relative flex-1 min-w-48 max-w-sm">
                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
@@ -698,7 +699,7 @@ const MembersPage = () => {
                             placeholder="Search by name or phone..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full pl-9 pr-8 py-2 border border-gray-200 dark:border-zinc-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                         />
                         {searchTerm && (
                             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -713,7 +714,7 @@ const MembersPage = () => {
                             admins don't have to bounce off into an empty state to enroll. */}
                         <button
                             onClick={() => navigate('/register')}
-                            className="flex items-center gap-2 px-3 py-2 bg-brand-50 text-brand-600 rounded-lg text-sm font-bold hover:bg-brand-100 active:scale-95 transition-all shadow-sm shadow-brand-100/50"
+                            className="flex items-center gap-2 px-3 py-2 bg-zinc-100 text-zinc-900 rounded-lg text-sm font-bold hover:bg-zinc-200 active:scale-95 transition-all shadow-sm shadow-zinc-100/50"
                             title="Enroll a new member"
                         >
                             <FaUserPlus size={13} /><span className="hidden sm:inline">New Member</span>
@@ -724,7 +725,7 @@ const MembersPage = () => {
                             <button
                                 onClick={exportSelectedToCSV}
                                 disabled={selectedIds.length === 0}
-                                className="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 rounded-lg text-sm font-bold border border-red-100 dark:border-red-900/30 hover:bg-zinc-100 dark:hover:bg-red-900/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                className="flex items-center gap-2 px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 rounded-lg text-sm font-bold border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700/40 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 title={selectedIds.length === 0 ? 'Select members to export' : `Export ${selectedIds.length} selected`}
                             >
                                 <FaFileExport size={13} />
@@ -744,7 +745,7 @@ const MembersPage = () => {
                         <div className="relative">
                             <button
                                 onClick={() => setColumnChooserOpen(o => !o)}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-600"
+                                className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg transition-colors border border-gray-200 dark:border-zinc-700"
                                 title="Choose columns"
                             >
                                 <FaColumns size={13} />
@@ -756,8 +757,8 @@ const MembersPage = () => {
                                         className="fixed inset-0 z-30"
                                         onClick={() => setColumnChooserOpen(false)}
                                     />
-                                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl z-40 overflow-hidden">
-                                        <div className="px-4 py-3 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                                    <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-40 overflow-hidden">
+                                        <div className="px-4 py-3 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
                                             <span className="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">Show columns</span>
                                             <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 cursor-pointer">
                                                 <input
@@ -766,7 +767,7 @@ const MembersPage = () => {
                                                     onChange={(e) => setVisibleColumns(
                                                         e.target.checked ? TOGGLEABLE_COLUMNS.map(c => c.key) : []
                                                     )}
-                                                    className="w-3.5 h-3.5 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                                    className="w-3.5 h-3.5 rounded border-gray-300 text-zinc-900 focus:ring-red-500"
                                                 />
                                                 Select All
                                             </label>
@@ -774,7 +775,7 @@ const MembersPage = () => {
                                         <div className="max-h-72 overflow-y-auto py-1">
                                             {/* Name is always shown — render disabled checkbox so the user knows */}
                                             <label className="flex items-center gap-3 px-4 py-2 text-sm text-gray-400 dark:text-gray-500 cursor-not-allowed">
-                                                <input type="checkbox" checked disabled className="w-4 h-4 rounded border-gray-300 text-red-600" />
+                                                <input type="checkbox" checked disabled className="w-4 h-4 rounded border-gray-300 text-zinc-900" />
                                                 <span>Name</span>
                                                 <span className="ml-auto text-[10px] uppercase">Required</span>
                                             </label>
@@ -783,7 +784,7 @@ const MembersPage = () => {
                                                 return (
                                                     <label
                                                         key={col.key}
-                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer"
+                                                        className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer"
                                                     >
                                                         <input
                                                             type="checkbox"
@@ -793,15 +794,15 @@ const MembersPage = () => {
                                                                     ? [...prev, col.key]
                                                                     : prev.filter(k => k !== col.key));
                                                             }}
-                                                            className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                                            className="w-4 h-4 rounded border-gray-300 text-zinc-900 focus:ring-red-500"
                                                         />
                                                         <span>{col.label}</span>
-                                                        {checked && <FaCheck className="ml-auto text-red-500" size={10} />}
+                                                        {checked && <FaCheck className="ml-auto text-zinc-700" size={10} />}
                                                     </label>
                                                 );
                                             })}
                                         </div>
-                                        <div className="px-4 py-2 border-t border-gray-100 dark:border-slate-700 flex justify-between">
+                                        <div className="px-4 py-2 border-t border-gray-100 dark:border-zinc-800 flex justify-between">
                                             <button
                                                 onClick={() => setVisibleColumns(DEFAULT_VISIBLE_COLUMNS)}
                                                 className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
@@ -810,7 +811,7 @@ const MembersPage = () => {
                                             </button>
                                             <button
                                                 onClick={() => setColumnChooserOpen(false)}
-                                                className="text-xs font-medium text-red-600 hover:text-red-700"
+                                                className="text-xs font-medium text-zinc-900 hover:text-zinc-700"
                                             >
                                                 Done
                                             </button>
@@ -822,19 +823,19 @@ const MembersPage = () => {
 
                         <button
                             onClick={fetchMembers} disabled={loading}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-transparent dark:hover:border-slate-700"
+                            className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg transition-colors border border-transparent dark:hover:border-zinc-700"
                             title="Refresh"
                         >
                             <FaSync size={13} className={loading ? 'animate-spin' : ''} />
                         </button>
                         {/* Gender filter */}
-                        <div className="inline-flex bg-gray-100 dark:bg-slate-700/50 rounded-lg p-1 border border-gray-100 dark:border-slate-700">
+                        <div className="inline-flex bg-gray-100 dark:bg-zinc-800/50 rounded-lg p-1 border border-gray-100 dark:border-zinc-800">
                             {['all', 'Male', 'Female'].map(f => (
                                 <button
                                     key={f}
                                     onClick={() => setGenderFilter(f)}
                                     className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${genderFilter === f
-                                        ? 'bg-white dark:bg-slate-600 text-gray-900 dark:text-white shadow-sm'
+                                        ? 'bg-white dark:bg-zinc-700 text-gray-900 dark:text-white shadow-sm'
                                         : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
                                         }`}
                                 >
@@ -846,7 +847,7 @@ const MembersPage = () => {
                 </div>
 
                 {/* Mobile Toolbar */}
-                <div className="flex lg:hidden gap-3 px-4 py-3 border-b border-gray-200 dark:border-slate-700 items-center bg-gray-50/50 dark:bg-slate-800/50">
+                <div className="flex lg:hidden gap-3 px-4 py-3 border-b border-gray-200 dark:border-zinc-800 items-center bg-gray-50/50 dark:bg-zinc-900/50">
                     <div className="relative flex-1">
                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
                         <input
@@ -854,7 +855,7 @@ const MembersPage = () => {
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                            className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-zinc-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all text-sm bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                         />
                         {searchTerm && (
                             <button onClick={() => setSearchTerm('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -864,7 +865,7 @@ const MembersPage = () => {
                     </div>
                     <button
                         onClick={() => setIsFilterSheetOpen(true)}
-                        className="w-[38px] h-[38px] border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
+                        className="w-[38px] h-[38px] border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
                     >
                         <FaFilter size={14} />
                     </button>
@@ -896,7 +897,7 @@ const MembersPage = () => {
                         showSelection={activeTab === 'all'}
                         selectedIds={selectedIds}
                         onSelectionChange={setSelectedIds}
-                        hoverColor={activeTab === 'inactive' ? 'hover:bg-zinc-50 dark:hover:bg-red-900/10' : 'hover:bg-zinc-50 dark:hover:bg-red-900/10'}
+                        hoverColor={activeTab === 'inactive' ? 'hover:bg-zinc-50 dark:hover:bg-zinc-800/20' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/20'}
                         gender={genderFilter}
                         serverSide={true}
                         count={totalRecords}
@@ -913,7 +914,7 @@ const MembersPage = () => {
             <div className="fixed bottom-24 right-4 z-10 lg:bottom-6 lg:right-6">
                 <button
                     onClick={() => navigate('/inactivesoon')}
-                    className="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-shadow relative"
+                    className="flex items-center justify-center w-14 h-14 rounded-full bg-white dark:bg-zinc-900 shadow-lg border border-gray-200 dark:border-zinc-800 hover:shadow-xl transition-shadow relative"
                     aria-label="Expiring Soon"
                 >
                     <FaExclamationTriangle className="text-orange-500 text-xl" />
@@ -928,10 +929,10 @@ const MembersPage = () => {
             {/* Modals */}
             {renewingMemberId && renewingMember && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
-                        <div className="p-6 border-b border-gray-100 dark:border-slate-700 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all">
+                        <div className="p-6 border-b border-gray-100 dark:border-zinc-800 flex justify-between items-center bg-gray-50 dark:bg-zinc-900/50">
                             <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                                <FaRedo className="text-red-500" /> Renew {renewingMember.name}
+                                <FaRedo className="text-zinc-700" /> Renew {renewingMember.name}
                             </h3>
                             <button onClick={() => setRenewingMemberId(null)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
                                 ✕
@@ -951,7 +952,7 @@ const MembersPage = () => {
                                             amount: planObj ? planObj.price : '',
                                         });
                                     }}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                                 >
                                     <option value="">Select Plan...</option>
                                     {settings?.plans?.filter(p => p.isActive)?.map((p, i) => (
@@ -973,7 +974,7 @@ const MembersPage = () => {
                                         type="number"
                                         value={renewForm.amount}
                                         onChange={(e) => setRenewForm({ ...renewForm, amount: e.target.value })}
-                                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                        className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                                     />
                                 </div>
                             </div>
@@ -982,7 +983,7 @@ const MembersPage = () => {
                                 <select
                                     value={renewForm.paymentMethod}
                                     onChange={(e) => setRenewForm({ ...renewForm, paymentMethod: e.target.value })}
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-slate-700 text-gray-900 dark:text-white"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white"
                                 >
                                     <option value="Cash">Cash</option>
                                     <option value="UPI">UPI</option>
@@ -991,10 +992,10 @@ const MembersPage = () => {
                                 </select>
                             </div>
                         </div>
-                        <div className="p-6 border-t border-gray-100 dark:border-slate-700 bg-gray-50 flex gap-3 dark:bg-slate-800/50 justify-end">
+                        <div className="p-6 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 flex gap-3 dark:bg-zinc-900/50 justify-end">
                             <button
                                 onClick={() => setRenewingMemberId(null)}
-                                className="px-6 py-2 border border-gray-300 dark:border-slate-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors font-medium text-sm"
+                                className="px-6 py-2 border border-gray-300 dark:border-zinc-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors font-medium text-sm"
                             >
                                 Cancel
                             </button>
@@ -1041,22 +1042,22 @@ const MembersPage = () => {
                             animate={{ y: 0 }}
                             exit={{ y: "100%" }}
                             transition={{ type: "tween", duration: 0.3 }}
-                            className="fixed inset-x-0 bottom-0 z-[70] bg-white dark:bg-slate-800 rounded-t-3xl shadow-2xl pb-safe flex flex-col max-h-[85vh] lg:hidden"
+                            className="fixed inset-x-0 bottom-0 z-[70] bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl pb-safe flex flex-col max-h-[85vh] lg:hidden"
                         >
                             {/* Drag Handle */}
                             <div className="flex justify-center pt-3 pb-2 shrink-0">
-                                <div className="w-12 h-1.5 bg-gray-300 dark:bg-slate-600 rounded-full" />
+                                <div className="w-12 h-1.5 bg-gray-300 dark:bg-zinc-700 rounded-full" />
                             </div>
 
                             {/* Header */}
-                            <div className="flex justify-between items-center px-6 pb-4 border-b border-gray-100 dark:border-slate-700 shrink-0">
+                            <div className="flex justify-between items-center px-6 pb-4 border-b border-gray-100 dark:border-zinc-800 shrink-0">
                                 <h3 className="font-bold text-lg dark:text-white tracking-tight">Filters</h3>
                                 <button
                                     onClick={() => {
                                         setGenderFilter('all');
                                         setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
                                     }}
-                                    className="text-red-600 font-semibold text-sm"
+                                    className="text-zinc-900 font-semibold text-sm"
                                 >
                                     Reset all
                                 </button>
@@ -1073,8 +1074,8 @@ const MembersPage = () => {
                                                 key={f}
                                                 onClick={() => setGenderFilter(f)}
                                                 className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${genderFilter === f
-                                                    ? 'bg-zinc-900 border border-zinc-900 text-white shadow-red-500/30'
-                                                    : 'bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-600'
+                                                    ? 'bg-zinc-900 border border-zinc-900 text-white shadow-zinc-900/20'
+                                                    : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-600'
                                                     }`}
                                             >
                                                 {f === 'all' ? 'All' : f}
@@ -1088,8 +1089,8 @@ const MembersPage = () => {
                                     <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Columns to show</label>
                                     <div className="space-y-1">
                                         {/* Disabled name checkbox */}
-                                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 cursor-not-allowed">
-                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-zinc-100 dark:bg-zinc-700/50 text-red-500 opacity-50">
+                                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 cursor-not-allowed">
+                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 opacity-50">
                                                 <FaCheck size={10} />
                                             </div>
                                             <span className="text-sm font-semibold text-gray-400 dark:text-gray-500">Name</span>
@@ -1099,8 +1100,8 @@ const MembersPage = () => {
                                         {TOGGLEABLE_COLUMNS.map(col => {
                                             const checked = visibleColumns.includes(col.key);
                                             return (
-                                                <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer border border-transparent dark:hover:border-slate-600">
-                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-slate-500 bg-white dark:bg-slate-800'}`}>
+                                                <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer border border-transparent dark:hover:border-zinc-600">
+                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-zinc-500 bg-white dark:bg-zinc-900'}`}>
                                                         {checked && <FaCheck size={10} />}
                                                     </div>
                                                     <span className={`text-sm font-semibold ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
@@ -1112,10 +1113,10 @@ const MembersPage = () => {
                             </div>
 
                             {/* Footer */}
-                            <div className="p-4 border-t border-gray-100 dark:border-slate-700 shrink-0 bg-white dark:bg-slate-800">
+                            <div className="p-4 border-t border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900">
                                 <button
                                     onClick={() => setIsFilterSheetOpen(false)}
-                                    className="w-full py-3.5 bg-zinc-900 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-red-500/30"
+                                    className="w-full py-3.5 bg-zinc-900 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-zinc-900/20"
                                 >
                                     Show Results
                                 </button>

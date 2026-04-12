@@ -30,16 +30,16 @@ const CustomDropZone = ({ isDisabled, onDropFiles, ...props }) => {
             }}
             className={({ isDropTarget }) => twMerge(
                 "relative w-full px-4 py-8 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-colors cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2",
-                isDropTarget ? "border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50" : "border-gray-300 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800",
+                isDropTarget ? "border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50" : "border-gray-300 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800",
                 isDisabled && "opacity-50 cursor-not-allowed pointer-events-none"
             )}
         >
-            <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-700/60 text-red-600 dark:text-red-400 flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full bg-zinc-100 dark:bg-zinc-700/60 text-zinc-900 dark:text-zinc-500 flex items-center justify-center">
                 <FaCloudUploadAlt size={24} />
             </div>
             <div className="text-center">
                 <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    <span className="text-red-600 dark:text-red-400">Click to upload</span> or drag and drop
+                    <span className="text-zinc-900 dark:text-zinc-500">Click to upload</span> or drag and drop
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     Receipts, PDFs, or Images (max. 5MB)
@@ -69,14 +69,14 @@ const List = ({ children, className }) => {
 
 const ListItemProgressBar = ({ name, size, type, progress, failed, onDelete, onRetry }) => {
     return (
-        <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm relative group overflow-hidden">
+        <div className="w-full flex items-center gap-3 p-3 rounded-xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm relative group overflow-hidden">
             {/* Absolute loading pattern / effect if desired */}
             {progress < 100 && !failed && (
                 <div className="absolute inset-0 bg-zinc-50/30 dark:bg-zinc-800/30 pointer-events-none" />
             )}
 
             {/* Icon */}
-            <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 z-10">
+            <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-gray-400 shrink-0 z-10">
                 <FaFileAlt size={18} />
             </div>
 
@@ -86,17 +86,17 @@ const ListItemProgressBar = ({ name, size, type, progress, failed, onDelete, onR
                     <p className="text-sm font-medium text-gray-900 dark:text-white truncate pr-4">{name}</p>
                     <div className="flex-shrink-0">
                         {failed ? (
-                            <span className="text-[10px] font-bold tracking-wide text-red-500 uppercase flex items-center gap-1"><FaExclamationCircle /> Failed</span>
+                            <span className="text-[10px] font-bold tracking-wide text-zinc-700 uppercase flex items-center gap-1"><FaExclamationCircle /> Failed</span>
                         ) : progress === 100 ? (
                             <span className="text-[10px] font-bold tracking-wide text-green-500 uppercase flex items-center gap-1"><FaCheckCircle /> Completed</span>
                         ) : (
-                            <span className="text-[10px] font-bold tracking-wide text-red-500">{progress}%</span>
+                            <span className="text-[10px] font-bold tracking-wide text-zinc-700">{progress}%</span>
                         )}
                     </div>
                 </div>
 
                 {/* Progress bar track */}
-                <div className="w-full h-1.5 bg-gray-100 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                     {/* Progress bar fill */}
                     <div
                         className={twMerge(
@@ -119,11 +119,11 @@ const ListItemProgressBar = ({ name, size, type, progress, failed, onDelete, onR
             {/* Actions */}
             <div className="flex items-center gap-1 shrink-0 z-10">
                 {failed && (
-                    <button type="button" onClick={onRetry} className="p-2 text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-slate-700 rounded-md transition-colors" title="Retry">
+                    <button type="button" onClick={onRetry} className="p-2 text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-md transition-colors" title="Retry">
                         <FaRedo size={12} />
                     </button>
                 )}
-                <button type="button" onClick={onDelete} className="p-2 text-gray-400 hover:text-red-500 hover:bg-zinc-50 dark:hover:bg-slate-700 rounded-md transition-colors" title="Remove file">
+                <button type="button" onClick={onDelete} className="p-2 text-gray-400 hover:text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 rounded-md transition-colors" title="Remove file">
                     <FaTimes size={14} />
                 </button>
             </div>

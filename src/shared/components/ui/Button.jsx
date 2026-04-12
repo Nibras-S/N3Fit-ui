@@ -27,9 +27,9 @@ import React from "react";
 
 const variants = {
   primary:
-    "bg-brand-600 text-white hover:bg-brand-700 active:bg-brand-800 focus:ring-brand-500 shadow-sm",
+    "bg-zinc-900 text-white hover:bg-zinc-800 active:bg-zinc-700 focus:ring-zinc-900 shadow-sm dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100 dark:active:bg-zinc-200 dark:focus:ring-white",
   secondary:
-    "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 focus:ring-brand-500 dark:bg-dark-card dark:text-gray-200 dark:border-dark-border dark:hover:bg-dark",
+    "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 focus:ring-zinc-900 dark:bg-dark-card dark:text-gray-200 dark:border-dark-border dark:hover:bg-dark",
   ghost:
     "bg-transparent text-gray-600 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400 dark:text-gray-300 dark:hover:bg-dark-card",
   danger:
@@ -37,7 +37,7 @@ const variants = {
   success:
     "bg-green-600 text-white hover:bg-green-700 active:bg-green-800 focus:ring-green-500 shadow-sm",
   outline:
-    "bg-transparent text-gray-800 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus:ring-brand-500 dark:text-gray-100 dark:border-dark-border dark:hover:bg-dark-card",
+    "bg-transparent text-gray-800 border border-gray-200 hover:bg-gray-50 active:bg-gray-100 focus:ring-zinc-900 dark:text-gray-100 dark:border-dark-border dark:hover:bg-dark-card",
 };
 
 const sizes = {

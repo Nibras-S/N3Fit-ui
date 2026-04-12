@@ -15,7 +15,7 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 
-const COLORS = ['#f43f5e', '#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
+const COLORS = ['#3f3f46', '#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
 
 const ReportsPage = () => {
     const navigate = useNavigate();
@@ -111,18 +111,18 @@ const ReportsPage = () => {
      * Reports page feels at home with the rest of the app.
      */
     const ReportsEmptyState = () => (
-        <div className="flex flex-col items-center justify-center py-24 px-6 relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700">
+        <div className="flex flex-col items-center justify-center py-24 px-6 relative overflow-hidden bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800">
             {/* Concentric rings background */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-60 dark:opacity-40">
-                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-slate-700" />
-                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-slate-700" />
-                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-slate-700 shadow-sm" />
-                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-slate-700" />
+                <div className="absolute w-[200px] h-[200px] rounded-full border border-gray-200 dark:border-zinc-800" />
+                <div className="absolute w-[360px] h-[360px] rounded-full border border-gray-200 dark:border-zinc-800" />
+                <div className="absolute w-[520px] h-[520px] rounded-full border border-gray-200 dark:border-zinc-800 shadow-sm" />
+                <div className="absolute w-[680px] h-[680px] rounded-full border border-gray-200 dark:border-zinc-800" />
             </div>
 
             {/* Center icon */}
-            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 flex items-center justify-center mb-6 shadow-sm z-10">
-                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 flex items-center justify-center">
+            <div className="relative w-14 h-14 rounded-2xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 flex items-center justify-center mb-6 shadow-sm z-10">
+                <div className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800/50 flex items-center justify-center">
                     <FaChartPie className="text-gray-400" size={20} />
                 </div>
             </div>
@@ -135,7 +135,7 @@ const ReportsPage = () => {
             <div className="flex items-center gap-3 z-10">
                 <button
                     onClick={() => handleFilterChange({ ...computePresetRange('all_time'), preset: 'all_time' })}
-                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 hover:bg-gray-50 dark:hover:bg-slate-700 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
+                    className="px-4 py-2 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all font-medium text-gray-700 dark:text-gray-300 shadow-sm flex items-center gap-2 text-sm"
                 >
                     Show all time
                 </button>
@@ -155,19 +155,19 @@ const ReportsPage = () => {
                 <div className="max-w-7xl mx-auto space-y-6">
                     {/* Header Actions Skeleton */}
                     <div className="flex justify-end gap-3 opacity-50">
-                        <div className="h-10 w-10 bg-gray-200 dark:bg-slate-700/50 animate-pulse rounded-lg"></div>
-                        <div className="h-10 w-48 bg-gray-200 dark:bg-slate-700/50 animate-pulse rounded-lg"></div>
+                        <div className="h-10 w-10 bg-gray-200 dark:bg-zinc-800/50 animate-pulse rounded-lg"></div>
+                        <div className="h-10 w-48 bg-gray-200 dark:bg-zinc-800/50 animate-pulse rounded-lg"></div>
                     </div>
                     {/* KPI Cards Skeleton */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-[120px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                            <div key={i} className="h-[120px] bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800"></div>
                         ))}
                     </div>
                     {/* Charts Skeleton */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2 h-[400px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
-                        <div className="h-[400px] bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700"></div>
+                        <div className="lg:col-span-2 h-[400px] bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800"></div>
+                        <div className="h-[400px] bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800"></div>
                     </div>
                 </div>
             </AppLayout>
@@ -182,7 +182,7 @@ const ReportsPage = () => {
                         onClick={fetchReports}
                         disabled={loading}
                         title="Refresh"
-                        className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm"
+                        className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg transition-colors border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm"
                     >
                         <FaSync size={13} className={loading ? 'animate-spin' : ''} />
                     </button>
@@ -194,7 +194,7 @@ const ReportsPage = () => {
                     {/* Income → /reports/income */}
                     <button
                         onClick={() => drillTo('/reports/income')}
-                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 hover:-translate-y-0.5 transition-all"
+                        className="text-left bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group hover:shadow-lg hover:border-green-200 dark:hover:border-green-800 hover:-translate-y-0.5 transition-all"
                     >
                         <div className="absolute -right-6 -top-6 w-24 h-24 bg-green-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                         <div className="flex justify-between items-start mb-4">
@@ -213,33 +213,33 @@ const ReportsPage = () => {
                     {/* Expenses → /reports/expense */}
                     <button
                         onClick={() => drillTo('/reports/expense')}
-                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-red-200 dark:hover:border-red-800 hover:-translate-y-0.5 transition-all"
+                        className="text-left bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-600 hover:-translate-y-0.5 transition-all"
                     >
                         <div className="absolute -right-6 -top-6 w-24 h-24 bg-zinc-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                         <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-red-600 dark:text-red-400">
+                            <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-zinc-900 dark:text-zinc-300">
                                 <FaArrowDown size={20} />
                             </div>
-                            <span className="text-xs font-bold px-2 py-1 bg-zinc-100 dark:bg-zinc-700/60 text-red-700 dark:text-red-300 rounded-full">Expense</span>
+                            <span className="text-xs font-bold px-2 py-1 bg-zinc-100 dark:bg-zinc-700/60 text-zinc-800 dark:text-zinc-300 rounded-full">Expense</span>
                         </div>
                         <h3 className="text-3xl font-black text-gray-900 dark:text-white">{formatCurrency(data.kpi.totalExpense)}</h3>
                         <p className="text-sm text-gray-500 mt-1 flex items-center justify-between">
                             <span>Total Operational Cost</span>
-                            <FaArrowRight size={11} className="text-gray-300 group-hover:text-red-500 group-hover:translate-x-0.5 transition-all" />
+                            <FaArrowRight size={11} className="text-gray-300 group-hover:text-zinc-600 group-hover:translate-x-0.5 transition-all" />
                         </p>
                     </button>
 
                     {/* Net Profit — non-clickable for now (no detail page yet).
                     Marked with cursor-default so users don't expect a drill-in. */}
-                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group">
+                    <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group">
                         <div className="absolute -right-6 -top-6 w-24 h-24 bg-zinc-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                         <div className="flex justify-between items-start mb-4">
-                            <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-red-600 dark:text-red-400">
+                            <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl text-zinc-900 dark:text-zinc-300">
                                 <FaWallet size={20} />
                             </div>
-                            <span className="text-xs font-bold px-2 py-1 bg-zinc-100 dark:bg-zinc-700/60 text-red-700 dark:text-red-300 rounded-full">Profit</span>
+                            <span className="text-xs font-bold px-2 py-1 bg-zinc-100 dark:bg-zinc-700/60 text-zinc-800 dark:text-zinc-300 rounded-full">Profit</span>
                         </div>
-                        <h3 className={`text-3xl font-black ${data.kpi.netProfit >= 0 ? 'text-red-600 dark:text-red-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <h3 className={`text-3xl font-black ${data.kpi.netProfit >= 0 ? 'text-zinc-900 dark:text-zinc-300' : 'text-zinc-900 dark:text-zinc-300'}`}>
                             {formatCurrency(data.kpi.netProfit)}
                         </h3>
                         <p className="text-sm text-gray-500 mt-1">Net Income Retained</p>
@@ -248,7 +248,7 @@ const ReportsPage = () => {
                     {/* Active Members → /members */}
                     <button
                         onClick={() => navigate('/members?tab=active')}
-                        className="text-left bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 relative overflow-hidden group hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 hover:-translate-y-0.5 transition-all"
+                        className="text-left bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800 relative overflow-hidden group hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-800 hover:-translate-y-0.5 transition-all"
                     >
                         <div className="absolute -right-6 -top-6 w-24 h-24 bg-purple-500/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                         <div className="flex justify-between items-start mb-4">
@@ -273,7 +273,7 @@ const ReportsPage = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
                             {/* Financial Overview (Bar Chart) */}
-                            <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                            <div className="lg:col-span-2 bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Financial Overview (Income vs Expense)</h3>
                                 <div className="h-80">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -288,14 +288,14 @@ const ReportsPage = () => {
                                             />
                                             <Legend wrapperStyle={{ paddingTop: '20px' }} />
                                             <Bar dataKey="income" name="Income" fill="#10b981" radius={[4, 4, 0, 0]} maxBarSize={40} />
-                                            <Bar dataKey="expense" name="Expense" fill="#f43f5e" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                                            <Bar dataKey="expense" name="Expense" fill="#3f3f46" radius={[4, 4, 0, 0]} maxBarSize={40} />
                                         </BarChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
 
                             {/* Expense Breakdown (Pie Chart) */}
-                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Expense Breakdown</h3>
                                 <p className="text-xs text-gray-500 mb-6">Category wise distribution</p>
                                 {data.expenseBreakdown.length > 0 ? (
@@ -338,29 +338,29 @@ const ReportsPage = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                             {/* Net Profit Flow (Area Chart) */}
-                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Net Profit Growth</h3>
                                 <div className="h-72">
                                     <ResponsiveContainer width="100%" height="100%">
                                         <AreaChart data={data.financialChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                             <defs>
                                                 <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                                                    <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
-                                                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                                                    <stop offset="5%" stopColor="#3f3f46" stopOpacity={0.3} />
+                                                    <stop offset="95%" stopColor="#3f3f46" stopOpacity={0} />
                                                 </linearGradient>
                                             </defs>
                                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
                                             <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} dy={10} />
                                             <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} tickFormatter={(value) => `${value >= 1000 ? (value / 1000) + 'k' : value}`} />
                                             <Tooltip formatter={(value) => formatCurrency(value)} contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                            <Area type="monotone" dataKey="profit" name="Net Profit" stroke="#f43f5e" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
+                                            <Area type="monotone" dataKey="profit" name="Net Profit" stroke="#3f3f46" strokeWidth={3} fillOpacity={1} fill="url(#colorProfit)" />
                                         </AreaChart>
                                     </ResponsiveContainer>
                                 </div>
                             </div>
 
                             {/* Member Retention & Churn (Line Chart) */}
-                            <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700">
+                            <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-zinc-800">
                                 <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Member Activity vs Expiry Rate</h3>
                                 <div className="h-72">
                                     <ResponsiveContainer width="100%" height="100%">
@@ -371,7 +371,7 @@ const ReportsPage = () => {
                                             <Tooltip contentStyle={{ borderRadius: '12px', border: 'none' }} />
                                             <Legend wrapperStyle={{ paddingTop: '10px' }} />
                                             <Line type="monotone" dataKey="joined" name="New Members" stroke="#10b981" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
-                                            <Line type="monotone" dataKey="expired" name="Expired Members" stroke="#f43f5e" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                                            <Line type="monotone" dataKey="expired" name="Expired Members" stroke="#3f3f46" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
                                         </LineChart>
                                     </ResponsiveContainer>
                                 </div>

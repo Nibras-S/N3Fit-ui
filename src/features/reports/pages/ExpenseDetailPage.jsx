@@ -15,7 +15,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
 
-const COLORS = ['#f43f5e', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
+const COLORS = ['#3f3f46', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
 
 const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 const formatDate = (d) => d
@@ -136,7 +136,7 @@ const ExpenseDetailPage = () => {
                             <button
                                 onClick={fetchData}
                                 disabled={loading}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
+                                className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg border border-gray-200 dark:border-zinc-800 transition-colors"
                                 title="Refresh"
                             >
                                 <FaSync size={13} className={loading ? 'animate-spin' : ''} />
@@ -160,7 +160,7 @@ const ExpenseDetailPage = () => {
                 </div>
 
                 {/* Trend chart */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Expense Trend</h3>
@@ -173,15 +173,15 @@ const ExpenseDetailPage = () => {
                                 <AreaChart data={trendData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                     <defs>
                                         <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.4} />
-                                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                                            <stop offset="5%" stopColor="#3f3f46" stopOpacity={0.4} />
+                                            <stop offset="95%" stopColor="#3f3f46" stopOpacity={0} />
                                         </linearGradient>
                                     </defs>
                                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#cbd5e1" opacity={0.3} />
                                     <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#64748b' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => v >= 1000 ? `${v / 1000}k` : v} axisLine={false} tickLine={false} />
                                     <Tooltip formatter={(v) => formatCurrency(v)} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
-                                    <Area type="monotone" dataKey="expense" stroke="#f43f5e" strokeWidth={2.5} fill="url(#expenseGradient)" />
+                                    <Area type="monotone" dataKey="expense" stroke="#3f3f46" strokeWidth={2.5} fill="url(#expenseGradient)" />
                                 </AreaChart>
                             </ResponsiveContainer>
                         ) : <EmptyChart />}
@@ -244,7 +244,7 @@ const ExpenseDetailPage = () => {
                                         <XAxis dataKey="method" tick={{ fontSize: 11, fill: '#64748b' }} />
                                         <YAxis tick={{ fontSize: 11, fill: '#64748b' }} tickFormatter={(v) => v >= 1000 ? `${v / 1000}k` : v} />
                                         <Tooltip formatter={(v) => formatCurrency(v)} contentStyle={{ borderRadius: '12px', border: 'none' }} />
-                                        <Bar dataKey="total" fill="#f43f5e" radius={[6, 6, 0, 0]} maxBarSize={60} />
+                                        <Bar dataKey="total" fill="#3f3f46" radius={[6, 6, 0, 0]} maxBarSize={60} />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
@@ -273,8 +273,8 @@ const ExpenseDetailPage = () => {
                 </BreakdownCard>
 
                 {/* Expense list */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">All Expenses</h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{data.expenses.length} entr{data.expenses.length === 1 ? 'y' : 'ies'} in selected range</p>
@@ -287,7 +287,7 @@ const ExpenseDetailPage = () => {
                     </div>
                     <div className="overflow-x-auto max-h-[600px]">
                         <table className="w-full text-sm">
-                            <thead className="bg-gray-50 dark:bg-slate-900/50 sticky top-0">
+                            <thead className="bg-gray-50 dark:bg-zinc-950/50 sticky top-0">
                                 <tr className="text-xs text-gray-500 dark:text-gray-400 uppercase">
                                     <th className="text-left px-6 py-3 font-semibold">Date</th>
                                     <th className="text-left px-6 py-3 font-semibold">Category</th>
@@ -297,7 +297,7 @@ const ExpenseDetailPage = () => {
                                     <th className="text-right px-6 py-3 font-semibold">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700/60">
+                            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800/60">
                                 {loading && (
                                     <tr><td colSpan={6} className="py-10 text-center text-gray-400">Loading…</td></tr>
                                 )}
@@ -305,17 +305,17 @@ const ExpenseDetailPage = () => {
                                     <tr><td colSpan={6} className="py-10 text-center text-gray-400">No expenses in this range</td></tr>
                                 )}
                                 {data.expenses.map(e => (
-                                    <tr key={e._id} className="hover:bg-gray-50 dark:hover:bg-slate-700/30">
+                                    <tr key={e._id} className="hover:bg-gray-50 dark:hover:bg-zinc-800/30">
                                         <td className="px-6 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{formatDate(e.date)}</td>
                                         <td className="px-6 py-3">
-                                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-gray-200">
+                                            <span className="text-xs font-semibold px-2 py-1 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-200">
                                                 {e.category}
                                             </span>
                                         </td>
                                         <td className="px-6 py-3 text-gray-700 dark:text-gray-200">{e.vendor || '-'}</td>
                                         <td className="px-6 py-3 text-gray-600 dark:text-gray-300">{e.paymentMethod}</td>
                                         <td className="px-6 py-3 text-gray-500 dark:text-gray-400 max-w-xs truncate">{e.note || '-'}</td>
-                                        <td className="px-6 py-3 text-right font-bold text-red-600 dark:text-red-400">{formatCurrency(e.amount)}</td>
+                                        <td className="px-6 py-3 text-right font-bold text-zinc-900 dark:text-zinc-300">{formatCurrency(e.amount)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -332,9 +332,9 @@ const ExpenseDetailPage = () => {
 // ─────────────────────────────────────────────────────────────────────────
 
 const KPI_COLORS = {
-    red:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-red-600 dark:text-red-400' },
-    blue:   { bg: 'bg-zinc-50 dark:bg-zinc-800/50',     text: 'text-red-600 dark:text-red-400' },
-    rose: { bg: 'bg-rose-50 dark:bg-rose-900/20', text: 'text-rose-600 dark:text-rose-400' },
+    red:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-zinc-900 dark:text-zinc-300' },
+    blue:   { bg: 'bg-zinc-50 dark:bg-zinc-800/50',     text: 'text-zinc-900 dark:text-zinc-300' },
+    rose: { bg: 'bg-zinc-100 dark:bg-zinc-800/50', text: 'text-zinc-900 dark:text-zinc-300' },
     amber:  { bg: 'bg-amber-50 dark:bg-amber-900/20',   text: 'text-amber-600 dark:text-amber-400' },
     violet: { bg: 'bg-violet-50 dark:bg-violet-900/20', text: 'text-violet-600 dark:text-violet-400' },
 };
@@ -342,7 +342,7 @@ const KPI_COLORS = {
 function KpiTile({ label, value, icon, color, loading }) {
     const c = KPI_COLORS[color] || KPI_COLORS.blue;
     return (
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
                 <span className={`p-1.5 rounded-lg ${c.bg} ${c.text}`}>{icon}</span>
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</span>
@@ -356,7 +356,7 @@ function KpiTile({ label, value, icon, color, loading }) {
 
 function BreakdownCard({ title, subtitle, children, exportData }) {
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>

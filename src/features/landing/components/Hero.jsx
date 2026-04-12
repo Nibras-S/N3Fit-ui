@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { FiArrowRight, FiCheck } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 
 /* ─── Animated Counter ─── */
 function AnimatedCounter({ end, suffix = '', duration = 2000 }) {
@@ -40,7 +39,7 @@ function DashboardMockup() {
       {/* Browser chrome */}
       <div className="mockup-chrome">
         <div className="mockup-dots">
-          <span style={{ background: '#ff5f57' }} />
+          <span style={{ background: '#71717a' }} />
           <span style={{ background: '#febc2e' }} />
           <span style={{ background: '#28c840' }} />
         </div>
@@ -57,7 +56,7 @@ function DashboardMockup() {
       <div className="mockup-body">
         {/* Mini sidebar */}
         <div className="mockup-sidebar">
-          <div className="mockup-sidebar-item" style={{ background: '#ef4444' }} />
+          <div className="mockup-sidebar-item" style={{ background: '#18181b' }} />
           <div className="mockup-sidebar-item" />
           <div className="mockup-sidebar-item" />
           <div className="mockup-sidebar-item" />
@@ -136,8 +135,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function Hero() {
-  const navigate = useNavigate();
+export default function Hero({ onOpenTrial }) {
 
   const stats = [
     { value: 500, suffix: '+', label: 'Active Clubs' },
@@ -203,7 +201,7 @@ export default function Hero() {
             >
               <button
                 className="landing-btn-primary landing-btn-lg"
-                onClick={() => navigate('/login')}
+                onClick={onOpenTrial}
               >
                 Get Started Now
                 <FiArrowRight size={18} />

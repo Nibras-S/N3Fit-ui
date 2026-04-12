@@ -9,6 +9,7 @@ import api from '../../../shared/services/api';
 import { useAuth } from '../../auth/context/AuthContext';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 
@@ -96,9 +97,7 @@ export default function MembershipCardPage() {
     if (loading) {
         return (
             <AppLayout>
-                <div className="flex items-center justify-center min-h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin" />
-                </div>
+                <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4"><CardSkeleton /><CardSkeleton /></div>
             </AppLayout>
         );
     }
@@ -142,7 +141,7 @@ export default function MembershipCardPage() {
                 <div className="w-full max-w-sm">
 
                     {/* Card container with gradient accent on top */}
-                    <div className="relative bg-white dark:bg-slate-800 rounded-3xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
+                    <div className="relative bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
 
                         {/* Top colour band */}
                         <div className="h-2 bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-500" />
@@ -151,7 +150,7 @@ export default function MembershipCardPage() {
                             {/* Gym header */}
                             <div className="flex items-center gap-3">
                                 {gymLogo ? (
-                                    <img src={gymLogo} alt={gymName} className="w-10 h-10 rounded-xl object-contain bg-gray-50 dark:bg-slate-700 p-1" />
+                                    <img src={gymLogo} alt={gymName} className="w-10 h-10 rounded-xl object-contain bg-gray-50 dark:bg-zinc-800 p-1" />
                                 ) : (
                                     <div className="w-10 h-10 rounded-xl bg-zinc-900 flex items-center justify-center">
                                         <FaDumbbell className="text-white" size={16} />
@@ -171,10 +170,10 @@ export default function MembershipCardPage() {
                             {/* Member identity */}
                             <div className="flex items-center gap-4">
                                 {profileImg ? (
-                                    <img src={profileImg} alt={member.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white dark:border-slate-700 shadow-md" />
+                                    <img src={profileImg} alt={member.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white dark:border-zinc-800 shadow-md" />
                                 ) : (
                                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner ${
-                                        member.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-zinc-100 text-red-600'
+                                        member.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-zinc-100 text-zinc-900'
                                     }`}>
                                         {member.name?.charAt(0)?.toUpperCase()}
                                     </div>
@@ -183,7 +182,7 @@ export default function MembershipCardPage() {
                                     <p className="font-black text-gray-900 dark:text-white text-lg leading-tight truncate">{member.name}</p>
                                     <p className="text-[11px] text-gray-500 mt-0.5">{member.phone}</p>
                                     {member.gender && (
-                                        <span className="text-[9px] font-black uppercase bg-gray-100 dark:bg-slate-700 text-gray-500 px-2 py-0.5 rounded-full">
+                                        <span className="text-[9px] font-black uppercase bg-gray-100 dark:bg-zinc-800 text-gray-500 px-2 py-0.5 rounded-full">
                                             {member.gender}
                                         </span>
                                     )}
@@ -191,7 +190,7 @@ export default function MembershipCardPage() {
                             </div>
 
                             {/* Divider */}
-                            <div className="border-t border-dashed border-gray-100 dark:border-slate-700" />
+                            <div className="border-t border-dashed border-gray-100 dark:border-zinc-800" />
 
                             {/* Plan + dates */}
                             <div className="grid grid-cols-2 gap-4">
@@ -257,7 +256,7 @@ export default function MembershipCardPage() {
                             <button
                                 type="button"
                                 onClick={() => setShowPayModal(true)}
-                                className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-red-500/30 flex items-center justify-center gap-2"
+                                className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-lg shadow-zinc-900/20 flex items-center justify-center gap-2"
                             >
                                 <FaMoneyBillWave size={15} />
                                 Mark as Paid
@@ -268,13 +267,13 @@ export default function MembershipCardPage() {
                         <div className="grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => navigate(`/members/${member._id}`)}
-                                className="py-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
+                                className="py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
                             >
                                 <FaIdCard size={11} /> View Profile
                             </button>
                             <button
                                 onClick={() => navigate('/members')}
-                                className="py-3 bg-gray-50 dark:bg-slate-700 hover:bg-gray-100 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
+                                className="py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
                             >
                                 Done <FaArrowRight size={10} />
                             </button>

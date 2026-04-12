@@ -102,13 +102,13 @@ export default function Pricing() {
                   ? 'none'
                   : '1px solid var(--landing-border)',
                 boxShadow: plan.popular
-                  ? '0 8px 30px rgba(220, 38, 38, 0.3)'
+                  ? '0 8px 30px rgba(0, 0, 0, 0.35)'
                   : 'var(--landing-shadow-sm)',
                 color: plan.popular ? '#ffffff' : 'var(--landing-text)',
               }}
             >
               {plan.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-red-600">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-white text-zinc-900">
                   Most Popular
                 </div>
               )}

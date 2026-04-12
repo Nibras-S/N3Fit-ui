@@ -19,11 +19,11 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
 
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-2xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[90vh]">
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
                             <FaEye />
                         </div>
                         <div>
@@ -31,7 +31,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                             <p className="text-xs text-gray-500 dark:text-gray-400">Reference: {expense._id.slice(-6).toUpperCase()}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
                         <FaTimes className="text-gray-500 dark:text-gray-400" />
                     </button>
                 </div>
@@ -39,17 +39,17 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                 {/* Body */}
                 <div className="p-0 overflow-y-auto custom-scrollbar flex-1 flex flex-col md:flex-row">
                     {/* Left: Info */}
-                    <div className="p-6 space-y-6 flex-1 border-r border-gray-100 dark:border-slate-700">
+                    <div className="p-6 space-y-6 flex-1 border-r border-gray-100 dark:border-zinc-800">
                         <div className="grid grid-cols-2 gap-6">
                             <div>
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Category</label>
                                 <div className="flex items-center gap-2 text-gray-900 dark:text-white font-medium">
-                                    <FaTag className="text-red-500" /> {expense.category}
+                                    <FaTag className="text-zinc-600" /> {expense.category}
                                 </div>
                             </div>
                             <div>
                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Amount</label>
-                                <div className="text-2xl font-black text-red-600 dark:text-red-400">
+                                <div className="text-2xl font-black text-zinc-700 dark:text-zinc-300">
                                     {formatCurrency(expense.amount)}
                                 </div>
                             </div>
@@ -70,28 +70,28 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                         <div>
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Vendor / Receiver</label>
                             <div className="flex items-center gap-2 text-gray-900 dark:text-white">
-                                <FaUser className="text-rose-500" /> {expense.vendor || 'N/A'}
+                                <FaUser className="text-zinc-900" /> {expense.vendor || 'N/A'}
                             </div>
                         </div>
 
                         <div>
                             <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Note</label>
-                            <div className="bg-gray-50 dark:bg-slate-900 p-4 rounded-xl border border-gray-100 dark:border-slate-700 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">
+                            <div className="bg-gray-50 dark:bg-zinc-950 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 text-gray-700 dark:text-gray-300 text-sm whitespace-pre-wrap">
                                 {expense.note || <span className="italic opacity-50 text-xs text-gray-400">No additional notes provided.</span>}
                             </div>
                         </div>
                     </div>
 
                     {/* Right: Attachment Preview */}
-                    <div className="w-full md:w-72 bg-gray-50 dark:bg-slate-900/50 p-6 flex flex-col">
+                    <div className="w-full md:w-72 bg-gray-50 dark:bg-zinc-950/50 p-6 flex flex-col">
                         <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-3">Attachment</label>
 
                         {fileUrl ? (
                             <div className="flex-1 flex flex-col gap-4">
-                                <div className="aspect-[3/4] rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800 flex items-center justify-center relative group">
+                                <div className="aspect-[3/4] rounded-xl border-2 border-dashed border-gray-200 dark:border-zinc-800 overflow-hidden bg-white dark:bg-zinc-900 flex items-center justify-center relative group">
                                     {isPDF ? (
                                         <div className="text-center p-4">
-                                            <FaFilePdf size={48} className="mx-auto text-red-500 mb-2" />
+                                            <FaFilePdf size={48} className="mx-auto text-zinc-600 mb-2" />
                                             <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">PDF Document</p>
                                         </div>
                                     ) : (
@@ -118,13 +118,13 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                                         </a>
                                     </div>
                                 </div>
-                                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg flex items-center gap-2 text-xs text-red-700 dark:text-red-300">
+                                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-lg flex items-center gap-2 text-xs text-zinc-700 dark:text-zinc-300">
                                     <FaCheckCircle className="flex-shrink-0" />
                                     <span>Attachment Verified</span>
                                 </div>
                             </div>
                         ) : (
-                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700">
+                            <div className="flex-1 flex flex-col items-center justify-center text-center p-6 bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800">
                                 <FaTimesCircle size={32} className="text-gray-300 dark:text-gray-600 mb-2" />
                                 <p className="text-xs text-gray-400 dark:text-gray-500 font-medium italic">No receipt attached to this expense.</p>
                             </div>
@@ -133,7 +133,7 @@ const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 border-t border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 flex justify-end">
+                <div className="p-4 border-t border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-950 flex justify-end">
                     <button
                         onClick={onClose}
                         className="px-6 py-2.5 rounded-xl bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-bold hover:opacity-90 transition-all text-sm"

@@ -12,34 +12,34 @@ import { FaCaretUp, FaCaretDown } from 'react-icons/fa';
  */
 
 const SkeletonRow = ({ columns }) => (
-    <tr className="animate-pulse border-b border-gray-100 dark:border-slate-700/50">
+    <tr className="animate-pulse border-b border-gray-100 dark:border-zinc-800/50">
         {columns.map((_, i) => (
             <td key={i} className="px-6 py-4">
-                <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded-full w-3/4" />
+                <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded-full w-3/4" />
             </td>
         ))}
         <td className="px-6 py-4">
             <div className="flex gap-2 justify-end">
-                <div className="h-8 w-16 bg-gray-100 dark:bg-slate-700 rounded-lg" />
-                <div className="h-8 w-8 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+                <div className="h-8 w-16 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
+                <div className="h-8 w-8 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
             </div>
         </td>
     </tr>
 );
 
 const SkeletonCard = () => (
-    <div className="p-4 animate-pulse bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
+    <div className="p-4 animate-pulse bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800">
         <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-gray-100 dark:bg-slate-700 rounded-full" />
+            <div className="w-10 h-10 bg-gray-100 dark:bg-zinc-800 rounded-full" />
             <div className="flex-1">
-                <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded-full w-1/2 mb-2" />
-                <div className="h-3 bg-gray-100 dark:bg-slate-700 rounded-full w-1/3" />
+                <div className="h-4 bg-gray-100 dark:bg-zinc-800 rounded-full w-1/2 mb-2" />
+                <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded-full w-1/3" />
             </div>
-            <div className="h-6 w-16 bg-gray-100 dark:bg-slate-700 rounded-full" />
+            <div className="h-6 w-16 bg-gray-100 dark:bg-zinc-800 rounded-full" />
         </div>
-        <div className="flex gap-2 pt-3 border-t border-gray-50 dark:border-slate-700">
-            <div className="h-8 flex-1 bg-gray-100 dark:bg-slate-700 rounded-lg" />
-            <div className="h-8 w-8 bg-gray-100 dark:bg-slate-700 rounded-lg" />
+        <div className="flex gap-2 pt-3 border-t border-gray-50 dark:border-zinc-800">
+            <div className="h-8 flex-1 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
+            <div className="h-8 w-8 bg-gray-100 dark:bg-zinc-800 rounded-lg" />
         </div>
     </div>
 );
@@ -55,7 +55,7 @@ const DataTable = ({
     renderActions = null,
     renderMobileCard = null,
     getRowKey = (row) => row._id || row.id,
-    hoverColor = 'hover:bg-brand-50/40 dark:hover:bg-brand-900/10',
+    hoverColor = 'hover:bg-zinc-100/40 dark:hover:bg-zinc-800/10',
     renderExpandedRow = null,
     expandedRowId = null,
     gender = 'all',
@@ -119,10 +119,10 @@ const DataTable = ({
 
     if (loading) {
         return (
-            <div className={`bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-sm ${className}`}>
+            <div className={`bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm ${className}`}>
                 <div className="hidden lg:block">
                     <table className="w-full">
-                        <thead className="bg-gray-50 dark:bg-slate-900/50 border-b border-gray-200 dark:border-slate-700">
+                        <thead className="bg-gray-50 dark:bg-zinc-950/50 border-b border-gray-200 dark:border-zinc-800">
                             <tr>
                                 {columns.map((col, i) => (
                                     <th key={i} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -132,7 +132,7 @@ const DataTable = ({
                                 {renderActions && <th className="px-6 py-3" />}
                             </tr>
                         </thead>
-                        <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-100 dark:divide-slate-700/50">
+                        <tbody className="bg-white dark:bg-zinc-900 divide-y divide-gray-100 dark:divide-zinc-800/50">
                             {[...Array(rowsPerPage)].map((_, i) => <SkeletonRow key={i} columns={columns} />)}
                         </tbody>
                     </table>
@@ -145,18 +145,18 @@ const DataTable = ({
     }
 
     return (
-        <div className={`bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden shadow-sm flex flex-col ${className}`}>
+        <div className={`bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 overflow-hidden shadow-sm flex flex-col ${className}`}>
 
             {/* ── Desktop Table ────────────────────────────────── */}
             <div className="hidden lg:block overflow-x-auto min-h-[360px]">
                 <table className="w-full">
                     {/* Header */}
                     <thead>
-                        <tr className="bg-gray-50 dark:bg-slate-900/50 border-b border-gray-200 dark:border-slate-700">
+                        <tr className="bg-gray-50 dark:bg-zinc-950/50 border-b border-gray-200 dark:border-zinc-800">
                             {showSelection && (
                                 <th className="pl-6 pr-3 py-3 w-10">
                                     <input type="checkbox" checked={isAllSelected} onChange={handleSelectAll}
-                                        className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-100 cursor-pointer shadow-sm" />
+                                        className="w-4 h-4 rounded border-gray-300 text-zinc-900 focus:ring-zinc-200 cursor-pointer shadow-sm" />
                                 </th>
                             )}
                             {columns.map((col, i) => (
@@ -169,8 +169,8 @@ const DataTable = ({
                                         {col.label}
                                         {col.sortable && onSort && (
                                             <span className="flex flex-col gap-0 text-[9px] leading-none">
-                                                <FaCaretUp className={sortConfig?.key === col.key && sortConfig.direction === 'asc' ? 'text-brand-600' : 'text-gray-300 dark:text-slate-600'} />
-                                                <FaCaretDown className={sortConfig?.key === col.key && sortConfig.direction === 'desc' ? 'text-brand-600' : 'text-gray-300 dark:text-slate-600'} />
+                                                <FaCaretUp className={sortConfig?.key === col.key && sortConfig.direction === 'asc' ? 'text-zinc-900' : 'text-gray-300 dark:text-gray-600'} />
+                                                <FaCaretDown className={sortConfig?.key === col.key && sortConfig.direction === 'desc' ? 'text-zinc-900' : 'text-gray-300 dark:text-gray-600'} />
                                             </span>
                                         )}
                                     </div>
@@ -185,7 +185,7 @@ const DataTable = ({
                     </thead>
 
                     {/* Body */}
-                    <tbody className="divide-y divide-gray-100 dark:divide-slate-700/40">
+                    <tbody className="divide-y divide-gray-100 dark:divide-zinc-800/40">
                         {currentData.map((row, index) => {
                             const rowId = getRowKey(row);
                             const isSelected = selectedIds.includes(rowId);
@@ -195,15 +195,15 @@ const DataTable = ({
                                     <tr
                                         onClick={onRowClick ? () => onRowClick(row, index) : undefined}
                                         className={`transition-colors duration-100 ${onRowClick ? 'cursor-pointer' : ''} ${isSelected
-                                            ? 'bg-brand-50 dark:bg-brand-900/20'
+                                            ? 'bg-zinc-100 dark:bg-zinc-800/50'
                                             : isEven
-                                                ? `bg-white dark:bg-slate-800 ${hoverColor}`
-                                                : `bg-gray-50/60 dark:bg-slate-800/70 ${hoverColor}`
+                                                ? `bg-white dark:bg-zinc-900 ${hoverColor}`
+                                                : `bg-gray-50/60 dark:bg-zinc-900/70 ${hoverColor}`
                                             }`}>
                                         {showSelection && (
                                             <td className="pl-6 pr-3 py-4 w-10" onClick={(e) => e.stopPropagation()}>
                                                 <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
-                                                    className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-100 cursor-pointer shadow-sm" />
+                                                    className="w-4 h-4 rounded border-gray-300 text-zinc-900 focus:ring-zinc-200 cursor-pointer shadow-sm" />
                                             </td>
                                         )}
                                         {columns.map((col, i) => (
@@ -220,7 +220,7 @@ const DataTable = ({
                                         )}
                                     </tr>
                                     {renderExpandedRow && expandedRowId === rowId && (
-                                        <tr className="bg-brand-50/40 dark:bg-brand-900/10">
+                                        <tr className="bg-zinc-100/40 dark:bg-zinc-800/30">
                                             <td colSpan={totalColumns} className="px-6 py-4">
                                                 {renderExpandedRow(row)}
                                             </td>
@@ -234,7 +234,7 @@ const DataTable = ({
             </div>
 
             {/* ── Mobile Cards ────────────────────────────────── */}
-            <div className="lg:hidden divide-y divide-gray-100 dark:divide-slate-700/50">
+            <div className="lg:hidden divide-y divide-gray-100 dark:divide-zinc-800/50">
                 {currentData.map((row, index) => {
                     const rowId = getRowKey(row);
                     const isSelected = selectedIds.includes(rowId);
@@ -242,12 +242,12 @@ const DataTable = ({
                         <div
                             key={rowId}
                             onClick={onRowClick ? () => onRowClick(row, index) : undefined}
-                            className={`p-4 relative ${onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-brand-50 dark:bg-brand-900/20' : index % 2 === 0 ? 'bg-white dark:bg-slate-800' : 'bg-gray-50/60 dark:bg-slate-800/70'}`}
+                            className={`p-4 relative ${onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-zinc-100 dark:bg-zinc-800/50' : index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50/60 dark:bg-zinc-900/70'}`}
                         >
                             {showSelection && (
                                 <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
                                     <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
-                                        className="w-5 h-5 rounded border-gray-300 text-brand-600 focus:ring-brand-100 cursor-pointer shadow-sm transition-all" />
+                                        className="w-5 h-5 rounded border-gray-300 text-zinc-900 focus:ring-zinc-200 cursor-pointer shadow-sm transition-all" />
                                 </div>
                             )}
                             {renderMobileCard ? renderMobileCard(row, index) : (
@@ -258,7 +258,7 @@ const DataTable = ({
                                         </div>
                                     ))}
                                     {renderActions && (
-                                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-slate-700">
+                                        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
                                             {renderActions(row, index)}
                                         </div>
                                     )}
@@ -270,7 +270,7 @@ const DataTable = ({
             </div>
 
             {/* ── Pagination ──────────────────────────────────── */}
-            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 gap-3 mt-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-3 border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 gap-3 mt-auto">
                 {/* Left: rows per page + count */}
                 <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                     <div className="flex items-center gap-2">
@@ -278,7 +278,7 @@ const DataTable = ({
                         <select
                             value={rowsPerPage}
                             onChange={handleRowsPerChange}
-                            className="border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-brand-600 cursor-pointer transition-all"
+                            className="border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-700 dark:text-gray-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:border-zinc-900 cursor-pointer transition-all"
                         >
                             {[10, 20, 50, 100].map(v => <option key={v} value={v}>{v}</option>)}
                         </select>
@@ -293,7 +293,7 @@ const DataTable = ({
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-zinc-600 transition-colors"
                     >
                         Prev
                     </button>
@@ -305,10 +305,10 @@ const DataTable = ({
                                 onClick={() => typeof p === 'number' && handlePageChange(p)}
                                 disabled={p === '...'}
                                 className={`w-8 h-8 text-xs font-medium rounded-lg flex items-center justify-center transition-all ${p === currentPage
-                                    ? 'bg-brand-50 text-brand-600 shadow-sm shadow-brand-100/50 scale-110 font-black'
+                                    ? 'bg-zinc-100 text-zinc-900 shadow-sm shadow-zinc-100/50 scale-110 font-black'
                                     : p === '...'
                                         ? 'cursor-default text-gray-400 dark:text-gray-500'
-                                        : 'border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-600'
+                                        : 'border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-600'
                                     }`}
                             >
                                 {p}
@@ -319,7 +319,7 @@ const DataTable = ({
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-slate-600 transition-colors"
+                        className="px-3 py-1.5 text-xs font-medium rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-600 dark:text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-zinc-600 transition-colors"
                     >
                         Next
                     </button>

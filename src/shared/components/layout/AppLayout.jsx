@@ -13,12 +13,9 @@ import {
   FaUserPlus,
   FaUsers,
   FaSignOutAlt,
-  FaUserCheck,
-  FaUserTimes,
   FaCog,
   FaUserCog,
   FaChartPie,
-  FaUserShield,
   FaBuilding,
   FaCrown,
   FaBullhorn,
@@ -27,16 +24,14 @@ import {
   FaBell,
   FaExclamationTriangle,
   FaCheckDouble,
-  FaCircle,
   FaMoon,
   FaSun,
-  FaDownload,
   FaChartLine,
   FaAngleDoubleLeft,
-  FaAngleDoubleRight,
   FaArrowLeft,
   FaBars,
-  FaExchangeAlt
+  FaExchangeAlt,
+  FaInbox,
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -88,13 +83,30 @@ export function AppLayout({
   const { isDirty, setDirty } = useFormState();
   const { user, logout, hasFeature, api } = useAuth();
   const {
-    notifications,
     unreadCount,
     activeWarning,
     markAsRead,
-    markAllAsRead,
-    setActiveWarning
+    socket,
   } = useNotifications();
+
+  // Enquiry count badge — superadmin only
+  const [enquiryCount, setEnquiryCount] = useState(0);
+  useEffect(() => {
+    if (user?.role !== 'superadmin') return;
+    api.get('/enquiries/count')
+      .then(res => setEnquiryCount(res.data?.newCount ?? 0))
+      .catch(() => {});
+  }, [user, api]);
+
+  // Real-time increment on new enquiry socket event
+  useEffect(() => {
+    if (user?.role !== 'superadmin') return;
+    const sock = socket?.current;
+    if (!sock) return;
+    const handler = () => setEnquiryCount(c => c + 1);
+    sock.on('enquiry:new', handler);
+    return () => sock.off('enquiry:new', handler);
+  }, [user, socket]);
 
   const isActive = (path) => {
     const [pathPart] = path.split('?');
@@ -103,7 +115,6 @@ export function AppLayout({
   };
 
   const [showWarningModal, setShowWarningModal] = useState(false);
-  const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
 
   useEffect(() => {
     if (activeWarning) {
@@ -120,6 +131,13 @@ export function AppLayout({
     onConfirm: () => { },
     type: "danger"
   });
+
+  // Clear enquiry badge when visiting the enquiries page
+  useEffect(() => {
+    if (location.pathname === '/superadmin/enquiries') {
+      setEnquiryCount(0);
+    }
+  }, [location.pathname]);
 
   const safeNavigate = (path) => {
     if (isDirty) {
@@ -161,6 +179,10 @@ export function AppLayout({
     { path: "/dashboard", label: "Dashboard", icon: FaChartPie, roles: ["gymadmin", "staff"], permission: "dashboard" },
     { path: "/superadmin", label: "Platform Overview", icon: FaBuilding, roles: ["superadmin"] },
     { path: "/superadmin/plans", label: "SaaS Plans", icon: FaCrown, roles: ["superadmin"] },
+    {
+      path: "/superadmin/enquiries", label: "Enquiries", icon: FaInbox, roles: ["superadmin"],
+      badge: enquiryCount > 0 ? (enquiryCount > 9 ? "9+" : enquiryCount) : null,
+    },
     {
       label: "Members",
       icon: FaUsers,
@@ -220,7 +242,6 @@ export function AppLayout({
   const userName = user?.name || "User";
   const userRole = user?.role === "gymadmin" ? "Admin" : user?.role === "staff" ? "Staff" : user?.role === "superadmin" ? "Super Admin" : "Admin";
   const gymName = user?.gym?.name || "Fit";
-  const gymCode = user?.gym?.gymCode;
   const gymLogo = user?.gym?.logo;
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -228,6 +249,7 @@ export function AppLayout({
     ? [
       { path: "/superadmin", label: "Dashboard", icon: FaBuilding },
       { path: "/superadmin/plans", label: "Plans", icon: FaCrown },
+      { path: "/superadmin/enquiries", label: "Enquiries", icon: FaInbox, badge: enquiryCount > 0 ? (enquiryCount > 9 ? "9+" : enquiryCount) : null },
       { path: "/superadmin/settings", label: "Settings", icon: FaCog },
     ]
     : [
@@ -251,11 +273,11 @@ export function AppLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-slate-900 font-sans flex flex-col lg:flex-row transition-colors duration-200">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d] font-sans flex flex-col lg:flex-row transition-colors duration-200">
 
       {/* ─── Desktop Sidebar ──────────────────────────────────────────────── */}
       <aside
-        className={`hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-[#0e1726] border-r border-gray-200 dark:border-transparent shrink-0 relative transition-all duration-300 ${isCollapsed ? "lg:w-[72px]" : "lg:w-[240px]"
+        className={`hidden lg:flex lg:flex-col lg:h-screen lg:sticky lg:top-0 bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-transparent shrink-0 relative transition-all duration-300 ${isCollapsed ? "lg:w-[72px]" : "lg:w-[240px]"
           }`}
       >
         <div className={`flex flex-col h-full overflow-hidden transition-all duration-300 ${isCollapsed ? "px-3 py-5" : "px-4 py-5"}`}>
@@ -276,7 +298,7 @@ export function AppLayout({
                 <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-9 h-9 rounded-xl shrink-0 bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-red-500/20">
+              <div className="w-9 h-9 rounded-xl shrink-0 bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-zinc-900/20">
                 <img src={n3Logo} alt="Fit" className="w-7 h-7 object-contain" />
               </div>
             )}
@@ -284,7 +306,7 @@ export function AppLayout({
               <>
                 <div className="min-w-0 flex-1 text-left">
                   <h1 className="font-bold text-gray-900 dark:text-white text-sm truncate leading-tight">{gymName}</h1>
-                  <p className="text-[11px] text-red-600 dark:text-red-400 truncate font-medium">{userRole}</p>
+                  <p className="text-[11px] text-zinc-500 dark:text-zinc-400 truncate font-medium">{userRole}</p>
                 </div>
                 <FaAngleDoubleLeft className="text-gray-400 dark:text-gray-500 group-hover:text-gray-600 dark:group-hover:text-gray-300 text-xs shrink-0 transition-colors" />
               </>
@@ -314,13 +336,13 @@ export function AppLayout({
                       title={isCollapsed ? label : undefined}
                       className={`w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 justify-between"
                         } ${isItemActive
-                          ? "bg-brand-50 text-brand-600 shadow-sm dark:bg-brand-900/20 dark:text-brand-400"
+                          ? "bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800/50 dark:text-white"
                           : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                         }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
-                        <Icon className={`text-[18px] shrink-0 ${isItemActive ? "text-brand-600 dark:text-brand-400" : "text-gray-400 dark:text-gray-500"}`} />
-                        {!isCollapsed && <span className={`${isItemActive ? "text-brand-600 dark:text-brand-400" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
+                        <Icon className={`text-[18px] shrink-0 ${isItemActive ? "text-zinc-900 dark:text-white" : "text-gray-400 dark:text-gray-500"}`} />
+                        {!isCollapsed && <span className={`${isItemActive ? "text-zinc-900 dark:text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
                       </div>
                       {!isCollapsed && (
                         <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''} ${isItemActive ? 'text-white/60' : 'text-gray-600'}`} />
@@ -342,7 +364,7 @@ export function AppLayout({
                                   key={sub.path}
                                   onClick={() => safeNavigate(sub.path)}
                                   className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
-                                    ? "bg-brand-50/80 text-brand-600 dark:bg-brand-900/15 dark:text-brand-400"
+                                    ? "bg-zinc-100/80 text-zinc-900 dark:bg-zinc-800/40 dark:text-white"
                                     : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                                     }`}
                                 >
@@ -365,20 +387,20 @@ export function AppLayout({
                   title={isCollapsed ? label : undefined}
                   className={`relative w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 gap-3"
                     } ${isActive(path)
-                      ? "bg-brand-50 text-brand-600 shadow-sm dark:bg-brand-900/20 dark:text-brand-400"
+                      ? "bg-zinc-100 text-zinc-900 shadow-sm dark:bg-zinc-800/50 dark:text-white"
                       : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
                     }`}
                 >
-                  <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-brand-600 dark:text-brand-400" : "text-gray-400 dark:text-gray-500"}`} />
-                  {!isCollapsed && <span className={`flex-1 ${isActive(path) ? "text-brand-600 dark:text-brand-400" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
+                  <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-zinc-900 dark:text-white" : "text-gray-400 dark:text-gray-500"}`} />
+                  {!isCollapsed && <span className={`flex-1 ${isActive(path) ? "text-zinc-900 dark:text-white" : "text-gray-600 dark:text-gray-300"}`}>{label}</span>}
                   {/* Badge — collapsed: red dot overlay; expanded: pill */}
                   {badge && !isCollapsed && (
-                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto ${isActive(path) ? "bg-brand-600/10 text-brand-600 dark:bg-brand-400/20 dark:text-brand-400" : "bg-zinc-900/20 text-red-400"}`}>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ml-auto ${isActive(path) ? "bg-zinc-900/10 text-zinc-900 dark:bg-zinc-300/20 dark:text-white" : "bg-zinc-900/10 text-zinc-500 dark:text-zinc-400"}`}>
                       {badge}
                     </span>
                   )}
                   {badge && isCollapsed && (
-                    <span className="absolute top-1.5 right-1.5 bg-brand-600 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                    <span className="absolute top-1.5 right-1.5 bg-zinc-900 text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
                       {badge}
                     </span>
                   )}
@@ -404,14 +426,14 @@ export function AppLayout({
       {/* ─── Main Content ─────────────────────────────────────────────────── */}
       {/* `min-w-0` is critical: prevents flex item from growing beyond its
           track, which allows nested overflow-x-auto tables to actually scroll. */}
-      <main className="flex-1 min-w-0 flex flex-col min-h-screen lg:min-h-0 bg-gray-50 dark:bg-slate-900 transition-colors duration-200">
+      <main className="flex-1 min-w-0 flex flex-col min-h-screen lg:min-h-0 bg-gray-50 dark:bg-[#0d0d0d] transition-colors duration-200">
 
         {/* Desktop Header — sticky, shown only on lg+ */}
-        <header className="hidden lg:flex items-center justify-between px-6 py-3.5 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700/60 sticky top-0 z-20 shrink-0">
+        <header className="hidden lg:flex items-center justify-between px-6 py-3.5 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 sticky top-0 z-20 shrink-0">
           {/* Left: page title */}
           <div className="flex items-center gap-3">
             {PageIcon && (
-              <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-slate-700/50 text-red-600 dark:text-red-400 flex items-center justify-center">
+              <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-600 dark:text-zinc-400 flex items-center justify-center">
                 <PageIcon size={20} />
               </div>
             )}
@@ -428,7 +450,7 @@ export function AppLayout({
           {/* Right: online status + notification + profile */}
           <div className="flex items-center gap-2">
             {/* Online / offline indicator */}
-            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-slate-700/50 px-3 py-1.5 rounded-full border border-gray-100 dark:border-slate-600/50">
+            <div className="flex items-center gap-1.5 bg-gray-50 dark:bg-zinc-800/50 px-3 py-1.5 rounded-full border border-gray-100 dark:border-zinc-700/50">
               <NetworkDot status={networkStatus} />
               <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 capitalize">{networkStatus}</span>
             </div>
@@ -437,7 +459,7 @@ export function AppLayout({
             <button
               onClick={() => safeNavigate('/notifications')}
               aria-label="Notifications"
-              className="relative p-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-100 dark:border-slate-600/50 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-150"
+              className="relative p-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-100 dark:border-zinc-700/50 text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800 hover:text-gray-700 dark:hover:text-gray-200 transition-all duration-150"
             >
               <FaBell className="text-[17px]" />
               {unreadCount > 0 && (
@@ -452,8 +474,8 @@ export function AppLayout({
               <button
                 onClick={() => setProfileModalOpen(!profileModalOpen)}
                 className={`flex items-center gap-2.5 pl-2 pr-3 py-1.5 rounded-xl border transition-all duration-150 group ${profileModalOpen
-                  ? "bg-gray-100 dark:bg-slate-700 border-gray-200 dark:border-slate-600"
-                  : "bg-gray-50 dark:bg-slate-700/50 border-gray-100 dark:border-slate-600/50 hover:bg-gray-100 dark:hover:bg-slate-700"
+                  ? "bg-gray-100 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700"
+                  : "bg-gray-50 dark:bg-zinc-800/50 border-gray-100 dark:border-zinc-700/50 hover:bg-gray-100 dark:hover:bg-zinc-800"
                   }`}
               >
                 <div className="relative w-7 h-7 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-xs overflow-hidden shrink-0">
@@ -478,16 +500,16 @@ export function AppLayout({
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: 8, scale: 0.96 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden z-40"
+                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40"
                     >
                       {/* User info header */}
-                      <div className="p-4 border-b border-gray-100 dark:border-slate-700 bg-gray-50 dark:bg-slate-700/40">
+                      <div className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40">
                         <div className="flex items-center gap-3">
                           <div className="relative w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
                             {user?.profileImage ? (
                               <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
                             ) : userInitial}
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-slate-700" />
+                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-zinc-800" />
                           </div>
                           <div className="min-w-0">
                             <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userName}</p>
@@ -501,22 +523,22 @@ export function AppLayout({
                             safeNavigate(user?.role === 'superadmin' ? '/superadmin/settings' : '/settings');
                             setProfileModalOpen(false);
                           }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                          <FaUserCog className="text-red-500 text-base shrink-0" />
+                          <FaUserCog className="text-zinc-500 text-base shrink-0" />
                           Manage Account
                         </button>
                         <button
                           onClick={() => { toggleTheme(); setProfileModalOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                         >
                           {theme === 'dark' ? <FaSun className="text-amber-400 text-base shrink-0" /> : <FaMoon className="text-slate-500 text-base shrink-0" />}
                           <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
                         </button>
-                        <div className="h-px bg-gray-100 dark:bg-slate-700 my-1" />
+                        <div className="h-px bg-gray-100 dark:bg-zinc-800 my-1" />
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                         >
                           <FaSignOutAlt className="text-base shrink-0" />
                           Logout
@@ -531,11 +553,11 @@ export function AppLayout({
         </header>
 
         {/* Mobile top bar */}
-        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700/60 shadow-sm">
+        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 shadow-sm">
           {/* Left: hamburger or back */}
           <button
             onClick={() => showBackToList ? safeNavigate('/members') : setMobileMenuOpen(true)}
-            className="w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            className="w-10 h-10 rounded-full border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
             aria-label="Menu"
           >
             {showBackToList ? <FaArrowLeft size={16} /> : <span className="flex items-center"><FaBars size={16} /></span>}
@@ -554,12 +576,12 @@ export function AppLayout({
           {/* Right: notifications */}
           <button
             onClick={() => safeNavigate('/notifications')}
-            className="relative w-10 h-10 rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
+            className="relative w-10 h-10 rounded-full border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors shadow-sm"
             aria-label="Notifications"
           >
             <FaBell size={16} />
             {unreadCount > 0 && (
-              <span className="absolute top-2.5 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-zinc-900 text-[8px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-slate-800">
+              <span className="absolute top-2.5 right-2 min-w-[14px] h-[14px] px-1 rounded-full bg-zinc-900 text-[8px] font-bold text-white flex items-center justify-center border-2 border-white dark:border-zinc-800">
                 {unreadCount > 9 ? '9+' : unreadCount}
               </span>
             )}
@@ -581,7 +603,7 @@ export function AppLayout({
                 animate={{ x: 0 }}
                 exit={{ x: "-100%" }}
                 transition={{ type: "tween", duration: 0.2 }}
-                className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-slate-800 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-slate-700 flex flex-col"
+                className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-zinc-900 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-zinc-800 flex flex-col"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
@@ -592,7 +614,7 @@ export function AppLayout({
                           <img src={getImageUrl(gymLogo)} alt="Gym Logo" className="w-full h-full object-cover" />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-red-500/20 shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-zinc-900/20 shrink-0">
                           <img src={n3Logo} alt="N3" className="w-6 h-6 object-contain" />
                         </div>
                       )}
@@ -600,7 +622,7 @@ export function AppLayout({
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
-                      className="p-2 -mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 focus:outline-none"
+                      className="p-2 -mr-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-500 dark:text-gray-400 focus:outline-none"
                     >
                       ✕
                     </button>
@@ -623,8 +645,8 @@ export function AppLayout({
                                 }
                               }}
                               className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all text-sm ${isItemActive
-                                ? "bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold"
-                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                                ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-white font-bold"
+                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                                 }`}
                             >
                               <div className="flex items-center gap-3">
@@ -634,7 +656,7 @@ export function AppLayout({
                               <FaChevronDown className={`text-[10px] transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                             </button>
                             {isExpanded && (
-                              <div className="ml-6 space-y-1 border-l-2 border-gray-100 dark:border-slate-700 pl-4 mt-1">
+                              <div className="ml-6 space-y-1 border-l-2 border-gray-100 dark:border-zinc-800 pl-4 mt-1">
                                 {subItems.map((sub) => (
                                   <button
                                     key={sub.path}
@@ -643,8 +665,8 @@ export function AppLayout({
                                       setMobileMenuOpen(false);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 text-xs ${isActive(sub.path)
-                                      ? "text-brand-600 dark:text-brand-400 font-bold"
-                                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                                      ? "text-zinc-900 dark:text-white font-bold"
+                                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                                       }`}
                                   >
                                     {sub.label}
@@ -664,11 +686,17 @@ export function AppLayout({
                             setMobileMenuOpen(false);
                           }}
                           className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 text-sm ${isActive(path)
-                            ? "bg-brand-50 dark:bg-brand-900/20 text-brand-600 dark:text-brand-400 font-bold"
-                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                            ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-white font-bold"
+                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                             }`}
                         >
-                          <Icon /> {label}
+                          <Icon />
+                          <span className="flex-1">{label}</span>
+                          {item.badge && (
+                            <span className="bg-zinc-900 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full dark:bg-white dark:text-zinc-900">
+                              {item.badge}
+                            </span>
+                          )}
                         </button>
                       );
                     })}
@@ -678,18 +706,18 @@ export function AppLayout({
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-zinc-50 dark:hover:bg-red-900/20"
+                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
                   >
                     <FaSignOutAlt /> Logout
                   </button>
 
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-slate-700">
+                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
                     <button
                       onClick={() => {
                         toggleTheme();
                         setMobileMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700/50"
+                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
                     >
                       {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-500" />}
                       <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
@@ -731,16 +759,16 @@ export function AppLayout({
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-red-100 dark:border-red-900/30"
+                className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
               >
                 <div className="p-8 text-center">
-                  <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-red-500 animate-bounce">
+                  <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-700 dark:text-zinc-300 animate-bounce">
                     <FaExclamationTriangle size={40} />
                   </div>
                   <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2 uppercase tracking-tight">Urgent Message</h2>
-                  <p className="text-xs font-bold text-red-500 uppercase tracking-widest mb-6 px-4 py-1 bg-zinc-50 dark:bg-zinc-700/50 rounded-full inline-block">Attention Required</p>
+                  <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-6 px-4 py-1 bg-zinc-50 dark:bg-zinc-700/50 rounded-full inline-block">Attention Required</p>
 
-                  <div className="bg-gray-50 dark:bg-slate-700/50 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-slate-700 shadow-inner">
+                  <div className="bg-gray-50 dark:bg-zinc-800/50 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-zinc-800 shadow-inner">
                     <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-medium">
                       {activeWarning.message}
                     </p>
@@ -768,7 +796,7 @@ export function AppLayout({
       <InstallPWA />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] safe-area-pb">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-20 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] safe-area-pb">
         <div className="relative flex items-center justify-around px-2 pt-2 pb-1.5 h-[68px]">
           {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
             <BottomNavButton
@@ -809,7 +837,7 @@ function BottomNavButton({ active, onClick, label, icon, badge, isPrimary }) {
     <button
       onClick={onClick}
       className={`flex flex-col items-center justify-center gap-1 min-w-[48px] py-1.5 px-1 rounded-lg transition-colors relative flex-1 ${active
-        ? "text-red-600 dark:text-red-400 font-medium"
+        ? "text-zinc-900 dark:text-white font-medium"
         : "text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
         }`}
     >
@@ -833,7 +861,7 @@ function NetworkDot({ status }) {
   const cfg = {
     online: { color: 'bg-green-500', ring: 'bg-green-400', pulse: true, label: 'Online' },
     weak: { color: 'bg-amber-500', ring: 'bg-amber-400', pulse: true, label: 'Weak connection' },
-    offline: { color: 'bg-zinc-900', ring: 'bg-red-400', pulse: false, label: 'Offline' },
+    offline: { color: 'bg-zinc-900', ring: 'bg-zinc-500', pulse: false, label: 'Offline' },
   }[status] || { color: 'bg-gray-400', ring: 'bg-gray-300', pulse: false, label: 'Unknown' };
 
   return (

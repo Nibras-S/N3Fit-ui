@@ -121,9 +121,9 @@ export default function DateRangeFilter({ value, onChange }) {
         <div className="relative">
             <button
                 onClick={() => setOpen(o => !o)}
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors min-w-[160px]"
+                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors min-w-[160px]"
             >
-                <FaCalendarAlt size={12} className="text-red-500 shrink-0" />
+                <FaCalendarAlt size={12} className="text-zinc-600 shrink-0" />
                 <span className="flex-1 text-left truncate">{currentLabel}</span>
                 <FaChevronDown size={10} className="text-gray-400" />
             </button>
@@ -131,8 +131,8 @@ export default function DateRangeFilter({ value, onChange }) {
             {open && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl z-40 overflow-hidden">
-                        <div className="p-3 border-b border-gray-100 dark:border-slate-700">
+                    <div className="absolute right-0 mt-2 w-72 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-40 overflow-hidden">
+                        <div className="p-3 border-b border-gray-100 dark:border-zinc-800">
                             <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">Quick range</p>
                             <div className="grid grid-cols-2 gap-1.5">
                                 {PRESETS.map(p => {
@@ -144,7 +144,7 @@ export default function DateRangeFilter({ value, onChange }) {
                                             className={`px-2.5 py-1.5 rounded-md text-xs font-medium text-left transition-colors ${
                                                 isActive
                                                     ? 'bg-zinc-900 text-white'
-                                                    : 'bg-gray-50 dark:bg-slate-700/60 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700'
+                                                    : 'bg-gray-50 dark:bg-zinc-800/60 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800'
                                             }`}
                                         >
                                             {p.label}
@@ -162,7 +162,7 @@ export default function DateRangeFilter({ value, onChange }) {
                                         type="date"
                                         value={draftStart}
                                         onChange={(e) => setDraftStart(e.target.value)}
-                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
+                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
                                     />
                                 </div>
                                 <div>
@@ -171,7 +171,7 @@ export default function DateRangeFilter({ value, onChange }) {
                                         type="date"
                                         value={draftEnd}
                                         onChange={(e) => setDraftEnd(e.target.value)}
-                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-900 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
+                                        className="w-full px-2 py-1.5 border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 rounded-md text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900"
                                     />
                                 </div>
                                 <button

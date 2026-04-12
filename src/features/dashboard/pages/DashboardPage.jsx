@@ -20,20 +20,6 @@ const Dashboard = () => {
     const [todayModalOpen, setTodayModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
 
-    useEffect(() => {
-        if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
-            navigate('/members');
-            return;
-        }
-        fetchStats();
-    }, [user]);
-
-    // Refetch whenever any member, transaction, or expense changes in this gym
-    useGymSocket(
-        ['member:created', 'member:updated', 'member:deleted', 'transaction:created', 'transaction:updated', 'expense:created', 'expense:updated', 'expense:deleted'],
-        fetchStats,
-    );
-
     const fetchStats = async () => {
         try {
             const [res, expenseRes] = await Promise.all([
@@ -48,8 +34,23 @@ const Dashboard = () => {
         }
     };
 
+    useEffect(() => {
+        if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
+            navigate('/members');
+            return;
+        }
+        fetchStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [user]);
+
+    // Refetch whenever any member, transaction, or expense changes in this gym
+    useGymSocket(
+        ['member:created', 'member:updated', 'member:deleted', 'transaction:created', 'transaction:updated', 'expense:created', 'expense:updated', 'expense:deleted'],
+        fetchStats,
+    );
+
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#6366f1', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
-    const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#f43f5e' };
+    const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#3f3f46' };
 
     const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
     const formatDate = (d) => d
@@ -60,16 +61,16 @@ const Dashboard = () => {
         return (
             <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
                 <div className="space-y-6 pb-10">
-                    <div className="h-36 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-slate-700/50 dark:to-slate-600/50 animate-pulse rounded-2xl w-full" />
+                    <div className="h-36 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1c1c1c] animate-pulse rounded-2xl w-full" />
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="h-24 bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-xl border border-gray-100 dark:border-slate-700" />
+                            <div key={i} className="h-24 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-xl border border-gray-100 dark:border-zinc-800" />
                         ))}
                     </div>
-                    <div className="h-80 bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700" />
+                    <div className="h-80 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800" />
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div className="h-64 bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700" />
-                        <div className="h-64 bg-white dark:bg-slate-800 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-slate-700" />
+                        <div className="h-64 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800" />
+                        <div className="h-64 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800" />
                     </div>
                 </div>
             </AppLayout>
@@ -88,30 +89,30 @@ const Dashboard = () => {
             <div className="space-y-6 pb-10">
 
                 {/* ── Daily Report ──────────────────────────────────────── */}
-                <div className="bg-brand-50 border border-brand-100 p-6 rounded-2xl shadow-sm">
+                <div className="bg-zinc-100 border border-zinc-200 p-6 rounded-2xl shadow-sm">
                     <div className="flex items-center gap-2 mb-5">
-                        <FaCalendarAlt className="text-brand-600" />
-                        <h2 className="text-lg font-bold text-brand-800">Daily Report</h2>
-                        <span className="text-sm text-brand-600/80 font-medium ml-auto">
+                        <FaCalendarAlt className="text-zinc-900" />
+                        <h2 className="text-lg font-bold text-zinc-800">Daily Report</h2>
+                        <span className="text-sm text-zinc-900/80 font-medium ml-auto">
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                         </span>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Joined Today */}
-                        <div className="bg-white p-4 rounded-xl border border-brand-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <FaUserPlus className="text-brand-500 text-sm" />
+                                <FaUserPlus className="text-zinc-700 text-sm" />
                                 <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Joined Today</p>
                             </div>
-                            <p className="text-2xl font-black text-brand-600">{stats?.members?.joinedToday || 0}</p>
+                            <p className="text-2xl font-black text-zinc-900">{stats?.members?.joinedToday || 0}</p>
                             <p className="text-[10px] text-gray-400 font-medium">new members</p>
                         </div>
 
                         {/* Revenue Booked */}
-                        <div className="bg-white p-4 rounded-xl border border-brand-100 shadow-sm">
+                        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <FaChartLine className="text-brand-500 text-sm" />
+                                <FaChartLine className="text-zinc-700 text-sm" />
                                 <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Revenue</p>
                             </div>
                             <p className="text-2xl font-black text-gray-800">{formatCurrency(stats?.income?.daily)}</p>
@@ -147,73 +148,17 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                {/* ── KPI Stat Cards ────────────────────────────────────── */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    {/* Active Members */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="w-9 h-9 rounded-lg bg-brand-50 dark:bg-brand-900/20 flex items-center justify-center">
-                                <FaUsers className="text-brand-600 text-sm" />
-                            </div>
-                        </div>
-                        <p className="text-2xl font-black text-gray-900 dark:text-white">{stats?.members?.active || 0}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Active Members</p>
-                        <p className="text-[10px] text-gray-400 mt-1">+{stats?.members?.newThisMonth || 0} this month</p>
-                    </div>
-
-                    {/* Monthly Revenue */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="w-9 h-9 rounded-lg bg-green-50 dark:bg-green-900/20 flex items-center justify-center">
-                                <FaChartLine className="text-green-600 text-sm" />
-                            </div>
-                            {monthChange !== 0 && (
-                                <span className={`text-[10px] font-bold flex items-center gap-0.5 ${monthChange > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                    {monthChange > 0 ? <FaArrowUp /> : <FaArrowDown />}
-                                    {Math.abs(monthChange)}%
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-2xl font-black text-gray-900 dark:text-white">{formatCurrency(stats?.income?.monthlyActual)}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Monthly Collected</p>
-                        <p className="text-[10px] text-gray-400 mt-1">{stats?.income?.monthlyCount || 0} transactions</p>
-                    </div>
-
-                    {/* Outstanding Dues */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="w-9 h-9 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 flex items-center justify-center">
-                                <FaWallet className="text-yellow-600 text-sm" />
-                            </div>
-                        </div>
-                        <p className="text-2xl font-black text-gray-900 dark:text-white">{formatCurrency(stats?.income?.outstandingDues)}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Outstanding Dues</p>
-                        <p className="text-[10px] text-gray-400 mt-1">{stats?.income?.outstandingCount || 0} open payments</p>
-                    </div>
-
-                    {/* Expiring Soon */}
-                    <div className="bg-white dark:bg-slate-800 p-5 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="w-9 h-9 rounded-lg bg-orange-50 dark:bg-orange-900/20 flex items-center justify-center">
-                                <FaUserClock className="text-orange-500 text-sm" />
-                            </div>
-                        </div>
-                        <p className="text-2xl font-black text-gray-900 dark:text-white">{expiringSoon.length}</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Expiring in 7 Days</p>
-                        <p className="text-[10px] text-gray-400 mt-1">members at risk</p>
-                    </div>
-                </div>
 
                 {/* ── Recent Transactions ───────────────────────────────── */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
                         <div className="flex items-center gap-2">
-                            <FaExchangeAlt className="text-brand-600 text-sm" />
+                            <FaExchangeAlt className="text-zinc-900 text-sm" />
                             <h3 className="font-bold text-gray-900 dark:text-white">Recent Transactions</h3>
                         </div>
                         <button
                             onClick={() => navigate('/transactions')}
-                            className="text-xs text-brand-600 hover:text-brand-700 font-semibold transition-colors"
+                            className="text-xs text-zinc-900 hover:text-zinc-700 font-semibold transition-colors"
                         >
                             View All →
                         </button>
@@ -221,24 +166,24 @@ const Dashboard = () => {
 
                     {recentTransactions.length === 0 ? (
                         <div className="text-center py-12">
-                            <FaFileInvoiceDollar className="text-gray-300 dark:text-slate-600 text-3xl mx-auto mb-3" />
-                            <p className="text-sm text-gray-400 dark:text-slate-500">No transactions yet</p>
+                            <FaFileInvoiceDollar className="text-gray-300 dark:text-gray-600 text-3xl mx-auto mb-3" />
+                            <p className="text-sm text-gray-400 dark:text-gray-500">No transactions yet</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-gray-50 dark:divide-slate-700/50">
+                        <div className="divide-y divide-gray-50 dark:divide-zinc-800/50">
                             {recentTransactions.map((txn) => (
                                 <div
                                     key={txn._id}
-                                    className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors cursor-pointer"
+                                    className="flex items-center justify-between px-6 py-3.5 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
                                     onClick={() => navigate(`/invoice/${txn._id}`)}
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
-                                        <div className="w-8 h-8 rounded-full bg-brand-50 dark:bg-brand-900/20 text-brand-600 flex items-center justify-center text-xs font-bold shrink-0">
+                                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 flex items-center justify-center text-xs font-bold shrink-0">
                                             {txn.memberName?.charAt(0)?.toUpperCase() || '?'}
                                         </div>
                                         <div className="min-w-0">
                                             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{txn.memberName}</p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-400">{txn.plan} · {formatDate(txn.transactionDate)}</p>
+                                            <p className="text-xs text-gray-400 dark:text-gray-400">{txn.plan} · {formatDate(txn.transactionDate)}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-3 shrink-0">
@@ -263,8 +208,8 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                     {/* Pending Payments */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
                             <div className="flex items-center gap-2">
                                 <FaWallet className="text-yellow-500 text-sm" />
                                 <h3 className="font-bold text-gray-900 dark:text-white">Pending Payments</h3>
@@ -278,24 +223,24 @@ const Dashboard = () => {
 
                         {pendingPayments.length === 0 ? (
                             <div className="text-center py-10">
-                                <p className="text-sm text-gray-400 dark:text-slate-500">All payments up to date</p>
+                                <p className="text-sm text-gray-400 dark:text-gray-500">All payments up to date</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-50 dark:divide-slate-700/50 max-h-64 overflow-y-auto">
+                            <div className="divide-y divide-gray-50 dark:divide-zinc-800/50 max-h-64 overflow-y-auto">
                                 {pendingPayments.map((p) => (
                                     <div
                                         key={p._id}
-                                        className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors"
+                                        className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors"
                                     >
                                         <div className="min-w-0">
                                             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{p.memberName}</p>
-                                            <p className="text-xs text-gray-400 dark:text-slate-400">{p.plan}</p>
+                                            <p className="text-xs text-gray-400 dark:text-gray-400">{p.plan}</p>
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(p.amount)}</span>
                                             <button
                                                 onClick={() => setPaymentTxn(p)}
-                                                className="text-[10px] bg-brand-600 hover:bg-brand-700 text-white px-2 py-1 rounded-lg font-semibold transition-colors"
+                                                className="text-[10px] bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-1 rounded-lg font-semibold transition-colors"
                                             >
                                                 Collect
                                             </button>
@@ -307,8 +252,8 @@ const Dashboard = () => {
                     </div>
 
                     {/* Expiring Soon */}
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
                             <div className="flex items-center gap-2">
                                 <FaUserClock className="text-orange-500 text-sm" />
                                 <h3 className="font-bold text-gray-900 dark:text-white">Expiring Soon</h3>
@@ -320,7 +265,7 @@ const Dashboard = () => {
                             </div>
                             <button
                                 onClick={() => navigate('/inactivesoon')}
-                                className="text-xs text-brand-600 hover:text-brand-700 font-semibold transition-colors"
+                                className="text-xs text-zinc-900 hover:text-zinc-700 font-semibold transition-colors"
                             >
                                 View All →
                             </button>
@@ -328,14 +273,14 @@ const Dashboard = () => {
 
                         {expiringSoon.length === 0 ? (
                             <div className="text-center py-10">
-                                <p className="text-sm text-gray-400 dark:text-slate-500">No members expiring soon</p>
+                                <p className="text-sm text-gray-400 dark:text-gray-500">No members expiring soon</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-gray-50 dark:divide-slate-700/50 max-h-64 overflow-y-auto">
+                            <div className="divide-y divide-gray-50 dark:divide-zinc-800/50 max-h-64 overflow-y-auto">
                                 {expiringSoon.map((m) => (
                                     <div
                                         key={m._id}
-                                        className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 dark:hover:bg-slate-700/40 transition-colors cursor-pointer"
+                                        className="flex items-center justify-between px-6 py-3 hover:bg-gray-50 dark:hover:bg-zinc-800/40 transition-colors cursor-pointer"
                                         onClick={() => navigate(`/members/${m._id}`)}
                                     >
                                         <div className="flex items-center gap-2 min-w-0">
@@ -344,20 +289,20 @@ const Dashboard = () => {
                                             </div>
                                             <div className="min-w-0">
                                                 <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{m.name}</p>
-                                                <p className="text-xs text-gray-400 dark:text-slate-400">{m.plan}</p>
+                                                <p className="text-xs text-gray-400 dark:text-gray-400">{m.plan}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <a
                                                 href={`tel:${m.phone}`}
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="p-1.5 text-gray-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors"
+                                                className="p-1.5 text-gray-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors"
                                             >
                                                 <FaPhone className="text-xs" />
                                             </a>
                                             <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                                                 m.dews === 0
-                                                    ? 'bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400'
+                                                    ? 'bg-zinc-50 text-zinc-900 dark:bg-zinc-800/30 dark:text-zinc-500'
                                                     : m.dews <= 3
                                                         ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400'
                                                         : 'bg-yellow-50 text-yellow-700 dark:bg-yellow-900/20 dark:text-yellow-400'
@@ -381,17 +326,17 @@ const Dashboard = () => {
                     onClick={() => setTodayModalOpen(false)}
                 >
                     <div
-                        className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
                         onClick={(e) => e.stopPropagation()}
                     >
                         {/* Header */}
-                        <div className="sticky top-0 bg-brand-50 dark:bg-brand-900/20 border-b border-brand-100 dark:border-brand-800/30 p-6 rounded-t-2xl">
+                        <div className="sticky top-0 bg-zinc-100 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700/30 p-6 rounded-t-2xl">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h2 className="text-xl font-bold flex items-center gap-2 text-brand-800 dark:text-brand-300">
-                                        <FaCalendarAlt className="text-brand-600" /> Today's Breakdown
+                                    <h2 className="text-xl font-bold flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
+                                        <FaCalendarAlt className="text-zinc-900" /> Today's Breakdown
                                     </h2>
-                                    <p className="text-xs text-brand-600/80 dark:text-brand-400 font-medium mt-1">
+                                    <p className="text-xs text-zinc-900/80 dark:text-white font-medium mt-1">
                                         {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                                     </p>
                                 </div>
@@ -402,7 +347,7 @@ const Dashboard = () => {
                                 >×</button>
                             </div>
                             <div className="mt-4 grid grid-cols-2 gap-3">
-                                <div className="bg-white dark:bg-slate-700 border border-brand-100 dark:border-slate-600 rounded-xl p-3">
+                                <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl p-3">
                                     <p className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">Booked</p>
                                     <p className="text-2xl font-black text-gray-800 dark:text-white">{formatCurrency(stats?.income?.daily)}</p>
                                     <p className="text-xs text-gray-400">{stats?.income?.dailyCount || 0} txns</p>
@@ -424,7 +369,7 @@ const Dashboard = () => {
                                         {dailyByMethod.map((m) => (
                                             <div
                                                 key={m._id || 'unknown'}
-                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-slate-700"
+                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-zinc-800"
                                                 style={{ backgroundColor: `${METHOD_COLORS[m._id] || '#94a3b8'}10` }}
                                             >
                                                 <div className="flex items-center gap-2">
@@ -449,7 +394,7 @@ const Dashboard = () => {
                                         {dailyByStatus.map((s) => (
                                             <div
                                                 key={s._id || 'unknown'}
-                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-slate-700"
+                                                className="flex items-center justify-between p-3 rounded-xl border border-gray-100 dark:border-zinc-800"
                                                 style={{ backgroundColor: `${STATUS_COLORS[s._id] || '#94a3b8'}10` }}
                                             >
                                                 <div className="flex items-center gap-2">
@@ -466,10 +411,10 @@ const Dashboard = () => {
                                 )}
                             </div>
 
-                            <div className="pt-2 border-t border-gray-100 dark:border-slate-700">
+                            <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
                                 <button
                                     onClick={() => { setTodayModalOpen(false); navigate('/transactions'); }}
-                                    className="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white rounded-xl font-bold text-sm transition-colors shadow-button-glow"
+                                    className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold text-sm transition-colors shadow-none"
                                 >
                                     View All Transactions →
                                 </button>

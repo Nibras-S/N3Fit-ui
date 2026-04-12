@@ -45,7 +45,7 @@ export class ErrorBoundary extends React.Component {
                             If it keeps happening, please contact support.
                         </p>
                         {process.env.NODE_ENV !== 'production' && this.state.error && (
-                            <pre className="text-xs text-left text-red-600 bg-zinc-50 p-3 rounded mb-6 overflow-auto max-h-40">
+                            <pre className="text-xs text-left text-zinc-900 bg-zinc-50 p-3 rounded mb-6 overflow-auto max-h-40">
                                 {String(this.state.error?.message || this.state.error)}
                             </pre>
                         )}

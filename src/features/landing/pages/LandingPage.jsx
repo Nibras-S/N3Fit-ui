@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -10,11 +10,14 @@ import Testimonials from '../components/Testimonials';
 import FAQ from '../components/FAQ';
 import CallToAction from '../components/CallToAction';
 import Footer from '../components/Footer';
+import FreeTrialModal from '../components/FreeTrialModal';
 import { FiArrowUp } from 'react-icons/fi';
 
 import '../styles/landing.css';
 
 export default function LandingPage() {
+  const [trialOpen, setTrialOpen] = useState(false);
+
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -34,18 +37,20 @@ export default function LandingPage() {
         style={{ scaleX, background: 'var(--landing-primary)' }}
       />
 
-      <Navbar />
+      <Navbar onOpenTrial={() => setTrialOpen(true)} />
 
       <main>
-        <Hero />
+        <Hero onOpenTrial={() => setTrialOpen(true)} />
         <Problem />
         <Features />
         <HowItWorks />
         <Pricing />
         <Testimonials />
         <FAQ />
-        <CallToAction />
+        <CallToAction onOpenTrial={() => setTrialOpen(true)} />
       </main>
+
+      <FreeTrialModal isOpen={trialOpen} onClose={() => setTrialOpen(false)} />
 
       <Footer />
 

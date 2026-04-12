@@ -1,15 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiArrowRight } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0 },
 };
 
-export default function CallToAction() {
-  const navigate = useNavigate();
+export default function CallToAction({ onOpenTrial }) {
 
   return (
     <section className="py-20 lg:py-28" style={{ background: 'var(--landing-bg)' }}>
@@ -52,7 +50,7 @@ export default function CallToAction() {
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
               <button
                 className="landing-cta-primary"
-                onClick={() => navigate('/login')}
+                onClick={onOpenTrial}
               >
                 Get Started Free
                 <FiArrowRight size={18} />

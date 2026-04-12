@@ -3,200 +3,145 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Single source of truth for every color used in the application.
  *
+ * DARK MODE PALETTE: Pure black + neutral grey. No blue, no indigo, no slate.
+ *
  * RULES:
- *  1. Never hardcode a hex value in a component — reference this file or the
- *     Tailwind classes derived from tailwind.config.js which mirrors these values.
- *  2. Any new feature or UI change MUST conform to this palette.
- *  3. Red/rose is ONLY for: CTA buttons, active nav, focus rings, important
- *     badges, and chart/financial accent (expense, refunded, expired).
- *  4. Never use red for normal paragraph text or large background fills.
+ *  1. Never hardcode a hex in a component that isn't defined here.
+ *  2. All UI changes MUST conform to this palette.
+ *  3. Red/rose (#F43F5E) ONLY for: CTA buttons, active nav, focus rings,
+ *     important badges, chart/financial accents (expense, refunded, expired).
+ *  4. Never use red for paragraph text or large background fills.
+ *  5. Dark mode = black + grey ONLY. No slate, no blue-grey, no indigo.
+ *  6. Buttons use rounded-lg (medium radius) consistently.
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-// ── Brand (Rose / Red) ───────────────────────────────────────────────────────
+// ── Brand (Black / Zinc) ──────────────────────────────────────────────────────
 export const brand = {
-  red:      '#F43F5E',   // rose-500 — primary brand color
-  redHover: '#E11D48',   // rose-600 — button hover
-  redPressed:'#BE123C',  // rose-700 — button active / pressed
-  redSoft:  '#FFE4E6',   // rose-100 — badge bg, input error bg (light)
-  redSoftDark: 'rgba(244, 63, 94, 0.15)', // badge bg (dark mode)
+  primary:     '#18181B',              // zinc-900 — primary brand
+  hover:       '#27272A',              // zinc-800 — hover
+  pressed:     '#3F3F46',              // zinc-700 — pressed
+  soft:        '#F4F4F5',              // zinc-100 — badge bg (light)
+  softDark:    'rgba(255,255,255,0.08)', // badge bg (dark)
 };
 
-// ── Light Theme ──────────────────────────────────────────────────────────────
+// ── Light Theme ───────────────────────────────────────────────────────────────
 export const light = {
-  // Background
-  bg:       '#FFFFFF',   // Main page background
-  bgSoft:   '#F8FAFC',   // Section / sidebar background
-  bgMuted:  '#F3F4F6',   // Divider / subtle surface
+  bg:       '#FFFFFF',
+  bgSoft:   '#F8FAFC',
+  bgMuted:  '#F3F4F6',
+  card:     '#FFFFFF',
+  border:   '#E5E7EB',
+  borderHover: '#D1D5DB',
+  divider:  '#F3F4F6',
 
-  // Cards & Borders
-  card:     '#FFFFFF',   // Card background
-  border:   '#E5E7EB',   // Card / input borders
-  borderHover: '#D1D5DB',// Border on hover
-  divider:  '#F3F4F6',   // Divider lines
+  textPrimary:   '#111827',
+  textSecondary: '#6B7280',
+  textMuted:     '#9CA3AF',
 
-  // Typography
-  textPrimary:   '#111827',  // Headings, strong text
-  textSecondary: '#6B7280',  // Body text, labels
-  textMuted:     '#9CA3AF',  // Placeholder, meta text
-  textHeadingH1: '#0F172A',  // H1 / H2
-  textHeadingH3: '#111827',  // H3 / H4
-  link:          '#F43F5E',  // Default link
-  linkHover:     '#E11D48',  // Link hover
+  btnPrimaryBg:      '#18181B',
+  btnPrimaryText:    '#FFFFFF',
+  btnPrimaryHover:   '#27272A',
+  btnPrimaryPressed: '#3F3F46',
+  btnPrimaryShadow:  'rgba(0,0,0,0.20)',
 
-  // Buttons
-  btnPrimaryBg:       '#F43F5E',
-  btnPrimaryText:     '#FFFFFF',
-  btnPrimaryHover:    '#E11D48',
-  btnPrimaryPressed:  '#BE123C',
-  btnPrimaryShadow:   'rgba(244, 63, 94, 0.25)',
-  btnSecondaryBg:     'transparent',
-  btnSecondaryBorder: '#E5E7EB',
-  btnSecondaryText:   '#111827',
-  btnSecondaryHover:  '#F9FAFB',
-  btnGhostText:       '#374151',
-  btnGhostHover:      '#F3F4F6',
-  btnDisabledBg:      '#E5E7EB',
-  btnDisabledText:    '#9CA3AF',
-
-  // Icons
-  iconDefault:   '#111827',
-  iconSecondary: '#6B7280',
-  iconMuted:     '#9CA3AF',
-  iconAccent:    '#F43F5E',   // Red accent icon
-  iconAccentHover:'#E11D48',
-
-  // Inputs
   inputBg:          '#FFFFFF',
   inputBorder:      '#E5E7EB',
   inputText:        '#111827',
   inputPlaceholder: '#9CA3AF',
-  inputFocusBorder: '#F43F5E',
-  inputFocusGlow:   'rgba(244, 63, 94, 0.20)',
-  inputErrorBorder: '#E11D48',
-  inputErrorBg:     '#FFE4E6',
+  inputFocusBorder: '#18181B',
+  inputFocusGlow:   'rgba(0,0,0,0.08)',
 
-  // Badges
-  badgePrimaryBg:   '#FFE4E6',
-  badgePrimaryText: '#BE123C',
-  badgeNeutralBg:   '#F3F4F6',
-  badgeNeutralText: '#374151',
-
-  // Alerts
-  successBg:   '#ECFDF5', successText: '#065F46', successBorder: '#A7F3D0',
-  warningBg:   '#FFFBEB', warningText: '#92400E', warningBorder: '#FDE68A',
-  errorBg:     '#FFE4E6', errorText:   '#BE123C', errorBorder:   '#FDA4AF',
-  infoBg:      '#EFF6FF', infoText:    '#1D4ED8', infoBorder:    '#BFDBFE',
-
-  // Shadows
-  cardShadow:   '0px 8px 30px rgba(15, 23, 42, 0.06)',
-  buttonShadow: '0px 10px 25px rgba(244, 63, 94, 0.25)',
+  cardShadow:   '0px 8px 30px rgba(0,0,0,0.06)',
+  buttonShadow: '0px 10px 25px rgba(244,63,94,0.25)',
 };
 
-// ── Dark Theme ───────────────────────────────────────────────────────────────
+// ── Dark Theme — BLACK + NEUTRAL GREY ────────────────────────────────────────
+// Pure black scale. Zero blue or indigo tones anywhere.
 export const dark = {
-  // Background
-  bg:      '#0B0F19',   // Main background (deep navy-black)
-  bg2:     '#111827',   // Secondary background / sections
-  card:    '#0F172A',   // Card background
-  modal:   '#151E2F',   // Modal / elevated card
-  inputBg: '#0B1220',   // Input field background
+  // Backgrounds
+  bg:      '#0d0d0d',   // Main page background
+  bg2:     '#141414',   // Sections / sidebar
+  card:    '#1c1c1c',   // Card surfaces
+  modal:   '#202020',   // Modals / elevated panels
+  inputBg: '#1c1c1c',
 
   // Borders
-  border:       '#1E293B',  // Default border
-  borderHover:  '#334155',  // Border on hover
-  divider:      '#0F172A',
+  border:       '#2a2a2a',
+  borderHover:  '#3a3a3a',
+  divider:      '#222222',
 
   // Typography
-  textPrimary:   '#F9FAFB',  // Headings
-  textSecondary: '#CBD5E1',  // Body text
-  textMuted:     '#94A3B8',  // Placeholder / meta
-  textDisabled:  '#64748B',  // Disabled state
+  textPrimary:   '#F5F5F5',   // Near-white headings
+  textSecondary: '#C0C0C0',   // Body / labels
+  textMuted:     '#888888',   // Placeholder / meta
+  textDisabled:  '#555555',
 
-  // Brand Red (dark-compatible)
-  brandRed:      '#F43F5E',
-  brandRedHover: '#FB7185',  // Lighter on dark for contrast
-  brandRedPressed:'#E11D48',
-  brandRedSoft:  'rgba(244, 63, 94, 0.15)',
+  // Brand (dark-compatible)
+  brandPrimary:       '#FFFFFF',
+  brandHover:         '#F4F4F5',
+  brandPressed:       '#E4E4E7',
+  brandSoft:          'rgba(255,255,255,0.08)',
 
   // Buttons
-  btnPrimaryBg:      '#F43F5E',
-  btnPrimaryText:    '#FFFFFF',
-  btnPrimaryHover:   '#FB7185',
-  btnPrimaryPressed: '#E11D48',
-  btnPrimaryShadow:  'rgba(244, 63, 94, 0.35)',
-  btnSecondaryBg:    '#1E293B',
-  btnSecondaryText:  '#F9FAFB',
-  btnSecondaryBorder:'#334155',
-  btnSecondaryHover: '#334155',
-  btnGhostText:      '#CBD5E1',
-  btnGhostHover:     'rgba(148, 163, 184, 0.12)',
-  btnDisabledBg:     '#1E293B',
-  btnDisabledText:   '#64748B',
-
-  // Icons
-  iconDefault: '#F9FAFB',
-  iconSecondary:'#94A3B8',
-  iconAccent:  '#F43F5E',
-  iconAccentHover:'#FB7185',
+  btnPrimaryBg:      '#FFFFFF',
+  btnPrimaryText:    '#18181B',
+  btnSecondaryBg:    '#1c1c1c',
+  btnSecondaryText:  '#F5F5F5',
+  btnSecondaryBorder:'#2a2a2a',
+  btnSecondaryHover: '#2a2a2a',
+  btnGhostText:      '#C0C0C0',
+  btnGhostHover:     'rgba(255,255,255,0.06)',
+  btnDisabledBg:     '#222222',
+  btnDisabledText:   '#555555',
 
   // Inputs
-  inputBorder:      '#1E293B',
-  inputText:        '#F9FAFB',
-  inputPlaceholder: '#64748B',
-  inputFocusBorder: '#F43F5E',
-  inputFocusGlow:   'rgba(244, 63, 94, 0.25)',
-  inputErrorBorder: '#FB7185',
-  inputErrorBg:     'rgba(244, 63, 94, 0.12)',
+  inputBorder:      '#2a2a2a',
+  inputText:        '#F5F5F5',
+  inputPlaceholder: '#555555',
+  inputFocusBorder: '#3a3a3a',
+  inputFocusGlow:   'rgba(255,255,255,0.05)',
 
   // Badges
-  badgePrimaryBg:   'rgba(244, 63, 94, 0.15)',
-  badgePrimaryText: '#FB7185',
-  badgeNeutralBg:   '#1E293B',
-  badgeNeutralText: '#CBD5E1',
+  badgePrimaryBg:   'rgba(255,255,255,0.08)',
+  badgePrimaryText: '#F5F5F5',
+  badgeNeutralBg:   '#2a2a2a',
+  badgeNeutralText: '#C0C0C0',
 
   // Alerts
-  successBg: 'rgba(34,197,94,0.15)',   successText: '#4ADE80', successBorder: 'rgba(34,197,94,0.35)',
-  warningBg: 'rgba(245,158,11,0.15)',  warningText: '#FBBF24', warningBorder: 'rgba(245,158,11,0.35)',
-  errorBg:   'rgba(244,63,94,0.15)',   errorText:   '#FB7185', errorBorder:   'rgba(244,63,94,0.35)',
-  infoBg:    'rgba(59,130,246,0.15)',  infoText:    '#60A5FA', infoBorder:    'rgba(59,130,246,0.35)',
+  successBg: 'rgba(34,197,94,0.12)',  successText: '#4ADE80', successBorder: 'rgba(34,197,94,0.30)',
+  warningBg: 'rgba(245,158,11,0.12)', warningText: '#FBBF24', warningBorder: 'rgba(245,158,11,0.30)',
+  errorBg:   'rgba(239,68,68,0.12)',  errorText:   '#FCA5A5', errorBorder:   'rgba(239,68,68,0.30)',
 
   // Shadows
-  cardShadow:   '0px 10px 30px rgba(0, 0, 0, 0.50)',
-  buttonShadow: '0px 10px 30px rgba(244, 63, 94, 0.35)',
+  cardShadow:   '0px 10px 30px rgba(0,0,0,0.70)',
+  buttonShadow: '0px 10px 30px rgba(0,0,0,0.40)',
 };
 
-// ── Chart / Data Visualization Colors ────────────────────────────────────────
-// These are categorical colors for charts. Red (brand) is used for
-// expense/refunded/expired because of universal financial convention.
+// ── Chart Colors ──────────────────────────────────────────────────────────────
 export const chart = {
   income:   '#10b981',  // green  — positive cashflow
-  expense:  '#F43F5E',  // rose   — negative cashflow / expense outflow
-  refunded: '#F43F5E',  // rose   — refund (financial loss)
-  expired:  '#F43F5E',  // rose   — expired members (churn)
-  pending:  '#f59e0b',  // amber  — pending/partial
+  expense:  '#F43F5E',  // rose   — negative cashflow
+  refunded: '#F43F5E',  // rose   — refund (loss)
+  expired:  '#F43F5E',  // rose   — churn
+  pending:  '#f59e0b',  // amber  — pending
   partial:  '#f97316',  // orange — partially paid
-  upi:      '#6366f1',  // indigo — UPI payment method
-  card:     '#8b5cf6',  // purple — card payment method
+  upi:      '#6366f1',  // indigo — UPI
+  card:     '#8b5cf6',  // purple — card
   bank:     '#06b6d4',  // cyan   — bank transfer
-  cash:     '#10b981',  // green  — cash payment
+  cash:     '#10b981',  // green  — cash
 };
 
-// ── Tailwind Companion Mapping ────────────────────────────────────────────────
-// Tailwind classes that correspond to the theme above (for reference).
-// The actual values come from tailwind.config.js — keep in sync.
+// ── Tailwind Class Reference ──────────────────────────────────────────────────
 //
-// brand-50   → #fff1f2  (rose-50)
-// brand-100  → #ffe4e6  (rose-100)  ← soft/badge bg
-// brand-500  → #f43f5e  (rose-500)  ← focus ring
-// brand-600  → #f43f5e  (rose-500)  ← primary button bg
-// brand-700  → #e11d48  (rose-600)  ← button hover
-// brand-800  → #be123c  (rose-700)  ← button pressed
+// dark.DEFAULT  → dark:bg-dark          (#0d0d0d — near-black main bg)
+// dark.bg2      → dark:bg-dark-bg2      (#141414 — section bg)
+// dark.card     → dark:bg-dark-card     (#1c1c1c — card bg)
+// dark.modal    → dark:bg-dark-modal    (#202020 — modal bg)
+// dark.border   → dark:border-dark-border (#2a2a2a)
+// dark.muted    → dark:text-dark-muted  (#888888)
 //
-// dark.DEFAULT     → bg-dark          = #0b0f19
-// dark.bg2         → bg-dark-bg2      = #111827
-// dark.card        → bg-dark-card     = #0f172a
-// dark.modal       → bg-dark-modal    = #151e2f
-// dark.border      → border-dark-border = #1e293b
-// dark.borderHover → border-dark-borderHover = #334155
-// dark.muted       → text-dark-muted  = #94a3b8
+// Buttons:  rounded-lg  (8px — medium clean radius)
+// Inputs:   rounded-lg or rounded-xl
+// Cards:    rounded-xl or rounded-2xl
+// Modals:   rounded-2xl or rounded-3xl

@@ -28,8 +28,8 @@ export const AuthProvider = ({ children }) => {
                     // Load gym features from the me endpoint (already embedded in response)
                     if (userData?.gym?.features) {
                         setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
-                    } else {
-                        // Fallback: fetch gym profile separately
+                    } else if (userData?.role !== 'superadmin') {
+                        // Fallback: fetch gym profile separately (skip for superadmin — no gymId)
                         try {
                             const gymRes = await api.get('/gym/profile');
                             if (gymRes.data?.features) {

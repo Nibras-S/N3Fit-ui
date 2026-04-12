@@ -9,34 +9,35 @@ module.exports = {
         display: ["Outfit", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
-        // Brand — Rose/Red primary (#F43F5E = rose-500)
+        // Brand — Black/Zinc primary
         brand: {
-          50:  '#fff1f2',   // rose-50  — soft background tint
-          100: '#ffe4e6',   // rose-100 — badge / input error bg
-          200: '#fecdd3',   // rose-200 — borders (light)
-          300: '#fda4af',   // rose-300 — muted accent
-          400: '#fb7185',   // rose-400 — focus ring / hover state (dark mode)
-          500: '#f43f5e',   // rose-500 — focus ring (light mode)
-          600: '#f43f5e',   // rose-500 — PRIMARY BUTTON background
-          700: '#e11d48',   // rose-600 — primary button hover
-          800: '#be123c',   // rose-700 — primary button pressed / dark text
-          900: '#9f1239',   // rose-800
-          950: '#4c0519',   // rose-950
+          50:  '#fafafa',
+          100: '#f4f4f5',
+          200: '#e4e4e7',
+          300: '#d4d4d8',
+          400: '#a1a1aa',
+          500: '#71717a',
+          600: '#18181b',   // PRIMARY BUTTON background
+          700: '#27272a',   // button hover
+          800: '#3f3f46',   // button pressed
+          900: '#09090b',
+          950: '#000000',
         },
         surface: {
           DEFAULT: "#f8fafc",
           muted: "#f3f4f6",
           card: "#ffffff",
         },
+        // ── Dark palette: pure black + neutral grey (no blue/indigo) ──
         dark: {
-          DEFAULT: "#0b0f19",    // Main background (deep navy-black)
-          bg2: "#111827",        // Secondary background / sections
-          card: "#0f172a",       // Card background
-          modal: "#151e2f",      // Modal / elevated card
-          border: "#1e293b",     // Border default
-          borderHover: "#334155",// Border hover
-          muted: "#94a3b8",      // Muted text (slate-400)
-          disabled: "#64748b",   // Disabled text (slate-500)
+          DEFAULT: "#0d0d0d",    // Main bg — near pure black
+          bg2: "#141414",        // Secondary bg / sections
+          card: "#1c1c1c",       // Card bg
+          modal: "#202020",      // Modal / elevated surface
+          border: "#2a2a2a",     // Border default
+          borderHover: "#3a3a3a",// Border hover
+          muted: "#888888",      // Muted text
+          disabled: "#555555",   // Disabled text
         },
       },
       spacing: {
@@ -44,19 +45,20 @@ module.exports = {
         22: "5.5rem",
       },
       borderRadius: {
-        xl: "1rem",
-        "2xl": "1.5rem",
-        "3xl": "2rem",
+        // Buttons use rounded-lg (8px) — medium, clean, professional
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
       },
       boxShadow: {
-        soft: "0 2px 8px rgba(15,23,42,0.06)",
-        card: "0px 8px 30px rgba(15,23,42,0.06)",
-        "card-hover": "0px 12px 36px rgba(15,23,42,0.10)",
-        "card-dark": "0px 10px 30px rgba(0,0,0,0.50)",
-        glow: "0 0 40px rgba(244,63,94,0.15)",
-        "glow-lg": "0 0 60px rgba(244,63,94,0.20)",
-        "button-glow": "0px 10px 25px rgba(244,63,94,0.25)",
-        "button-glow-dark": "0px 10px 30px rgba(244,63,94,0.35)",
+        soft: "0 2px 8px rgba(0,0,0,0.08)",
+        card: "0px 8px 30px rgba(0,0,0,0.06)",
+        "card-hover": "0px 12px 36px rgba(0,0,0,0.10)",
+        "card-dark": "0px 10px 30px rgba(0,0,0,0.60)",
+        glow: "0 0 40px rgba(0,0,0,0.12)",
+        "glow-lg": "0 0 60px rgba(0,0,0,0.18)",
+        "button-glow": "0px 10px 25px rgba(0,0,0,0.20)",
+        "button-glow-dark": "0px 10px 30px rgba(0,0,0,0.40)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-out",
@@ -64,8 +66,8 @@ module.exports = {
         "float": "float 6s ease-in-out infinite",
         "float-delayed": "float 6s ease-in-out 3s infinite",
         "pulse-slow": "pulse 4s ease-in-out infinite",
-        "counter": "counter 2s ease-out forwards",
         "gradient": "gradientShift 8s ease infinite",
+        "bounce-dot": "bounceDot 1.2s infinite ease-in-out",
       },
       keyframes: {
         fadeIn: {
@@ -84,13 +86,17 @@ module.exports = {
           "0%, 100%": { backgroundPosition: "0% 50%" },
           "50%": { backgroundPosition: "100% 50%" },
         },
+        bounceDot: {
+          "0%, 80%, 100%": { transform: "scale(0.8)", opacity: "0.5" },
+          "40%": { transform: "scale(1.1)", opacity: "1" },
+        },
       },
       backgroundImage: {
-        'brand-gradient': 'linear-gradient(135deg, #f43f5e, #e11d48, #be123c)',
-        'brand-radial': 'radial-gradient(circle at 50% 50%, rgba(244,63,94,0.25) 0%, transparent 70%)',
+        'brand-gradient': 'linear-gradient(135deg, #18181b, #27272a, #3f3f46)',
+        'brand-radial': 'radial-gradient(circle at 50% 50%, rgba(0,0,0,0.08) 0%, transparent 70%)',
         'hero-gradient': 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
-        'hero-gradient-dark': 'radial-gradient(circle at top, rgba(244,63,94,0.20), transparent 60%), linear-gradient(180deg, #0b0f19 0%, #111827 100%)',
-        'card-gradient': 'linear-gradient(135deg, rgba(244,63,94,0.05), rgba(220,38,38,0.02))',
+        'hero-gradient-dark': 'linear-gradient(180deg, #0d0d0d 0%, #141414 100%)',
+        'card-gradient': 'linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01))',
       },
     },
   },

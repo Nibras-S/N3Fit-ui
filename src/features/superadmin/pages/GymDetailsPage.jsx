@@ -3,6 +3,8 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import { PageSkeleton } from '../../../shared/components/ui/Skeleton';
+import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import {
@@ -135,9 +137,7 @@ const GymDetails = () => {
     if (loading) {
         return (
             <AppLayout showGenderSwitch={false}>
-                <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+                <PageSkeleton stats={3} tableRows={5} />
             </AppLayout>
         );
     }
@@ -163,11 +163,11 @@ const GymDetails = () => {
                     <div className="flex items-center gap-3">
                         <button
                             onClick={() => setIsEditing(!isEditing)}
-                            className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all ${isEditing ? "bg-gray-100 text-gray-600 hover:bg-gray-200" : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-red-500/20"}`}
+                            className={`px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all ${isEditing ? "bg-gray-100 text-gray-600 hover:bg-gray-200" : "bg-zinc-900 text-white hover:bg-zinc-800 shadow-lg shadow-zinc-900/20"}`}
                         >
                             {isEditing ? <><FaLock size={14} /> Cancel Edit</> : <><FaEdit size={14} /> Edit Details</>}
                         </button>
-                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${gym.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400"}`}>
+                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest flex items-center gap-2 ${gym.isActive ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500"}`}>
                             <span className={`w-2 h-2 rounded-full ${gym.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
                             {gym.isActive ? "Active" : "Suspended"}
                         </div>
@@ -181,10 +181,10 @@ const GymDetails = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             onSubmit={handleSubmit}
-                            className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-gray-100 dark:border-slate-700 shadow-xl shadow-gray-200/20 dark:shadow-none space-y-6"
+                            className="bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-gray-100 dark:border-zinc-800 shadow-xl shadow-gray-200/20 dark:shadow-none space-y-6"
                         >
-                            <div className="flex items-center gap-3 border-b border-gray-50 dark:border-slate-700 pb-4 mb-2">
-                                <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-red-600">
+                            <div className="flex items-center gap-3 border-b border-gray-50 dark:border-zinc-800 pb-4 mb-2">
+                                <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-zinc-900">
                                     <FaBuilding size={20} />
                                 </div>
                                 <div>
@@ -202,10 +202,10 @@ const GymDetails = () => {
                                             required
                                             value={form.name}
                                             onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                         />
                                     ) : (
-                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.name}</p>
+                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.name}</p>
                                     )}
                                 </div>
 
@@ -219,10 +219,10 @@ const GymDetails = () => {
                                                     type="email"
                                                     value={form.contactEmail}
                                                     onChange={(e) => setForm({ ...form, contactEmail: e.target.value })}
-                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
+                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                                 />
                                             ) : (
-                                                <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactEmail || "No email provided"}</p>
+                                                <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactEmail || "No email provided"}</p>
                                             )}
                                         </div>
                                     </div>
@@ -235,10 +235,10 @@ const GymDetails = () => {
                                                     type="text"
                                                     value={form.contactPhone}
                                                     onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
-                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
+                                                    className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                                 />
                                             ) : (
-                                                <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactPhone || "No phone provided"}</p>
+                                                <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent">{form.contactPhone || "No phone provided"}</p>
                                             )}
                                         </div>
                                     </div>
@@ -253,16 +253,16 @@ const GymDetails = () => {
                                                 rows={2}
                                                 value={form.address}
                                                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                                                className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none resize-none"
+                                                className="w-full pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none resize-none"
                                             />
                                         ) : (
-                                            <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent leading-relaxed">{form.address || "No address provided"}</p>
+                                            <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent leading-relaxed">{form.address || "No address provided"}</p>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-3 border-b border-gray-50 dark:border-slate-700 pb-4 mt-6">
+                            <div className="flex items-center gap-3 border-b border-gray-50 dark:border-zinc-800 pb-4 mt-6">
                                 <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-2xl text-purple-600">
                                     <FaCrown size={20} />
                                 </div>
@@ -279,7 +279,7 @@ const GymDetails = () => {
                                         <select
                                             value={form.saaSPlan}
                                             onChange={(e) => setForm({ ...form, saaSPlan: e.target.value })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none appearance-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none appearance-none"
                                         >
                                             <option value="">No Plan (Limited Access)</option>
                                             {plans.map(p => (
@@ -287,7 +287,7 @@ const GymDetails = () => {
                                             ))}
                                         </select>
                                     ) : (
-                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent flex items-center gap-2">
+                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent flex items-center gap-2">
                                             <FaCrown className="text-amber-500 text-xs" />
                                             {gym.saaSPlan?.name || "No Active Plan"}
                                         </p>
@@ -299,13 +299,13 @@ const GymDetails = () => {
                                         <select
                                             value={form.isActive}
                                             onChange={(e) => setForm({ ...form, isActive: e.target.value === 'true' })}
-                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
+                                            className="w-full px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-4 focus:ring-red-500/10 focus:border-zinc-900 transition-all outline-none"
                                         >
                                             <option value="true">Active & Functional</option>
                                             <option value="false">Suspended / Restricted</option>
                                         </select>
                                     ) : (
-                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">
+                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent">
                                             {form.isActive ? "Active & Functional" : "Suspended / Restricted"}
                                         </p>
                                     )}
@@ -316,20 +316,20 @@ const GymDetails = () => {
                                 <div>
                                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Subscription Type</label>
                                     {isEditing ? (
-                                        <div className="flex bg-gray-50 dark:bg-slate-900 p-1.5 rounded-2xl border border-gray-100 dark:border-slate-700">
+                                        <div className="flex bg-gray-50 dark:bg-zinc-950 p-1.5 rounded-2xl border border-gray-100 dark:border-zinc-800">
                                             {['trial', 'active', 'inactive'].map(status => (
                                                 <button
                                                     key={status}
                                                     type="button"
                                                     onClick={() => setForm({ ...form, subscriptionStatus: status })}
-                                                    className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-xl transition-all ${form.subscriptionStatus === status ? "bg-white dark:bg-slate-800 text-red-600 shadow-sm border border-gray-100 dark:border-slate-700" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
+                                                    className={`flex-1 py-1.5 text-xs font-bold uppercase rounded-xl transition-all ${form.subscriptionStatus === status ? "bg-white dark:bg-zinc-900 text-zinc-900 shadow-sm border border-gray-100 dark:border-zinc-800" : "text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"}`}
                                                 >
                                                     {status}
                                                 </button>
                                             ))}
                                         </div>
                                     ) : (
-                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-bold uppercase text-xs border border-transparent">{form.subscriptionStatus}</p>
+                                        <p className="px-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-bold uppercase text-xs border border-transparent">{form.subscriptionStatus}</p>
                                     )}
                                 </div>
                                 <div>
@@ -339,10 +339,10 @@ const GymDetails = () => {
                                             <DatePicker
                                                 value={form.subscriptionExpiry || ''}
                                                 onChange={(e) => setForm({ ...form, subscriptionExpiry: e.target.value })}
-                                                className="!bg-gray-50 dark:!bg-slate-900 !rounded-2xl !py-3 !pl-10 !pr-5 !border-gray-200 dark:!border-slate-700"
+                                                className="!bg-gray-50 dark:!bg-zinc-950 !rounded-2xl !py-3 !pl-10 !pr-5 !border-gray-200 dark:!border-zinc-800"
                                             />
                                         ) : (
-                                            <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-slate-900/50 text-gray-900 dark:text-white font-medium border border-transparent">
+                                            <p className="pl-12 pr-5 py-3 rounded-2xl bg-gray-50 dark:bg-zinc-950/50 text-gray-900 dark:text-white font-medium border border-transparent">
                                                 {form.subscriptionExpiry ? new Date(form.subscriptionExpiry).toLocaleDateString() : "Never expires"}
                                             </p>
                                         )}
@@ -357,7 +357,7 @@ const GymDetails = () => {
                                     className="w-full py-4 mt-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-bold flex items-center justify-center gap-3 shadow-xl shadow-zinc-900/25 transition-all active:scale-[0.98] disabled:opacity-50"
                                 >
                                     {updating ? (
-                                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        <ButtonSpinner />
                                     ) : (
                                         <>
                                             <FaSave />
@@ -374,11 +374,11 @@ const GymDetails = () => {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-gray-100 dark:border-slate-700 shadow-xl shadow-gray-200/20 dark:shadow-none space-y-6"
+                            className="bg-white dark:bg-zinc-900 rounded-3xl p-8 border border-gray-100 dark:border-zinc-800 shadow-xl shadow-gray-200/20 dark:shadow-none space-y-6"
                         >
-                            <div className="flex items-center justify-between border-b border-gray-50 dark:border-slate-700 pb-4">
+                            <div className="flex items-center justify-between border-b border-gray-50 dark:border-zinc-800 pb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-red-600">
+                                    <div className="p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-2xl text-zinc-900">
                                         <FaCogs size={20} />
                                     </div>
                                     <div>
@@ -387,7 +387,7 @@ const GymDetails = () => {
                                     </div>
                                 </div>
                                 {updatingFeatures && (
-                                    <div className="w-4 h-4 border-2 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
+                                    <span className="w-4 h-4 block bg-gray-400 rounded-full animate-pulse inline-block"></span>
                                 )}
                             </div>
 
@@ -406,13 +406,13 @@ const GymDetails = () => {
                                         disabled={updatingFeatures}
                                         onClick={() => handleUpdateFeatures(feature.key)}
                                         className={`flex items-start justify-between p-4 rounded-2xl border transition-all text-left group ${gymFeatures[feature.key]
-                                            ? "bg-zinc-50/50 border-red-200 dark:bg-zinc-800/30 dark:border-red-800"
-                                            : "bg-gray-50/50 border-gray-100 dark:bg-slate-900/50 dark:border-slate-700"
+                                            ? "bg-zinc-50/50 border-zinc-200 dark:bg-zinc-800/30 dark:border-zinc-700"
+                                            : "bg-gray-50/50 border-gray-100 dark:bg-zinc-950/50 dark:border-zinc-800"
                                             }`}
                                     >
                                         <div className="flex gap-3">
                                             <div>
-                                                <p className={`font-bold text-sm ${gymFeatures[feature.key] ? "text-red-700 dark:text-red-400" : "text-gray-600 dark:text-gray-400"}`}>
+                                                <p className={`font-bold text-sm ${gymFeatures[feature.key] ? "text-zinc-700 dark:text-zinc-500" : "text-gray-600 dark:text-gray-400"}`}>
                                                     {feature.label}
                                                 </p>
                                                 <p className="text-[10px] text-gray-400 mt-0.5">{feature.desc}</p>
@@ -420,7 +420,7 @@ const GymDetails = () => {
                                         </div>
                                         <div className="mt-0.5">
                                             {gymFeatures[feature.key] ? (
-                                                <FaToggleOn className="text-red-600 text-2xl" />
+                                                <FaToggleOn className="text-zinc-900 text-2xl" />
                                             ) : (
                                                 <FaToggleOff className="text-gray-300 text-2xl" />
                                             )}
@@ -435,11 +435,11 @@ const GymDetails = () => {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-xl shadow-gray-200/20 dark:shadow-none overflow-hidden"
+                            className="bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800 shadow-xl shadow-gray-200/20 dark:shadow-none overflow-hidden"
                         >
-                            <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/30 dark:bg-slate-700/10">
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/30 dark:bg-zinc-800/10">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-2xl text-rose-600">
+                                    <div className="p-3 bg-zinc-100 dark:bg-zinc-800/50 rounded-2xl text-zinc-900">
                                         <FaUsers size={20} />
                                     </div>
                                     <div>
@@ -447,17 +447,17 @@ const GymDetails = () => {
                                         <p className="text-xs text-gray-500">List of active staff accounts for this fit club</p>
                                     </div>
                                 </div>
-                                <span className="bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 px-3 py-1 rounded-full text-xs font-bold">
+                                <span className="bg-zinc-100 dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-300 px-3 py-1 rounded-full text-xs font-bold">
                                     {gym.staff?.length || 0} Accounts
                                 </span>
                             </div>
 
-                            <div className="divide-y divide-gray-50 dark:divide-slate-700">
+                            <div className="divide-y divide-gray-50 dark:divide-zinc-800">
                                 {gym.staff && gym.staff.length > 0 ? (
                                     gym.staff.map((member, i) => (
-                                        <div key={member._id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                                        <div key={member._id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 font-bold uppercase overflow-hidden">
+                                                <div className="w-10 h-10 rounded-xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 font-bold uppercase overflow-hidden">
                                                     {member.name.charAt(0)}
                                                 </div>
                                                 <div>
@@ -492,8 +492,8 @@ const GymDetails = () => {
 
                     {/* Sidebar Stats & Info */}
                     <div className="space-y-6">
-                        <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 border border-gray-100 dark:border-slate-700 shadow-xl shadow-gray-200/20">
-                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-50 dark:border-slate-700 pb-2">Admin Details</h4>
+                        <div className="bg-white dark:bg-zinc-900 rounded-3xl p-6 border border-gray-100 dark:border-zinc-800 shadow-xl shadow-gray-200/20">
+                            <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-50 dark:border-zinc-800 pb-2">Admin Details</h4>
                             {gym.admin ? (
                                 <div className="space-y-5">
                                     <div className="flex items-center gap-4">
@@ -508,7 +508,7 @@ const GymDetails = () => {
                                             </p>
                                         </div>
                                     </div>
-                                    <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-2xl border border-gray-100 dark:border-slate-700">
+                                    <div className="p-4 bg-gray-50 dark:bg-zinc-950 rounded-2xl border border-gray-100 dark:border-zinc-800">
                                         <div className="flex items-center justify-between mb-2">
                                             <span className="text-xs text-gray-500 font-medium tracking-tight">Email Address</span>
                                             <FaEnvelope size={10} className="text-gray-300" />
@@ -522,7 +522,7 @@ const GymDetails = () => {
 
                                     <button
                                         onClick={handleDelete}
-                                        className="w-full py-3 rounded-2xl border border-red-100 dark:border-red-900/30 text-red-500 text-xs font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-all active:scale-95"
+                                        className="w-full py-3 rounded-2xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 text-xs font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-all active:scale-95"
                                     >
                                         <FaTrash size={12} />
                                         Delete Fit Club Account
@@ -541,7 +541,7 @@ const GymDetails = () => {
                             <div className="absolute top-0 right-0 p-8 opacity-10">
                                 <FaUsers size={120} />
                             </div>
-                            <h4 className="text-xs font-bold text-red-400 uppercase tracking-widest mb-6 relative z-10">Current Statistics</h4>
+                            <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 relative z-10">Current Statistics</h4>
 
                             <div className="space-y-6 relative z-10">
                                 <div className="flex justify-between items-center group">
@@ -550,7 +550,7 @@ const GymDetails = () => {
                                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Total Members</p>
                                     </div>
                                     <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-zinc-900/20 transition-colors">
-                                        <FaUsers size={16} className="text-red-400" />
+                                        <FaUsers size={16} className="text-zinc-500" />
                                     </div>
                                 </div>
 
@@ -559,15 +559,15 @@ const GymDetails = () => {
                                         <p className="text-3xl font-black">{gym.stats?.staffCount || 0}</p>
                                         <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Active Staff</p>
                                     </div>
-                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-rose-500/20 transition-colors">
-                                        <FaUserShield size={16} className="text-rose-400" />
+                                    <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-zinc-900/20 transition-colors">
+                                        <FaUserShield size={16} className="text-zinc-400" />
                                     </div>
                                 </div>
 
                                 <div className="space-y-4 pt-4 border-t border-white/5 mt-4">
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider">
-                                            <div className="flex items-center gap-2 text-red-400">
+                                            <div className="flex items-center gap-2 text-zinc-500">
                                                 <div className="w-1.5 h-1.5 rounded-full bg-zinc-900 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
                                                 Member Capacity
                                             </div>
@@ -587,8 +587,8 @@ const GymDetails = () => {
 
                                     <div className="space-y-2 pt-2">
                                         <div className="flex items-center justify-between text-[10px] uppercase font-bold tracking-wider">
-                                            <div className="flex items-center gap-2 text-rose-400">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
+                                            <div className="flex items-center gap-2 text-zinc-400">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-zinc-900 shadow-[0_0_8px_rgba(239,68,68,0.5)]"></div>
                                                 Staff Capacity
                                             </div>
                                             <span className="text-gray-400">{gym.stats?.staffCount || 0} / {gym.saaSPlan?.maxStaff || "∞"}</span>

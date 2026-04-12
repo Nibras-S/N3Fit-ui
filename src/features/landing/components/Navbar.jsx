@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX } from 'react-icons/fi';
 import n3Logo from '../../../assets/n3Logo.png';
 
-export default function Navbar() {
+export default function Navbar({ onOpenTrial }) {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -71,7 +71,7 @@ export default function Navbar() {
             <button className="landing-btn-ghost" onClick={() => navigate('/login')}>
               Sign In
             </button>
-            <button className="landing-btn-primary" onClick={() => navigate('/login')}>
+            <button className="landing-btn-primary" onClick={onOpenTrial}>
               Start Free Trial
             </button>
           </div>
@@ -122,7 +122,7 @@ export default function Navbar() {
                 className="landing-btn-primary landing-btn-full"
                 onClick={() => {
                   setMobileOpen(false);
-                  navigate('/login');
+                  onOpenTrial();
                 }}
               >
                 Start Free Trial

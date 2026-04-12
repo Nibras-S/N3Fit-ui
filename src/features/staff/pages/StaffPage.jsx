@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import { TableSkeleton } from '../../../shared/components/ui/Skeleton';
+import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
     FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers, FaUserCheck, FaUserTimes,
@@ -273,9 +275,7 @@ const StaffManagement = () => {
     if (loading) {
         return (
             <AppLayout showGenderSwitch={false}>
-                <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+                <div className="p-6"><TableSkeleton rows={6} cols={5} /></div>
             </AppLayout>
         );
     }
@@ -305,12 +305,12 @@ const StaffManagement = () => {
                 </div>
 
                 {/* View tabs — Active vs Archived */}
-                <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-slate-800 border border-gray-200 dark:border-slate-700">
+                <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800">
                     <button
                         onClick={() => setView('active')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                             view === 'active'
-                                ? 'bg-white dark:bg-slate-700 text-red-600 dark:text-red-400 shadow-sm'
+                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-500 shadow-sm'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                         }`}
                     >
@@ -320,7 +320,7 @@ const StaffManagement = () => {
                         onClick={() => setView('archived')}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                             view === 'archived'
-                                ? 'bg-white dark:bg-slate-700 text-amber-600 dark:text-amber-400 shadow-sm'
+                                ? 'bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-sm'
                                 : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
                         }`}
                     >
@@ -329,7 +329,7 @@ const StaffManagement = () => {
                             <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
                                 view === 'archived'
                                     ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                                    : 'bg-gray-200 dark:bg-slate-700 text-gray-600 dark:text-gray-300'
+                                    : 'bg-gray-200 dark:bg-zinc-800 text-gray-600 dark:text-gray-300'
                             }`}>
                                 {archivedCount}
                             </span>
@@ -339,10 +339,10 @@ const StaffManagement = () => {
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
-                                <FaUsers className="text-red-600 dark:text-red-400" />
+                                <FaUsers className="text-zinc-900 dark:text-zinc-500" />
                             </div>
                             <div>
                                 <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeStaff.length}</p>
@@ -350,7 +350,7 @@ const StaffManagement = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
                                 <FaUserCheck className="text-green-600 dark:text-green-400" />
@@ -361,7 +361,7 @@ const StaffManagement = () => {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                         <div className="flex items-center gap-3">
                             <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
                                 view === 'archived'
@@ -370,7 +370,7 @@ const StaffManagement = () => {
                             }`}>
                                 {view === 'archived'
                                     ? <FaArchive className="text-amber-600 dark:text-amber-400" />
-                                    : <FaUserTimes className="text-red-600 dark:text-red-400" />}
+                                    : <FaUserTimes className="text-zinc-900 dark:text-zinc-500" />}
                             </div>
                             <div>
                                 {view === 'archived' ? (
@@ -380,7 +380,7 @@ const StaffManagement = () => {
                                     </>
                                 ) : (
                                     <>
-                                        <p className="text-2xl font-bold text-red-600 dark:text-red-400">{inactiveCount}</p>
+                                        <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-500">{inactiveCount}</p>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Inactive</p>
                                     </>
                                 )}
@@ -397,17 +397,17 @@ const StaffManagement = () => {
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search staff..."
-                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                     />
                 </div>
 
                 {/* Staff Table */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
                     {/* Desktop Table */}
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b border-gray-100 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30">
+                                <tr className="border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-800/30">
                                     <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Staff Member</th>
                                     <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Email</th>
                                     <th className="px-5 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">Status</th>
@@ -418,10 +418,10 @@ const StaffManagement = () => {
                             </thead>
                             <tbody>
                                 {filtered.map((member) => (
-                                    <tr key={member._id} className="border-b border-gray-50 dark:border-slate-700/50 hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                                    <tr key={member._id} className="border-b border-gray-50 dark:border-zinc-800/50 hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 transition-colors">
                                         <td className="px-5 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                                <div className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive ? "bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500" : "bg-gray-100 dark:bg-zinc-800 text-gray-400"}`}>
                                                     {member.name?.charAt(0)?.toUpperCase()}
                                                 </div>
                                                 <span className="font-medium text-gray-900 dark:text-white text-sm">{member.name}</span>
@@ -438,7 +438,7 @@ const StaffManagement = () => {
                                                     onClick={() => toggleActive(member)}
                                                     className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium cursor-pointer transition-colors ${member.isActive
                                                         ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                                        : "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400 hover:bg-zinc-100 dark:hover:bg-red-900/30"
+                                                        : "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800/40"
                                                         }`}
                                                 >
                                                     <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
@@ -449,7 +449,7 @@ const StaffManagement = () => {
                                         <td className="px-5 py-4">
                                             <div className="flex gap-1.5 flex-wrap">
                                                 {(member.permissions || []).map(p => (
-                                                    <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 capitalize">
+                                                    <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 capitalize">
                                                         {p}
                                                     </span>
                                                 ))}
@@ -477,7 +477,7 @@ const StaffManagement = () => {
                                                             title="Restore"
                                                         >
                                                             {restoringId === member._id ? (
-                                                                <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div>
+                                                                <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaUndo size={13} />
                                                             )}
@@ -485,11 +485,11 @@ const StaffManagement = () => {
                                                         <button
                                                             onClick={() => handleDelete(member._id)}
                                                             disabled={deletingId === member._id}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors disabled:opacity-50"
                                                             title="Delete permanently"
                                                         >
                                                             {deletingId === member._id ? (
-                                                                <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div>
+                                                                <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaTrash size={13} />
                                                             )}
@@ -499,7 +499,7 @@ const StaffManagement = () => {
                                                     <>
                                                         <button
                                                             onClick={() => openEditModal(member)}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
+                                                            className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
                                                             title="Edit"
                                                         >
                                                             <FaEdit size={14} />
@@ -511,7 +511,7 @@ const StaffManagement = () => {
                                                             title="Archive"
                                                         >
                                                             {deletingId === member._id ? (
-                                                                <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+                                                                <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaArchive size={13} />
                                                             )}
@@ -546,7 +546,7 @@ const StaffManagement = () => {
                     </div>
 
                     {/* Mobile Card View */}
-                    <div className="md:hidden divide-y divide-gray-100 dark:divide-slate-700">
+                    <div className="md:hidden divide-y divide-gray-100 dark:divide-zinc-800">
                         {filtered.length === 0 ? (
                             <div className="text-center py-12 text-gray-400">
                                 {view === 'archived' ? (
@@ -568,7 +568,7 @@ const StaffManagement = () => {
                                 <div key={member._id} className="p-4">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive && view === 'active' ? "bg-zinc-100 dark:bg-zinc-700/50 text-red-600 dark:text-red-400" : "bg-gray-100 dark:bg-slate-700 text-gray-400"}`}>
+                                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${member.isActive && view === 'active' ? "bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500" : "bg-gray-100 dark:bg-zinc-800 text-gray-400"}`}>
                                                 {member.name?.charAt(0)?.toUpperCase()}
                                             </div>
                                             <div>
@@ -591,7 +591,7 @@ const StaffManagement = () => {
                                                 onClick={() => toggleActive(member)}
                                                 className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
                                                     ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
-                                                    : "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400"
+                                                    : "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500"
                                                     }`}
                                             >
                                                 {member.isActive ? "Active" : "Inactive"}
@@ -601,7 +601,7 @@ const StaffManagement = () => {
                                     <div className="flex items-center justify-between">
                                         <div className="flex gap-1.5 flex-wrap">
                                             {(member.permissions || []).map(p => (
-                                                <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 capitalize">{p}</span>
+                                                <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 capitalize">{p}</span>
                                             ))}
                                         </div>
                                         <div className="flex items-center gap-1">
@@ -609,21 +609,21 @@ const StaffManagement = () => {
                                                 <>
                                                     <button onClick={() => handleRestore(member._id)} disabled={restoringId === member._id}
                                                         className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50">
-                                                        {restoringId === member._id ? <div className="w-3.5 h-3.5 border-2 border-green-400 border-t-transparent rounded-full animate-spin"></div> : <FaUndo size={13} />}
+                                                        {restoringId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaUndo size={13} />}
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
-                                                        className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
-                                                        {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-red-400 border-t-transparent rounded-full animate-spin"></div> : <FaTrash size={13} />}
+                                                        className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors disabled:opacity-50">
+                                                        {deletingId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaTrash size={13} />}
                                                     </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors">
+                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
                                                         <FaEdit size={14} />
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
                                                         className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50">
-                                                        {deletingId === member._id ? <div className="w-3.5 h-3.5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div> : <FaArchive size={13} />}
+                                                        {deletingId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaArchive size={13} />}
                                                     </button>
                                                 </>
                                             )}
@@ -650,17 +650,17 @@ const StaffManagement = () => {
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-slate-700"
+                            className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-zinc-800"
                             onClick={(e) => e.stopPropagation()}
                         >
                             {/* Modal Header */}
-                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
                                 <h3 className="font-bold text-gray-900 dark:text-white text-lg">
                                     {editingStaff ? "Edit Staff" : "Add New Staff"}
                                 </h3>
                                 <button
                                     onClick={() => setModalOpen(false)}
-                                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     <FaTimes size={14} />
                                 </button>
@@ -674,7 +674,7 @@ const StaffManagement = () => {
                                         type="text"
                                         value={formData.name}
                                         onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="John Doe"
                                         required
                                     />
@@ -688,7 +688,7 @@ const StaffManagement = () => {
                                                 type="email"
                                                 value={formData.email}
                                                 onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
-                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                                className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                                 placeholder="staff@example.com"
                                                 required
                                             />
@@ -700,7 +700,7 @@ const StaffManagement = () => {
                                                     type={showPassword ? "text" : "password"}
                                                     value={formData.password}
                                                     onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
-                                                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                                    className="w-full px-4 py-2.5 pr-10 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                                     placeholder="Enter password"
                                                     required
                                                 />
@@ -719,7 +719,7 @@ const StaffManagement = () => {
                                 {/* Joining Date — optional reference for HR records */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
-                                        <FaCalendarAlt className="text-red-500 text-xs" /> Joining Date
+                                        <FaCalendarAlt className="text-zinc-700 text-xs" /> Joining Date
                                         <span className="text-xs font-normal text-gray-400">(optional)</span>
                                     </label>
                                     <input
@@ -727,7 +727,7 @@ const StaffManagement = () => {
                                         value={formData.joiningDate}
                                         onChange={(e) => setFormData(p => ({ ...p, joiningDate: e.target.value }))}
                                         max={new Date().toISOString().split('T')[0]}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                     />
                                     <p className="text-[11px] text-gray-400 mt-1">
                                         When this person actually joined the team — distinct from when their app account was created.
@@ -737,17 +737,17 @@ const StaffManagement = () => {
                                 {/* ID Proof Upload — PDF or image */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 flex items-center gap-2">
-                                        <FaPaperclip className="text-red-500 text-xs" /> ID Proof Document
+                                        <FaPaperclip className="text-zinc-700 text-xs" /> ID Proof Document
                                         <span className="text-xs font-normal text-gray-400">(PDF / JPG / PNG, max 5 MB)</span>
                                     </label>
 
                                     {existingIdProofUrl && !idProofFile && (
-                                        <div className="mb-2 flex items-center justify-between gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600">
+                                        <div className="mb-2 flex items-center justify-between gap-2 p-2.5 rounded-lg bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700">
                                             <a
                                                 href={idProofHref(existingIdProofUrl)}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="flex items-center gap-2 text-xs text-red-600 dark:text-red-400 hover:underline truncate"
+                                                className="flex items-center gap-2 text-xs text-zinc-900 dark:text-zinc-500 hover:underline truncate"
                                             >
                                                 {existingIdProofUrl.toLowerCase().endsWith('.pdf')
                                                     ? <FaFilePdf className="shrink-0" />
@@ -758,14 +758,14 @@ const StaffManagement = () => {
                                         </div>
                                     )}
 
-                                    <label className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-300 dark:border-slate-600 cursor-pointer hover:border-red-400 dark:hover:border-zinc-900 transition-colors">
+                                    <label className="flex items-center gap-3 p-3 rounded-xl border border-dashed border-gray-300 dark:border-zinc-700 cursor-pointer hover:border-zinc-400 dark:hover:border-zinc-900 transition-colors">
                                         <input
                                             type="file"
                                             accept=".pdf,image/jpeg,image/jpg,image/png"
                                             onChange={handleIdProofChange}
                                             className="hidden"
                                         />
-                                        <div className="w-9 h-9 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center shrink-0">
+                                        <div className="w-9 h-9 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 flex items-center justify-center shrink-0">
                                             {idProofFile?.type === 'application/pdf'
                                                 ? <FaFilePdf />
                                                 : idProofFile
@@ -786,7 +786,7 @@ const StaffManagement = () => {
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.preventDefault(); setIdProofFile(null); }}
-                                                className="p-1.5 rounded-md text-gray-400 hover:text-red-500 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors"
+                                                className="p-1.5 rounded-md text-gray-400 hover:text-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
                                                 title="Remove"
                                             >
                                                 <FaTimes size={12} />
@@ -803,15 +803,15 @@ const StaffManagement = () => {
                                             <label
                                                 key={perm.key}
                                                 className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all ${formData.permissions.includes(perm.key)
-                                                    ? "border-red-200 dark:border-red-800 bg-zinc-50/50 dark:bg-zinc-800/30"
-                                                    : "border-gray-100 dark:border-slate-700 hover:border-gray-200 dark:hover:border-slate-600"
+                                                    ? "border-zinc-200 dark:border-zinc-700 bg-zinc-50/50 dark:bg-zinc-800/30"
+                                                    : "border-gray-100 dark:border-zinc-800 hover:border-gray-200 dark:hover:border-zinc-600"
                                                     }`}
                                             >
                                                 <input
                                                     type="checkbox"
                                                     checked={formData.permissions.includes(perm.key)}
                                                     onChange={() => togglePermission(perm.key)}
-                                                    className="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
+                                                    className="w-4 h-4 rounded border-gray-300 text-zinc-900 focus:ring-red-500"
                                                 />
                                                 <div>
                                                     <p className="text-sm font-medium text-gray-900 dark:text-white">{perm.label}</p>
@@ -827,7 +827,7 @@ const StaffManagement = () => {
                                     <button
                                         type="button"
                                         onClick={() => setModalOpen(false)}
-                                        className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-all"
+                                        className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all"
                                     >
                                         Cancel
                                     </button>
@@ -837,7 +837,7 @@ const StaffManagement = () => {
                                         className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                                     >
                                         {submitting ? (
-                                            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                            <ButtonSpinner />
                                         ) : editingStaff ? "Save Changes" : "Add Staff"}
                                     </button>
                                 </div>

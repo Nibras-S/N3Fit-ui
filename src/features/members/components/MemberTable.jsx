@@ -131,22 +131,22 @@ const AllMembers = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-red-600' : 'bg-pink-100 text-pink-600'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-zinc-900' : 'bg-pink-100 text-pink-600'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
-                    <span className="font-medium text-gray-900 group-hover:text-red-600 transition-colors">{row.name}</span>
+                    <span className="font-medium text-gray-900 group-hover:text-zinc-900 transition-colors">{row.name}</span>
                 </div>
             )
         },
         { key: 'phone', label: 'Phone', sortable: true, render: (row) => <span className="text-gray-500">{row.phone}</span> },
         {
             key: 'status', label: 'Status',
-            render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-red-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
+            render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
         },
         {
             key: 'dews', label: 'Days Left', sortable: true,
-            render: (row) => <span className={row.dews < 0 ? 'text-red-500 font-medium' : 'text-gray-700'}>{row.dews}</span>
+            render: (row) => <span className={row.dews < 0 ? 'text-zinc-700 font-medium' : 'text-gray-700'}>{row.dews}</span>
         },
         {
             key: 'paymentStatus', label: 'Payment',
@@ -171,8 +171,8 @@ const AllMembers = () => {
 
     const renderActions = (row) => (
         <div className="flex gap-2">
-            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-red-500 hover:bg-zinc-50 rounded-lg"><FaEdit /></button>
-            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-red-500 hover:bg-zinc-50 rounded-lg"><FaTrash /></button>
+            <button onClick={() => handleEditClick(row._id)} className="p-1.5 text-zinc-700 hover:bg-zinc-50 rounded-lg"><FaEdit /></button>
+            <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="p-1.5 text-zinc-700 hover:bg-zinc-50 rounded-lg"><FaTrash /></button>
         </div>
     );
 
@@ -190,7 +190,7 @@ const AllMembers = () => {
                             />
                         </div>
                     ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-red-600' : 'bg-pink-100 text-pink-600'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-zinc-900' : 'bg-pink-100 text-pink-600'}`}>
                             {row.name?.charAt(0)}
                         </div>
                     )}
@@ -199,17 +199,17 @@ const AllMembers = () => {
                         <div className="text-sm text-gray-500">{row.phone}</div>
                     </div>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-red-700'}`}>
+                <span className={`px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-700'}`}>
                     {row.dews >= 0 ? 'Active' : 'Expired'}
                 </span>
             </div>
             <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                <span className={row.dews < 0 ? 'text-red-500 font-medium' : ''}>{row.dews} days</span>
+                <span className={row.dews < 0 ? 'text-zinc-700 font-medium' : ''}>{row.dews} days</span>
                 <span>{formatDate(row.date)}</span>
             </div>
             <div className="flex gap-2 pt-3 border-t border-gray-100">
-                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-2 bg-zinc-50 text-red-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaEdit /> Edit</button>
-                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-2 bg-zinc-50 text-red-600 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaTrash /> Delete</button>
+                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-2 bg-zinc-50 text-zinc-900 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaEdit /> Edit</button>
+                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-2 bg-zinc-50 text-zinc-900 font-medium rounded-lg text-sm flex items-center justify-center gap-2"><FaTrash /> Delete</button>
             </div>
         </>
     );
@@ -257,7 +257,7 @@ const AllMembers = () => {
                         <button
                             onClick={fetchMembers}
                             disabled={loading}
-                            className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-red-100"
+                            className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 rounded-lg transition-colors border border-transparent hover:border-zinc-200"
                             title="Refresh"
                         >
                             <FaSync className={loading ? 'animate-spin' : ''} />

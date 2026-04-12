@@ -8,6 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
+import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 
 const Announcement = () => {
     const { api, user } = useAuth();
@@ -221,10 +222,10 @@ const Announcement = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
                     {/* Draft Section */}
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                            <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
                                 <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    {mode === 'whatsapp' ? <FaBullhorn className="text-red-500" /> : <FaBell className="text-orange-500" />}
+                                    {mode === 'whatsapp' ? <FaBullhorn className="text-zinc-700" /> : <FaBell className="text-orange-500" />}
                                     {mode === 'whatsapp' ? 'Draft WhatsApp Message' : 'Draft Internal Message'}
                                 </h2>
                                 {mode === 'whatsapp' ? (
@@ -248,7 +249,7 @@ const Announcement = () => {
                                             type="text"
                                             value={form.heading}
                                             onChange={(e) => setForm(p => ({ ...p, heading: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none"
                                             placeholder="e.g. SPECIAL OFFER! 🎉"
                                         />
                                     </div>
@@ -257,13 +258,13 @@ const Announcement = () => {
                                 {mode === 'internal' && (
                                     <div className="flex gap-3">
                                         {[
-                                            { id: 'notification', label: 'Notification', icon: FaBell, color: 'text-red-500' },
-                                            { id: 'warning', label: 'Urgent Warning', icon: FaExclamationTriangle, color: 'text-red-500' }
+                                            { id: 'notification', label: 'Notification', icon: FaBell, color: 'text-zinc-700' },
+                                            { id: 'warning', label: 'Urgent Warning', icon: FaExclamationTriangle, color: 'text-zinc-700' }
                                         ].map(t => (
                                             <button
                                                 key={t.id}
                                                 onClick={() => setForm(p => ({ ...p, type: t.id }))}
-                                                className={`flex-1 p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${form.type === t.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/50' : 'border-gray-100 dark:border-slate-700 text-gray-400'}`}
+                                                className={`flex-1 p-3 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${form.type === t.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/50' : 'border-gray-100 dark:border-zinc-800 text-gray-400'}`}
                                             >
                                                 <t.icon className={form.type === t.id ? t.color : ''} size={20} />
                                                 <span className={`text-xs font-bold ${form.type === t.id ? 'text-gray-900 dark:text-white' : ''}`}>{t.label}</span>
@@ -278,7 +279,7 @@ const Announcement = () => {
                                         rows={mode === 'whatsapp' ? 4 : 6}
                                         value={form.caption}
                                         onChange={(e) => setForm(p => ({ ...p, caption: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none resize-none"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all outline-none resize-none"
                                         placeholder={mode === 'whatsapp' ? "Write your announcement message here..." : "Type the update or warning message for the app users..."}
                                     />
                                 </div>
@@ -286,7 +287,7 @@ const Announcement = () => {
                                 {mode === 'whatsapp' && (
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 text-gray-900 dark:text-white">Announcement Image</label>
-                                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 dark:border-slate-700 border-dashed rounded-2xl hover:border-red-400 dark:hover:border-zinc-900 transition-colors group cursor-pointer"
+                                        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 dark:border-zinc-800 border-dashed rounded-2xl hover:border-zinc-400 dark:hover:border-zinc-900 transition-colors group cursor-pointer"
                                             onClick={() => document.getElementById('image-upload').click()}>
                                             <div className="space-y-1 text-center font-bold text-gray-900 dark:text-white">
                                                 {form.imagePreview ? (
@@ -301,9 +302,9 @@ const Announcement = () => {
                                                     </div>
                                                 ) : (
                                                     <>
-                                                        <FaImage className="mx-auto h-12 w-12 text-gray-400 group-hover:text-red-500 transition-colors" />
+                                                        <FaImage className="mx-auto h-12 w-12 text-gray-400 group-hover:text-zinc-700 transition-colors" />
                                                         <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                                                            <span className="relative cursor-pointer rounded-md font-medium text-red-600 hover:text-red-500">Upload an image</span>
+                                                            <span className="relative cursor-pointer rounded-md font-medium text-zinc-700 hover:text-zinc-700">Upload an image</span>
                                                             <p className="pl-1 text-gray-900 dark:text-white">or drag and drop</p>
                                                         </div>
                                                         <p className="text-xs text-gray-500 font-bold text-gray-900 dark:text-white">PNG, JPG up to 5MB</p>
@@ -320,8 +321,8 @@ const Announcement = () => {
 
                     {/* Audience Section */}
                     <div className="space-y-6">
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                            <div className="p-6 border-b border-gray-50 dark:border-slate-700 bg-gray-50/50 dark:bg-slate-700/30">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-800/30">
                                 <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                     <FaUsers className="text-purple-500" />
                                     Target Audience
@@ -335,7 +336,7 @@ const Announcement = () => {
                                         { id: 'expired', label: 'Expired Only', desc: 'Only members with expired plans' },
                                         { id: 'selected', label: 'Select Specific', desc: 'Choose members manually' }
                                     ].map(opt => (
-                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
+                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-zinc-800 hover:border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="audience"
@@ -354,7 +355,7 @@ const Announcement = () => {
                                         { id: 'all', label: 'All Fit Clubs', desc: 'Broadcast to every fit club on platform' },
                                         { id: 'selected', label: 'Select Fit Clubs', desc: 'Target specific fit club locations' }
                                     ].map(opt => (
-                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-slate-700 hover:border-gray-200'}`}>
+                                        <label key={opt.id} className={`flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ${form.audience === opt.id ? 'border-zinc-900 bg-zinc-50/50 dark:bg-zinc-800/30' : 'border-gray-50 dark:border-zinc-800 hover:border-gray-200'}`}>
                                             <input
                                                 type="radio"
                                                 name="audience"
@@ -373,8 +374,8 @@ const Announcement = () => {
                         </div>
 
                         {form.audience === 'selected' && mode === 'whatsapp' && (
-                            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col max-h-[400px]">
-                                <div className="p-4 border-b border-gray-50 dark:border-slate-700">
+                            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col max-h-[400px]">
+                                <div className="p-4 border-b border-gray-50 dark:border-zinc-800">
                                     <div className="relative">
                                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
                                         <input
@@ -382,32 +383,32 @@ const Announcement = () => {
                                             placeholder="Search members..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-lg text-xs outline-none"
+                                            className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs outline-none"
                                         />
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {fetchingContacts ? (
-                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-red-500" /></div>
+                                        <div className="p-4 space-y-2"><div className="h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded animate-pulse w-full"></div><div className="h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded animate-pulse w-3/4"></div></div>
                                     ) : filteredContacts.map(contact => (
                                         <div
                                             key={contact._id}
                                             onClick={() => toggleMember(contact._id)}
-                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedMembers.includes(contact._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
+                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedMembers.includes(contact._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
                                         >
                                             <div className="min-w-0">
                                                 <p className="text-xs font-medium text-gray-900 dark:text-white truncate">{contact.name}</p>
                                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{contact.phone}</p>
                                             </div>
-                                            {selectedMembers.includes(contact._id) && <FaCheckCircle className="text-red-500" size={12} />}
+                                            {selectedMembers.includes(contact._id) && <FaCheckCircle className="text-zinc-700" size={12} />}
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-3 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                                <div className="p-3 bg-gray-50 dark:bg-zinc-950/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center">
                                     <span className="text-[10px] font-medium text-gray-500">{selectedMembers.length} selected</span>
                                     <button
                                         onClick={() => setSelectedMembers([])}
-                                        className="text-[10px] font-medium text-red-500 hover:underline"
+                                        className="text-[10px] font-medium text-zinc-700 hover:underline"
                                     >
                                         Clear All
                                     </button>
@@ -416,8 +417,8 @@ const Announcement = () => {
                         )}
 
                         {form.audience === 'selected' && mode === 'internal' && (
-                            <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col max-h-[400px]">
-                                <div className="p-4 border-b border-gray-50 dark:border-slate-700">
+                            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col max-h-[400px]">
+                                <div className="p-4 border-b border-gray-50 dark:border-zinc-800">
                                     <div className="relative">
                                         <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
                                         <input
@@ -425,32 +426,32 @@ const Announcement = () => {
                                             placeholder="Search fit clubs..."
                                             value={searchTerm}
                                             onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 rounded-lg text-xs outline-none"
+                                            className="w-full pl-8 pr-3 py-1.5 bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 rounded-lg text-xs outline-none"
                                         />
                                     </div>
                                 </div>
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {fetchingGyms ? (
-                                        <div className="text-center py-4"><FaSpinner className="animate-spin mx-auto text-red-500" /></div>
+                                        <div className="p-4 space-y-2"><div className="h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded animate-pulse w-full"></div><div className="h-4 bg-gray-200 dark:bg-[#2a2a2a] rounded animate-pulse w-3/4"></div></div>
                                     ) : gyms.filter(g => g.name.toLowerCase().includes(searchTerm.toLowerCase())).map(gym => (
                                         <div
                                             key={gym._id}
                                             onClick={() => toggleGym(gym._id)}
-                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedGyms.includes(gym._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'}`}
+                                            className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${selectedGyms.includes(gym._id) ? 'bg-zinc-50 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
                                         >
                                             <div className="min-w-0">
                                                 <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">{gym.name}</p>
                                                 <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{gym.gymCode}</p>
                                             </div>
-                                            {selectedGyms.includes(gym._id) && <FaCheckCircle className="text-red-500" size={12} />}
+                                            {selectedGyms.includes(gym._id) && <FaCheckCircle className="text-zinc-700" size={12} />}
                                         </div>
                                     ))}
                                 </div>
-                                <div className="p-3 bg-gray-50 dark:bg-slate-900/50 border-t border-gray-100 dark:border-slate-700 flex justify-between items-center">
+                                <div className="p-3 bg-gray-50 dark:bg-zinc-950/50 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-center">
                                     <span className="text-[10px] font-medium text-gray-500">{selectedGyms.length} selected</span>
                                     <button
                                         onClick={() => setSelectedGyms([])}
-                                        className="text-[10px] font-medium text-red-500 hover:underline"
+                                        className="text-[10px] font-medium text-zinc-700 hover:underline"
                                     >
                                         Clear All
                                     </button>
@@ -465,7 +466,7 @@ const Announcement = () => {
                         >
                             {loading ? (
                                 <>
-                                    <FaSpinner className="animate-spin" />
+                                    <ButtonSpinner />
                                     {mode === 'whatsapp' ? 'Sending Announcements...' : 'Posting Message...'}
                                 </>
                             ) : (

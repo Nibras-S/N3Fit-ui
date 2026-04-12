@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import { TableSkeleton } from '../../../shared/components/ui/Skeleton';
+import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import {
     FaPlus, FaEdit, FaTimes, FaCrown, FaCheck, FaUsers, FaUserShield
 } from "react-icons/fa";
@@ -86,7 +88,7 @@ const SaaSPlanManagement = () => {
     const formatCurrency = (v) => `₹${(v || 0).toLocaleString("en-IN")}`;
 
     const tierColors = [
-        { bg: "from-zinc-800 to-red-600", light: "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400" },
+        { bg: "from-zinc-800 to-red-600", light: "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500" },
         { bg: "from-purple-500 to-purple-600", light: "bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400" },
         { bg: "from-amber-500 to-amber-600", light: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400" },
         { bg: "from-emerald-500 to-emerald-600", light: "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400" },
@@ -95,9 +97,7 @@ const SaaSPlanManagement = () => {
     if (loading) {
         return (
             <AppLayout showGenderSwitch={false}>
-                <div className="flex items-center justify-center h-[60vh]">
-                    <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+                <div className="p-6"><TableSkeleton rows={8} cols={4} /></div>
             </AppLayout>
         );
     }
@@ -130,7 +130,7 @@ const SaaSPlanManagement = () => {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.05 }}
-                                className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden group"
+                                className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden group"
                             >
                                 {/* Price Header */}
                                 <div className={`bg-gradient-to-r ${color.bg} p-5 text-white relative`}>
@@ -173,7 +173,7 @@ const SaaSPlanManagement = () => {
 
                                     {/* Features */}
                                     {plan.features?.length > 0 && (
-                                        <div className="pt-3 border-t border-gray-100 dark:border-slate-700 space-y-2">
+                                        <div className="pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-2">
                                             {plan.features.map((f, j) => (
                                                 <div key={j} className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                                     <FaCheck className="text-green-500 shrink-0" size={10} />
@@ -211,14 +211,14 @@ const SaaSPlanManagement = () => {
                             initial={{ opacity: 0, scale: 0.95, y: 10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                            className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-slate-700 max-h-[90vh] overflow-y-auto"
+                            className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-zinc-800 max-h-[90vh] overflow-y-auto"
                             onClick={(e) => e.stopPropagation()}
                         >
-                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
                                 <h3 className="font-bold text-gray-900 dark:text-white text-lg">
                                     {editing ? "Edit Plan" : "Create Plan"}
                                 </h3>
-                                <button onClick={() => setModalOpen(false)} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors">
+                                <button onClick={() => setModalOpen(false)} className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
                                     <FaTimes size={14} />
                                 </button>
                             </div>
@@ -227,7 +227,7 @@ const SaaSPlanManagement = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Plan Name *</label>
                                     <input type="text" value={form.name} onChange={(e) => setForm(p => ({ ...p, name: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                         placeholder="Pro" required />
                                 </div>
 
@@ -235,13 +235,13 @@ const SaaSPlanManagement = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Price (₹) *</label>
                                         <input type="number" value={form.price} onChange={(e) => setForm(p => ({ ...p, price: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             placeholder="999" required min="0" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Billing Cycle</label>
                                         <select value={form.billingCycle} onChange={(e) => setForm(p => ({ ...p, billingCycle: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all">
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all">
                                             <option value="monthly">Monthly</option>
                                             <option value="yearly">Yearly</option>
                                         </select>
@@ -252,13 +252,13 @@ const SaaSPlanManagement = () => {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Max Staff</label>
                                         <input type="number" value={form.maxStaff} onChange={(e) => setForm(p => ({ ...p, maxStaff: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             min="1" />
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Max Members</label>
                                         <input type="number" value={form.maxMembers} onChange={(e) => setForm(p => ({ ...p, maxMembers: e.target.value }))}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all"
                                             min="1" />
                                     </div>
                                 </div>
@@ -266,19 +266,19 @@ const SaaSPlanManagement = () => {
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Features</label>
                                     <textarea value={form.features} onChange={(e) => setForm(p => ({ ...p, features: e.target.value }))}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-700/50 border border-gray-200 dark:border-slate-600 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all resize-none"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 transition-all resize-none"
                                         rows={3} placeholder="Dashboard, Reports, SMS Reminders (comma-separated)" />
                                     <p className="text-xs text-gray-400 mt-1">Separate features with commas</p>
                                 </div>
 
                                 <div className="flex gap-3 pt-2">
                                     <button type="button" onClick={() => setModalOpen(false)}
-                                        className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-slate-700 transition-all">
+                                        className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-300 font-medium text-sm hover:bg-gray-50 dark:hover:bg-zinc-800 transition-all">
                                         Cancel
                                     </button>
                                     <button type="submit" disabled={submitting}
                                         className="flex-1 py-2.5 rounded-xl bg-zinc-900 text-white font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-50 flex items-center justify-center gap-2">
-                                        {submitting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                        {submitting ? <ButtonSpinner />
                                             : editing ? "Save Changes" : "Create Plan"}
                                     </button>
                                 </div>

@@ -15,7 +15,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
 
-const COLORS = ['#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f43f5e'];
+const COLORS = ['#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#3f3f46'];
 
 const formatCurrency = (val) => `₹${(val || 0).toLocaleString('en-IN')}`;
 const formatDate = (d) => d
@@ -156,7 +156,7 @@ const IncomeDetailPage = () => {
                             <button
                                 onClick={fetchData}
                                 disabled={loading}
-                                className="p-2 text-gray-500 hover:text-red-600 hover:bg-zinc-50 dark:hover:bg-red-900/20 rounded-lg border border-gray-200 dark:border-slate-700 transition-colors"
+                                className="p-2 text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 rounded-lg border border-gray-200 dark:border-zinc-800 transition-colors"
                                 title="Refresh"
                             >
                                 <FaSync size={13} className={loading ? 'animate-spin' : ''} />
@@ -210,7 +210,7 @@ const IncomeDetailPage = () => {
                 </div>
 
                 {/* Trend chart */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">Revenue Trend</h3>
@@ -321,9 +321,9 @@ const IncomeDetailPage = () => {
                                         <th className="text-right py-2 px-2 font-semibold">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100 dark:divide-slate-700/60">
+                                <tbody className="divide-y divide-gray-100 dark:divide-zinc-800/60">
                                     {data.topMembers.map((m, i) => (
-                                        <tr key={m.memberId || i} className="hover:bg-gray-50 dark:hover:bg-slate-700/30">
+                                        <tr key={m.memberId || i} className="hover:bg-gray-50 dark:hover:bg-zinc-800/30">
                                             <td className="py-3 px-2">
                                                 <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                                                     i === 0 ? 'bg-yellow-100 text-yellow-700' :
@@ -347,8 +347,8 @@ const IncomeDetailPage = () => {
                 </BreakdownCard>
 
                 {/* Transaction list */}
-                <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b border-gray-100 dark:border-slate-700 flex items-center justify-between">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
+                    <div className="px-6 py-4 border-b border-gray-100 dark:border-zinc-800 flex items-center justify-between">
                         <div>
                             <h3 className="text-lg font-bold text-gray-900 dark:text-white">All Transactions</h3>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{data.transactions.length} record{data.transactions.length === 1 ? '' : 's'} in selected range</p>
@@ -361,7 +361,7 @@ const IncomeDetailPage = () => {
                     </div>
                     <div className="overflow-x-auto max-h-[600px]">
                         <table className="w-full text-sm">
-                            <thead className="bg-gray-50 dark:bg-slate-900/50 sticky top-0">
+                            <thead className="bg-gray-50 dark:bg-zinc-950/50 sticky top-0">
                                 <tr className="text-xs text-gray-500 dark:text-gray-400 uppercase">
                                     <th className="text-left px-6 py-3 font-semibold">Date</th>
                                     <th className="text-left px-6 py-3 font-semibold">Member</th>
@@ -371,7 +371,7 @@ const IncomeDetailPage = () => {
                                     <th className="text-right px-6 py-3 font-semibold">Amount</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-gray-100 dark:divide-slate-700/60">
+                            <tbody className="divide-y divide-gray-100 dark:divide-zinc-800/60">
                                 {loading && (
                                     <tr><td colSpan={6} className="py-10 text-center text-gray-400">Loading…</td></tr>
                                 )}
@@ -381,7 +381,7 @@ const IncomeDetailPage = () => {
                                 {data.transactions.map(t => (
                                     <tr
                                         key={t._id}
-                                        className="hover:bg-gray-50 dark:hover:bg-slate-700/30 cursor-pointer"
+                                        className="hover:bg-gray-50 dark:hover:bg-zinc-800/30 cursor-pointer"
                                         onClick={() => navigate(`/invoice/${t._id}`)}
                                     >
                                         <td className="px-6 py-3 text-gray-600 dark:text-gray-300 whitespace-nowrap">{formatDate(t.transactionDate)}</td>
@@ -392,7 +392,7 @@ const IncomeDetailPage = () => {
                                             <span className={`text-xs font-semibold px-2 py-1 rounded-full ${
                                                 t.paymentStatus === 'Paid' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
                                                 t.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400' :
-                                                'bg-zinc-100 text-red-700 dark:bg-zinc-700/50 dark:text-red-400'
+                                                'bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500'
                                             }`}>
                                                 {t.paymentStatus}
                                             </span>
@@ -415,8 +415,8 @@ const IncomeDetailPage = () => {
 
 const KPI_COLORS = {
     green:   { bg: 'bg-green-50 dark:bg-green-900/20',     text: 'text-green-600 dark:text-green-400' },
-    blue:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-red-600 dark:text-red-400' },
-    rose:    { bg: 'bg-rose-50 dark:bg-rose-900/20',     text: 'text-rose-600 dark:text-rose-400' },
+    blue:    { bg: 'bg-zinc-50 dark:bg-zinc-800/50',       text: 'text-zinc-900 dark:text-zinc-300' },
+    rose:    { bg: 'bg-zinc-100 dark:bg-zinc-800/50',     text: 'text-zinc-900 dark:text-zinc-300' },
     emerald: { bg: 'bg-emerald-50 dark:bg-emerald-900/20', text: 'text-emerald-600 dark:text-emerald-400' },
     amber:   { bg: 'bg-amber-50 dark:bg-amber-900/20',     text: 'text-amber-600 dark:text-amber-400' },
 };
@@ -424,7 +424,7 @@ const KPI_COLORS = {
 function KpiTile({ label, value, icon, color, loading }) {
     const c = KPI_COLORS[color] || KPI_COLORS.blue;
     return (
-        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm">
+        <div className="bg-white dark:bg-zinc-900 p-4 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm">
             <div className="flex items-center gap-2 mb-2">
                 <span className={`p-1.5 rounded-lg ${c.bg} ${c.text}`}>{icon}</span>
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">{label}</span>
@@ -436,7 +436,7 @@ function KpiTile({ label, value, icon, color, loading }) {
 
 function BreakdownCard({ title, subtitle, children, exportData }) {
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm p-6">
             <div className="flex items-center justify-between mb-6">
                 <div>
                     <h3 className="text-lg font-bold text-gray-900 dark:text-white">{title}</h3>

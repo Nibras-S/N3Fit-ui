@@ -101,7 +101,7 @@ export default function InstallPWA() {
                     {/* CTA */}
                     <button
                         onClick={handleInstall}
-                        className="w-full py-2.5 rounded-xl bg-white text-red-700 text-sm font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 active:scale-95 transition-all shadow-lg shadow-red-900/30"
+                        className="w-full py-2.5 rounded-xl bg-white text-zinc-700 text-sm font-bold flex items-center justify-center gap-2 hover:bg-zinc-50 active:scale-95 transition-all shadow-lg shadow-red-900/30"
                     >
                         <FaDownload size={12} />
                         Install Now

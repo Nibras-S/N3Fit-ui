@@ -19,10 +19,10 @@ import React from "react";
  */
 
 const variants = {
-  brand: "bg-rose-50    text-rose-700    ring-rose-700/10   dark:bg-rose-900/20   dark:text-rose-300",
+  brand: "bg-zinc-100    text-zinc-800    ring-zinc-700/10   dark:bg-zinc-800/50   dark:text-zinc-200",
   success: "bg-green-50  text-green-700  ring-green-700/10  dark:bg-green-900/30  dark:text-green-300",
   warning: "bg-yellow-50 text-yellow-700 ring-yellow-700/10 dark:bg-yellow-900/30 dark:text-yellow-300",
-  error: "bg-red-50     text-red-700    ring-red-700/10    dark:bg-red-900/30    dark:text-red-300",
+  error: "bg-zinc-50     text-zinc-700    ring-red-700/10    dark:bg-zinc-800/50    dark:text-zinc-300",
   gray: "bg-gray-100  text-gray-600   ring-gray-500/10   dark:bg-dark-border   dark:text-gray-300",
   blue: "bg-gray-100  text-gray-700   ring-gray-500/10   dark:bg-gray-700/50   dark:text-gray-300",
   purple: "bg-purple-50 text-purple-700 ring-purple-700/10 dark:bg-purple-900/30 dark:text-purple-300",
@@ -30,10 +30,10 @@ const variants = {
 };
 
 const dotColors = {
-  brand: "bg-rose-500",
+  brand: "bg-zinc-900",
   success: "bg-green-500",
   warning: "bg-yellow-500",
-  error: "bg-red-500",
+  error: "bg-zinc-500",
   gray: "bg-gray-400",
   blue: "bg-gray-500",
   purple: "bg-purple-500",

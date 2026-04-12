@@ -78,18 +78,18 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                 onClick={handleClose}
             />
 
-            <div className="relative w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-xl border border-gray-100 dark:border-slate-700">
+            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800">
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
                     <div className="flex items-center gap-2">
-                        <FaCalendarAlt className="text-rose-500" />
+                        <FaCalendarAlt className="text-zinc-900" />
                         <h2 className="font-bold text-gray-900 dark:text-white text-lg">
                             Extend Membership
                         </h2>
                     </div>
                     <button
                         onClick={handleClose}
-                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                        className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
                     >
                         <FaTimes />
                     </button>
@@ -97,7 +97,7 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
 
                 <form onSubmit={handleSubmit} className="p-5 space-y-5">
                     {/* Current info */}
-                    <div className="bg-gray-50 dark:bg-slate-700/50 rounded-xl p-4 space-y-2 text-sm">
+                    <div className="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 space-y-2 text-sm">
                         <div className="flex justify-between">
                             <span className="text-gray-500 dark:text-gray-400">Member</span>
                             <span className="font-medium text-gray-900 dark:text-white">{member?.name}</span>
@@ -108,7 +108,7 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                         </div>
                         <div className="flex justify-between">
                             <span className="text-gray-500 dark:text-gray-400">Days Remaining</span>
-                            <span className={`font-bold ${(member?.dews ?? 0) > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                            <span className={`font-bold ${(member?.dews ?? 0) > 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-900 dark:text-zinc-500'}`}>
                                 {member?.dews ?? 0} days
                             </span>
                         </div>
@@ -126,22 +126,22 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                             value={daysToAdd}
                             onChange={(e) => setDaysToAdd(e.target.value)}
                             placeholder="e.g. 7"
-                            className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all text-sm"
+                            className="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/30 focus:border-zinc-900 transition-all text-sm"
                             required
                         />
                     </div>
 
                     {/* Live preview */}
                     {preview && (
-                        <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800/30 rounded-xl p-4 space-y-2 text-sm">
-                            <p className="text-xs font-semibold text-rose-600 dark:text-rose-400 uppercase tracking-wide">Preview</p>
+                        <div className="bg-zinc-100 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700/30 rounded-xl p-4 space-y-2 text-sm">
+                            <p className="text-xs font-semibold text-zinc-900 dark:text-zinc-300 uppercase tracking-wide">Preview</p>
                             <div className="flex justify-between">
                                 <span className="text-gray-600 dark:text-gray-300">New End Date</span>
                                 <span className="font-bold text-gray-900 dark:text-white">{fmt(preview.date)}</span>
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-600 dark:text-gray-300">New Days Remaining</span>
-                                <span className={`font-bold ${preview.dews > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-500'}`}>
+                                <span className={`font-bold ${preview.dews > 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-700'}`}>
                                     {preview.dews} days
                                 </span>
                             </div>
@@ -159,7 +159,7 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                             placeholder="e.g. Member was on leave for 14 days"
                             rows={3}
                             maxLength={500}
-                            className="w-full px-3 py-2.5 border border-gray-200 dark:border-slate-600 rounded-xl bg-white dark:bg-slate-700 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-rose-500/30 focus:border-rose-500 transition-all text-sm resize-none"
+                            className="w-full px-3 py-2.5 border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/30 focus:border-zinc-900 transition-all text-sm resize-none"
                             required
                         />
                         <p className="text-xs text-gray-400 mt-1 text-right">{reason.length}/500</p>
@@ -170,14 +170,14 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-slate-600 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                            className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={!preview || loading}
-                            className="flex-1 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 active:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
+                            className="flex-1 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-colors"
                         >
                             {loading ? 'Saving…' : 'Update End Date'}
                         </button>

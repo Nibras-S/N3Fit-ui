@@ -26,8 +26,8 @@ import React from "react";
  *   {loading ? <CardSkeleton /> : <MemberCard />}
  */
 
-const shimmer =
-  "animate-pulse bg-gray-200 dark:bg-dark-border rounded";
+// Shimmer uses neutral grey in both modes — no blue tones
+const shimmer = "animate-pulse bg-gray-200 dark:bg-[#2a2a2a] rounded";
 
 // ─── Base Skeleton ─────────────────────────────────────────────────────────────
 export function Skeleton({ className = "" }) {
@@ -156,14 +156,66 @@ export function StatCardSkeleton({ className = "" }) {
 export function PageSkeleton({ stats = 4, tableRows = 8, tableCols = 5 }) {
   return (
     <div className="space-y-6 p-6" aria-busy="true" aria-label="Loading page…">
-      {/* Stat cards row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {Array.from({ length: stats }).map((_, i) => (
           <StatCardSkeleton key={i} />
         ))}
       </div>
-      {/* Table */}
       <TableSkeleton rows={tableRows} cols={tableCols} />
     </div>
+  );
+}
+
+// ─── Profile Skeleton ────────────────────────────────────────────────────────
+/** Member / gym profile page loading placeholder. */
+export function ProfileSkeleton() {
+  return (
+    <div className="space-y-6 p-4 md:p-6" aria-busy="true" aria-label="Loading profile…">
+      {/* Header card */}
+      <div className="bg-white dark:bg-[#1c1c1c] border border-gray-100 dark:border-[#2a2a2a] rounded-2xl p-6">
+        <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+          <div className={`${shimmer} w-20 h-20 rounded-full shrink-0`} />
+          <div className="flex-1 space-y-2">
+            <div className={`${shimmer} h-6 w-48 rounded`} />
+            <div className={`${shimmer} h-4 w-32 rounded`} />
+            <div className="flex gap-2 pt-1">
+              <div className={`${shimmer} h-6 w-20 rounded-full`} />
+              <div className={`${shimmer} h-6 w-16 rounded-full`} />
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Stat row */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)}
+      </div>
+      {/* Details */}
+      <div className="bg-white dark:bg-[#1c1c1c] border border-gray-100 dark:border-[#2a2a2a] rounded-2xl p-6 space-y-4">
+        <div className={`${shimmer} h-5 w-32 rounded`} />
+        <FormSkeleton fields={4} />
+      </div>
+    </div>
+  );
+}
+
+// ─── ButtonSpinner ────────────────────────────────────────────────────────────
+/**
+ * Three-dot pulsing indicator for button loading states.
+ * Replaces inline circular spinners inside buttons.
+ *
+ * Usage:
+ *   {loading ? <ButtonSpinner /> : 'Save Changes'}
+ */
+export function ButtonSpinner({ className = '' }) {
+  return (
+    <span className={`inline-flex items-center gap-1 ${className}`} aria-hidden="true">
+      {[0, 150, 300].map((delay) => (
+        <span
+          key={delay}
+          className="w-1.5 h-1.5 bg-current rounded-full animate-bounce"
+          style={{ animationDelay: `${delay}ms`, animationDuration: '0.9s' }}
+        />
+      ))}
+    </span>
   );
 }

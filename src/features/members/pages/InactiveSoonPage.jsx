@@ -122,7 +122,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
   const pendingCount = contacts.filter((c) => c.reminderStatus !== "Sent").length;
 
   const getDaysColor = (days) => {
-    if (days === 0) return 'text-red-600 bg-zinc-50';
+    if (days === 0) return 'text-zinc-900 bg-zinc-50';
     if (days <= 2) return 'text-orange-600 bg-orange-50';
     return 'text-yellow-600 bg-yellow-50';
   };
@@ -212,7 +212,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
                     key={day}
                     onClick={() => setDaysFilter(day)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${daysFilter === day
-                      ? 'bg-rose-500 text-white shadow-sm'
+                      ? 'bg-zinc-900 text-white shadow-sm'
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
                   >

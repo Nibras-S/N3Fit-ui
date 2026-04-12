@@ -107,13 +107,13 @@ export default function RecordPaymentModal({
 
     return (
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
-            <div className="bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
                 {/* Header */}
-                <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-slate-700 shrink-0">
+                <div className="flex items-start justify-between p-5 border-b border-gray-100 dark:border-zinc-800 shrink-0">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
-                            <FaCreditCard className="text-red-600" size={16} />
+                            <FaCreditCard className="text-zinc-900" size={16} />
                         </div>
                         <div>
                             <h3 className="font-black text-gray-900 dark:text-white text-base">Record Payment</h3>
@@ -125,7 +125,7 @@ export default function RecordPaymentModal({
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors">
+                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
                         <FaTimes className="text-gray-500" size={14} />
                     </button>
                 </div>
@@ -150,7 +150,7 @@ export default function RecordPaymentModal({
                                         className={`px-3 py-1.5 rounded-lg text-[11px] font-black uppercase transition-all border ${
                                             splits[0].paymentMethod === m
                                                 ? 'bg-zinc-900 text-white border-zinc-900'
-                                                : 'bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-slate-600 hover:border-red-300'
+                                                : 'bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 border-gray-100 dark:border-zinc-700 hover:border-red-300'
                                         }`}
                                     >
                                         {m}
@@ -159,7 +159,7 @@ export default function RecordPaymentModal({
                             </div>
 
                             {/* Amount input */}
-                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-900/50 border border-gray-200 dark:border-slate-700 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
+                            <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
                                 <span className="text-gray-400 font-bold text-sm">₹</span>
                                 <input
                                     type="number"
@@ -173,7 +173,7 @@ export default function RecordPaymentModal({
                                 <button
                                     type="button"
                                     onClick={() => fillFull(0)}
-                                    className="text-[10px] font-black text-red-600 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded-md hover:bg-zinc-100 transition-colors"
+                                    className="text-[10px] font-black text-zinc-900 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded-md hover:bg-zinc-100 transition-colors"
                                 >
                                     Full
                                 </button>
@@ -186,13 +186,13 @@ export default function RecordPaymentModal({
                             </label>
                             <div className="space-y-3">
                                 {splits.map((split, idx) => (
-                                    <div key={idx} className="bg-gray-50 dark:bg-slate-900/40 rounded-xl p-4 border border-gray-100 dark:border-slate-700">
+                                    <div key={idx} className="bg-gray-50 dark:bg-zinc-950/40 rounded-xl p-4 border border-gray-100 dark:border-zinc-800">
                                         <div className="flex items-center justify-between mb-3">
                                             <span className="text-[10px] font-black text-gray-500 uppercase">Split {idx + 1}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => removeSplit(idx)}
-                                                className="text-red-400 hover:text-red-600 p-1 transition-colors"
+                                                className="text-zinc-500 hover:text-zinc-900 p-1 transition-colors"
                                             >
                                                 <FaTrash size={11} />
                                             </button>
@@ -208,7 +208,7 @@ export default function RecordPaymentModal({
                                                     className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase transition-all border ${
                                                         split.paymentMethod === m
                                                             ? 'bg-zinc-900 text-white border-zinc-900'
-                                                            : 'bg-white dark:bg-slate-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-slate-600'
+                                                            : 'bg-white dark:bg-zinc-800 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-zinc-700'
                                                     }`}
                                                 >
                                                     {m}
@@ -217,7 +217,7 @@ export default function RecordPaymentModal({
                                         </div>
 
                                         {/* Amount */}
-                                        <div className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl px-4 py-2.5 focus-within:border-zinc-900 transition-colors">
+                                        <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-xl px-4 py-2.5 focus-within:border-zinc-900 transition-colors">
                                             <span className="text-gray-400 font-bold text-sm">₹</span>
                                             <input
                                                 type="number"
@@ -231,7 +231,7 @@ export default function RecordPaymentModal({
                                             <button
                                                 type="button"
                                                 onClick={() => fillFull(idx)}
-                                                className="text-[10px] font-black text-red-600 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-md hover:bg-zinc-100 transition-colors"
+                                                className="text-[10px] font-black text-zinc-900 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-0.5 rounded-md hover:bg-zinc-100 transition-colors"
                                             >
                                                 Full
                                             </button>
@@ -253,7 +253,7 @@ export default function RecordPaymentModal({
                     <button
                         type="button"
                         onClick={addSplit}
-                        className="w-full py-2.5 border border-dashed border-gray-200 dark:border-slate-600 rounded-xl text-[11px] font-black text-gray-400 hover:text-red-600 hover:border-red-300 transition-colors flex items-center justify-center gap-2"
+                        className="w-full py-2.5 border border-dashed border-gray-200 dark:border-zinc-700 rounded-xl text-[11px] font-black text-gray-400 hover:text-zinc-900 hover:border-red-300 transition-colors flex items-center justify-center gap-2"
                     >
                         <FaPlus size={10} /> Add Split Payment
                     </button>
@@ -268,12 +268,12 @@ export default function RecordPaymentModal({
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="e.g. Cash collected by trainer"
-                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-slate-900/50 border border-gray-100 dark:border-slate-700 rounded-xl outline-none focus:border-zinc-900 text-sm transition-colors"
+                            className="w-full px-4 py-2.5 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl outline-none focus:border-zinc-900 text-sm transition-colors"
                         />
                     </div>
 
                     {/* Summary */}
-                    <div className="bg-gray-50 dark:bg-slate-900/40 rounded-xl p-4 border border-gray-100 dark:border-slate-700 space-y-1.5">
+                    <div className="bg-gray-50 dark:bg-zinc-950/40 rounded-xl p-4 border border-gray-100 dark:border-zinc-800 space-y-1.5">
                         {/* Per-split breakdown when multiple */}
                         {!isSingleSplit && splits.map((split, idx) => {
                             const amt = parseFloat(split.amount) || 0;
@@ -291,13 +291,13 @@ export default function RecordPaymentModal({
                             <span className="text-gray-900 dark:text-white font-bold">+₹{fmt(splitTotal)}</span>
                         </div>
 
-                        <div className={`flex justify-between items-center text-sm font-black pt-1 border-t border-gray-100 dark:border-slate-700 ${isOver ? 'text-red-600' : remaining < 0.01 ? 'text-green-600' : 'text-amber-600'}`}>
+                        <div className={`flex justify-between items-center text-sm font-black pt-1 border-t border-gray-100 dark:border-zinc-800 ${isOver ? 'text-zinc-900' : remaining < 0.01 ? 'text-green-600' : 'text-amber-600'}`}>
                             <span>Remaining after</span>
                             <span>₹{fmt(isOver ? '-' : remaining)}</span>
                         </div>
 
                         {isOver && (
-                            <p className="text-[10px] font-bold text-red-500 flex items-center gap-1">
+                            <p className="text-[10px] font-bold text-zinc-700 flex items-center gap-1">
                                 ⚠ Payment exceeds the balance due
                             </p>
                         )}
@@ -315,11 +315,11 @@ export default function RecordPaymentModal({
                 </div>
 
                 {/* Footer */}
-                <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-slate-700 shrink-0">
+                <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-zinc-800 shrink-0">
                     <button
                         type="button"
                         onClick={onClose}
-                        className="flex-1 py-3 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-slate-700 text-gray-600 dark:text-gray-200 hover:bg-gray-100 transition-colors"
+                        className="flex-1 py-3 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-100 transition-colors"
                     >
                         Cancel
                     </button>

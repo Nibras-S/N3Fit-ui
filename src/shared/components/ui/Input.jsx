@@ -45,7 +45,7 @@ export function Input({
         {...props}
       />
       {errorText && (
-        <p className="text-sm text-red-600">{errorText}</p>
+        <p className="text-sm text-zinc-900">{errorText}</p>
       )}
     </div>
   );

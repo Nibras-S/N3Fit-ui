@@ -71,9 +71,9 @@ export default function ExportMenu({ getExportData, disabled = false, label = 'E
                 ref={buttonRef}
                 onClick={toggleOpen}
                 disabled={disabled}
-                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-                <FaDownload size={11} className="text-red-500" />
+                <FaDownload size={11} className="text-zinc-600" />
                 <span>{label}</span>
                 <FaChevronDown size={9} className={`text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
             </button>
@@ -81,7 +81,7 @@ export default function ExportMenu({ getExportData, disabled = false, label = 'E
             {open && (
                 <>
                     <div className="fixed inset-0 z-30" onClick={() => setOpen(false)} />
-                    <div className={`absolute right-0 w-52 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-xl z-40 overflow-hidden ${
+                    <div className={`absolute right-0 w-52 bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-xl z-40 overflow-hidden ${
                         openUpward ? 'bottom-full mb-2' : 'top-full mt-2'
                     }`}>
                         <button
@@ -96,9 +96,9 @@ export default function ExportMenu({ getExportData, disabled = false, label = 'E
                         </button>
                         <button
                             onClick={() => handleExport('csv')}
-                            className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-slate-700 text-left"
+                            className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors border-t border-gray-100 dark:border-zinc-800 text-left"
                         >
-                            <FaFileCsv className="text-red-600" />
+                            <FaFileCsv className="text-zinc-900" />
                             <div className="flex-1">
                                 <div className="font-medium">CSV</div>
                                 <div className="text-[10px] text-gray-400">comma-separated</div>
@@ -106,9 +106,9 @@ export default function ExportMenu({ getExportData, disabled = false, label = 'E
                         </button>
                         <button
                             onClick={() => handleExport('pdf')}
-                            className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-zinc-50 dark:hover:bg-red-900/20 transition-colors border-t border-gray-100 dark:border-slate-700 text-left"
+                            className="w-full px-4 py-2.5 flex items-center gap-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors border-t border-gray-100 dark:border-zinc-800 text-left"
                         >
-                            <FaFilePdf className="text-red-600" />
+                            <FaFilePdf className="text-zinc-900" />
                             <div className="flex-1">
                                 <div className="font-medium">PDF</div>
                                 <div className="text-[10px] text-gray-400">printable document</div>

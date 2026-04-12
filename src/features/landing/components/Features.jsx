@@ -216,7 +216,7 @@ export default function Features() {
                   className="w-9 h-9 rounded-lg flex items-center justify-center mb-3"
                   style={{
                     background: item.dark
-                      ? 'rgba(220, 38, 38, 0.2)'
+                      ? 'rgba(255, 255, 255, 0.12)'
                       : 'var(--landing-primary-50)',
                     color: item.dark
                       ? 'var(--landing-primary-light)'

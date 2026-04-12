@@ -18,7 +18,7 @@ export { Input } from "./Input";
 // Badge / status labels
 export { Badge } from "./Badge";
 
-// Loading skeletons (use instead of spinners)
+// Loading skeletons + ButtonSpinner (use instead of all circular spinners)
 export {
     Skeleton,
     SkeletonText,
@@ -28,6 +28,8 @@ export {
     FormSkeleton,
     StatCardSkeleton,
     PageSkeleton,
+    ProfileSkeleton,
+    ButtonSpinner,
 } from "./Skeleton";
 
 // Modal dialog

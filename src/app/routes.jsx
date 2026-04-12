@@ -34,6 +34,7 @@ import SuperAdminDashboard from '../features/superadmin/pages/SuperAdminDashboar
 import GymDetailsPage from '../features/superadmin/pages/GymDetailsPage';
 import SuperAdminSettingsPage from '../features/superadmin/pages/SuperAdminSettingsPage';
 import SaaSPlanPage from '../features/superadmin/pages/SaaSPlanPage';
+import EnquiryPage from '../features/superadmin/pages/EnquiryPage';
 
 // Detect if running as installed PWA (standalone mode)
 const isPWA = window.matchMedia('(display-mode: standalone)').matches
@@ -105,6 +106,7 @@ export default function AppRoutes() {
                 <Route path="/superadmin/gyms/:id" element={<GymDetailsPage />} />
                 <Route path="/superadmin/settings" element={<SuperAdminSettingsPage />} />
                 <Route path="/superadmin/plans" element={<SaaSPlanPage />} />
+                <Route path="/superadmin/enquiries" element={<EnquiryPage />} />
             </Route>
 
             {/* ── Catch-all ───────────────────────────────────────── */}

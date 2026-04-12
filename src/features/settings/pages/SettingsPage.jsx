@@ -9,22 +9,24 @@ import {
     FaChevronRight, FaSignOutAlt, FaShieldAlt, FaUsers, FaCheckCircle, FaTimes
 } from 'react-icons/fa';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import { FormSkeleton } from '../../../shared/components/ui/Skeleton';
+import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import { useTheme } from '../../../shared/context/ThemeContext';
 import { useAuth } from '../../auth/context/AuthContext';
 
 const SettingItem = ({ icon, title, subtitle, onClick }) => (
     <button
         onClick={onClick}
-        className="w-full flex items-center gap-4 px-4 py-5 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors text-left group border-none outline-none"
+        className="w-full flex items-center gap-4 px-4 py-5 hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors text-left group border-none outline-none"
     >
-        <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-slate-700 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:bg-zinc-50 dark:group-hover:bg-red-900/30 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
+        <div className="w-10 h-10 rounded-2xl bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 dark:text-gray-400 group-hover:bg-zinc-50 dark:group-hover:bg-zinc-100 dark:group-hover:bg-zinc-800 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
             {React.cloneElement(icon, { size: 18 })}
         </div>
         <div className="flex-1">
-            <h5 className="font-bold text-gray-900 dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">{title}</h5>
+            <h5 className="font-bold text-gray-900 dark:text-white group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">{title}</h5>
             <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 leading-tight">{subtitle}</p>
         </div>
-        <FaChevronRight className="text-gray-300 dark:text-gray-600 group-hover:text-red-600 dark:group-hover:text-red-400 transition-transform group-hover:translate-x-1" size={12} />
+        <FaChevronRight className="text-gray-300 dark:text-gray-600 group-hover:text-zinc-900 dark:group-hover:text-white transition-transform group-hover:translate-x-1" size={12} />
     </button>
 );
 
@@ -220,15 +222,13 @@ const Settings = () => {
     const statusColor = {
         active: "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400",
         trial: "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400",
-        inactive: "bg-zinc-50 dark:bg-zinc-800/50 text-red-700 dark:text-red-400",
+        inactive: "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300",
     };
 
     if (loading) {
         return (
             <AppLayout title="Settings" description="Manage your account and preferences" icon={FaCog} showGenderSwitch={false}>
-                <div className="flex items-center justify-center h-[60vh]">
-                    <div className="loading-spinner w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
-                </div>
+                <div className="p-6 max-w-2xl"><FormSkeleton fields={6} /></div>
             </AppLayout>
         );
     }
@@ -248,7 +248,7 @@ const Settings = () => {
                                 setIsEditingPricing(false);
                                 setIsEditingProfile(false);
                             }}
-                            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-red-600 transition-colors"
+                            className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-zinc-900 transition-colors"
                         >
                             <FaChevronRight className="rotate-180" size={12} />
                             Back to Settings
@@ -258,14 +258,14 @@ const Settings = () => {
 
                 {activeTab === 'main' && (
                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
                             <SettingItem
                                 icon={<FaUser />}
                                 title="Profile Info"
                                 subtitle="Update your personal information"
                                 onClick={() => setActiveTab('profile')}
                             />
-                            <div className="h-px bg-gray-50 dark:bg-slate-700/50 mx-4"></div>
+                            <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
 
                             {(user?.role === 'gymadmin' || user?.role === 'staff') && (
                                 <>
@@ -275,7 +275,7 @@ const Settings = () => {
                                         subtitle="Manage fit club branding and details"
                                         onClick={() => setActiveTab('gym')}
                                     />
-                                    <div className="h-px bg-gray-50 dark:bg-slate-700/50 mx-4"></div>
+                                    <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
                                 </>
                             )}
 
@@ -287,7 +287,7 @@ const Settings = () => {
                                         subtitle="Manage staff accounts"
                                         onClick={() => navigate('/staff')}
                                     />
-                                    <div className="h-px bg-gray-50 dark:bg-slate-700/50 mx-4"></div>
+                                    <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
                                 </>
                             )}
 
@@ -297,7 +297,7 @@ const Settings = () => {
                                 subtitle="Manage pricing and billing"
                                 onClick={() => setActiveTab('billing')}
                             />
-                            <div className="h-px bg-gray-50 dark:bg-slate-700/50 mx-4"></div>
+                            <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
 
                             <SettingItem
                                 icon={<FaSun />}
@@ -311,7 +311,7 @@ const Settings = () => {
                         {/* Sign Out Button */}
                         <button
                             onClick={logout}
-                            className="w-full bg-white dark:bg-slate-800 border-2 border-red-50 dark:border-red-900/10 text-red-500 dark:text-red-400 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-zinc-900 hover:text-white dark:hover:bg-zinc-900 dark:hover:text-white transition-all duration-300 shadow-sm mt-8 border border-red-100"
+                            className="w-full bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 py-4 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-zinc-900 hover:text-white dark:hover:bg-zinc-900 dark:hover:text-white transition-all duration-300 shadow-sm mt-8 border border-zinc-200"
                         >
                             <FaSignOutAlt /> Sign Out
                         </button>
@@ -344,8 +344,8 @@ const Settings = () => {
                                         setIsEditingBranding(!isEditingBranding);
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingBranding
-                                        ? 'bg-zinc-50 text-red-600 border-red-100 hover:bg-zinc-100'
-                                        : 'bg-zinc-50 text-red-600 border-red-100 hover:bg-zinc-100'
+                                        ? 'bg-zinc-50 text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                                        : 'bg-zinc-50 text-zinc-900 border-zinc-200 hover:bg-zinc-100'
                                         }`}
                                 >
                                     {isEditingBranding ? 'Cancel' : 'Edit Profile'}
@@ -354,12 +354,12 @@ const Settings = () => {
                         </div>
 
                         {/* Logo + Quick Info */}
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
                             <div className="bg-gradient-to-r from-zinc-900 to-zinc-600 h-16 relative"></div>
                             <div className="px-6 pb-6">
                                 <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-10">
                                     <div
-                                        className={`relative w-20 h-20 rounded-xl bg-white dark:bg-slate-700 border-4 border-white dark:border-slate-800 shadow-lg flex items-center justify-center overflow-hidden ${user?.role === 'gymadmin' && isEditingBranding ? 'cursor-pointer group' : ''}`}
+                                        className={`relative w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 border-4 border-white dark:border-zinc-800 shadow-lg flex items-center justify-center overflow-hidden ${user?.role === 'gymadmin' && isEditingBranding ? 'cursor-pointer group' : ''}`}
                                         onClick={() => user?.role === 'gymadmin' && isEditingBranding && fileInputRef.current?.click()}
                                     >
                                         {gym?.logo ? (
@@ -370,7 +370,7 @@ const Settings = () => {
                                         {isEditingBranding && (
                                             <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {uploadingLogo ? (
-                                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                    <ButtonSpinner />
                                                 ) : (
                                                     <FaCamera className="text-white" size={16} />
                                                 )}
@@ -381,7 +381,7 @@ const Settings = () => {
 
                                     <div className="flex-1 pt-12">
                                         <h2 className="text-xl font-bold text-gray-900 dark:text-white">{gym?.name}</h2>
-                                        <p className="text-sm text-gray-500 dark:text-gray-400">Code: <span className="font-mono font-bold text-red-600 dark:text-red-400">{gym?.gymCode}</span></p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Code: <span className="font-mono font-bold text-zinc-900 dark:text-zinc-300">{gym?.gymCode}</span></p>
                                     </div>
 
                                     <div className="flex gap-2">
@@ -395,7 +395,7 @@ const Settings = () => {
 
                         {/* Plan & Subscription Info */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
                                         <FaCrown className="text-purple-600 dark:text-purple-400" size={14} />
@@ -406,10 +406,10 @@ const Settings = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
-                                        <FaBarcode className="text-red-600 dark:text-red-400" size={14} />
+                                        <FaBarcode className="text-zinc-900 dark:text-zinc-300" size={14} />
                                     </div>
                                     <div>
                                         <p className="text-xs text-gray-500 dark:text-gray-400">Club Code</p>
@@ -417,7 +417,7 @@ const Settings = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-gray-100 dark:border-slate-700 shadow-sm">
+                            <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
                                         <FaCalendarAlt className="text-amber-600 dark:text-amber-400" size={14} />
@@ -436,10 +436,10 @@ const Settings = () => {
                         </div>
 
                         {/* Gym Information Form */}
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                            <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
                                 <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <FaBuilding className="text-red-500" />
+                                    <FaBuilding className="text-zinc-700" />
                                     Fit Club Information
                                 </h2>
                                 {isEditingBranding && (
@@ -458,10 +458,10 @@ const Settings = () => {
                                     <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Fit Club Name</label>
                                     {isEditingBranding ? (
                                         <input type="text" value={gymForm.name} onChange={(e) => setGymForm(p => ({ ...p, name: e.target.value }))}
-                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
+                                            className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
                                             placeholder="Your Fit Club Name" />
                                     ) : (
-                                        <p className="text-base font-semibold text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{gymForm.name || "N/A"}</p>
+                                        <p className="text-base font-semibold text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg">{gymForm.name || "N/A"}</p>
                                     )}
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -471,10 +471,10 @@ const Settings = () => {
                                         </label>
                                         {isEditingBranding ? (
                                             <input type="email" value={gymForm.contactEmail} onChange={(e) => setGymForm(p => ({ ...p, contactEmail: e.target.value }))}
-                                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
                                                 placeholder="info@yourgym.com" />
                                         ) : (
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{gymForm.contactEmail || "N/A"}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg">{gymForm.contactEmail || "N/A"}</p>
                                         )}
                                     </div>
                                     <div>
@@ -483,10 +483,10 @@ const Settings = () => {
                                         </label>
                                         {isEditingBranding ? (
                                             <input type="text" value={gymForm.contactPhone} onChange={(e) => setGymForm(p => ({ ...p, contactPhone: e.target.value }))}
-                                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
                                                 placeholder="9876543210" />
                                         ) : (
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{gymForm.contactPhone || "N/A"}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg">{gymForm.contactPhone || "N/A"}</p>
                                         )}
                                     </div>
                                 </div>
@@ -496,10 +496,10 @@ const Settings = () => {
                                     </label>
                                     {isEditingBranding ? (
                                         <textarea value={gymForm.address} onChange={(e) => setGymForm(p => ({ ...p, address: e.target.value }))}
-                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none"
+                                            className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none resize-none"
                                             rows={2} placeholder="123 Main Street, City" />
                                     ) : (
-                                        <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg min-h-[40px]">{gymForm.address || "N/A"}</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg min-h-[40px]">{gymForm.address || "N/A"}</p>
                                     )}
                                 </div>
                             </div>
@@ -523,8 +523,8 @@ const Settings = () => {
                                         setIsEditingProfile(!isEditingProfile);
                                     }}
                                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${isEditingProfile
-                                        ? 'bg-zinc-50 text-red-600 border-red-100 hover:bg-zinc-100'
-                                        : 'bg-zinc-50 text-red-600 border-red-100 hover:bg-zinc-100'
+                                        ? 'bg-zinc-50 text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                                        : 'bg-zinc-50 text-zinc-900 border-zinc-200 hover:bg-zinc-100'
                                         }`}
                                 >
                                     {isEditingProfile ? 'Cancel' : 'Edit Profile'}
@@ -533,28 +533,28 @@ const Settings = () => {
                         </div>
 
                         {/* Personal Profile Section with Photo - Redesigned */}
-                        <div className="bg-white dark:bg-slate-800 rounded-3xl border border-gray-100 dark:border-slate-700 shadow-lg overflow-hidden mb-6 relative group">
-                            <div className="bg-gradient-to-br from-rose-500 via-purple-500 to-pink-500 h-24 relative overflow-hidden">
+                        <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-gray-100 dark:border-zinc-800 shadow-lg overflow-hidden mb-6 relative group">
+                            <div className="bg-gradient-to-br from-zinc-700 via-zinc-800 to-zinc-900 h-24 relative overflow-hidden">
                                 <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_30%_50%,rgba(255,255,255,0.4),transparent)] animate-pulse"></div>
                             </div>
                             <div className="px-8 pb-8">
                                 <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6 -mt-12 relative z-10">
                                     <div className="relative">
                                         <div
-                                            className="relative w-28 h-28 rounded-full bg-white dark:bg-slate-700 border-4 border-white dark:border-slate-800 shadow-2xl flex items-center justify-center overflow-hidden group/photo ring-4 ring-rose-500/10"
+                                            className="relative w-28 h-28 rounded-full bg-white dark:bg-zinc-800 border-4 border-white dark:border-zinc-800 shadow-2xl flex items-center justify-center overflow-hidden group/photo ring-4 ring-zinc-900/10"
                                         >
                                             {user?.profileImage ? (
                                                 <img src={user.profileImage.startsWith('http') ? user.profileImage : `${backendUrl}${user.profileImage}`} alt="User profile" className="w-full h-full object-cover transition-transform duration-500 group-hover/photo:scale-110" />
                                             ) : (
-                                                <div className="w-full h-full bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center">
-                                                    <span className="text-4xl font-black text-rose-500 dark:text-rose-400">{user?.name?.charAt(0)}</span>
+                                                <div className="w-full h-full bg-zinc-100 dark:bg-zinc-800/50 flex items-center justify-center">
+                                                    <span className="text-4xl font-black text-zinc-900 dark:text-zinc-300">{user?.name?.charAt(0)}</span>
                                                 </div>
                                             )}
                                         </div>
                                         {/* Always-visible edit button */}
                                         <button
                                             onClick={() => document.getElementById('user-photo-upload').click()}
-                                            className="absolute bottom-0 right-0 w-9 h-9 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full shadow-lg flex items-center justify-center border-3 border-white dark:border-slate-800 transition-all hover:scale-110 z-10"
+                                            className="absolute bottom-0 right-0 w-9 h-9 bg-zinc-900 hover:bg-zinc-800 text-white rounded-full shadow-lg flex items-center justify-center border-3 border-white dark:border-zinc-800 transition-all hover:scale-110 z-10"
                                         >
                                             <FaCamera size={13} />
                                         </button>
@@ -588,7 +588,7 @@ const Settings = () => {
                                     <div className="flex-1 pt-4 text-center sm:text-left">
                                         <h2 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{user?.name}</h2>
                                         <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-                                            <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/30 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                                            <span className="text-[10px] font-bold text-zinc-900 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800/50 px-2 py-0.5 rounded-full uppercase tracking-tighter">
                                                 {user?.role}
                                             </span>
                                             <span className="text-[10px] text-gray-400 font-medium">{user?.email}</span>
@@ -598,11 +598,11 @@ const Settings = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                            <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                            <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
                                 <h2 className="font-bold text-gray-900 dark:text-white flex items-center gap-2 tracking-tight">
-                                    <div className="w-8 h-8 rounded-lg bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center">
-                                        <FaUser className="text-rose-600 dark:text-rose-400" size={14} />
+                                    <div className="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800/50 flex items-center justify-center">
+                                        <FaUser className="text-zinc-900 dark:text-zinc-300" size={14} />
                                     </div>
                                     Account Details
                                 </h2>
@@ -626,11 +626,11 @@ const Settings = () => {
                                                 type="text"
                                                 value={profileForm.name}
                                                 onChange={(e) => setProfileForm(p => ({ ...p, name: e.target.value }))}
-                                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
                                                 placeholder="Your Name"
                                             />
                                         ) : (
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{user?.name || "N/A"}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg">{user?.name || "N/A"}</p>
                                         )}
                                     </div>
                                     <div>
@@ -642,18 +642,18 @@ const Settings = () => {
                                                 type="email"
                                                 value={profileForm.email}
                                                 onChange={(e) => setProfileForm(p => ({ ...p, email: e.target.value }))}
-                                                className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
+                                                className="w-full px-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 outline-none"
                                                 placeholder="email@example.com"
                                             />
                                         ) : (
-                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-slate-700/30 px-4 py-2 rounded-lg">{user?.email || "N/A"}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white bg-gray-50 dark:bg-zinc-800/30 px-4 py-2 rounded-lg">{user?.email || "N/A"}</p>
                                         )}
                                     </div>
-                                    <div className="sm:col-span-2 border-t border-gray-100 dark:border-slate-700 pt-4 mt-2">
+                                    <div className="sm:col-span-2 border-t border-gray-100 dark:border-zinc-800 pt-4 mt-2">
                                         <button
                                             type="button"
                                             onClick={() => setShowPasswordModal(true)}
-                                            className="text-sm text-red-600 hover:text-red-700 font-medium flex items-center gap-2"
+                                            className="text-sm text-zinc-900 hover:text-zinc-800 font-medium flex items-center gap-2"
                                         >
                                             <FaCog size={12} /> Change Password
                                         </button>
@@ -665,8 +665,8 @@ const Settings = () => {
                 )}
 
                 {(user?.role === 'gymadmin' || user?.role === 'staff') && activeTab === 'billing' && (
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                        <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
                             <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <FaMoneyBillWave className="text-green-500" />
                                 Plan Management
@@ -691,8 +691,8 @@ const Settings = () => {
                                             setIsEditingPricing(!isEditingPricing);
                                         }}
                                         className={`text-xs px-4 py-2 rounded-xl font-semibold flex items-center gap-1.5 transition-all ${isEditingPricing
-                                            ? 'bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 hover:bg-zinc-100'
-                                            : 'bg-zinc-900 text-white hover:bg-zinc-800 shadow-md shadow-red-500/20'
+                                            ? 'bg-zinc-50 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100'
+                                            : 'bg-zinc-900 text-white hover:bg-zinc-800 shadow-md shadow-zinc-900/20'
                                             }`}
                                     >
                                         {isEditingPricing ? (
@@ -705,12 +705,12 @@ const Settings = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 border-b border-gray-50 dark:border-slate-700">
+                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                <FaCheckCircle className="text-red-500" />
+                                <FaCheckCircle className="text-zinc-700" />
                                 Admission Fee
                             </h3>
-                            <div className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-xl border border-gray-100 dark:border-slate-600 transition-all hover:shadow-sm">
+                            <div className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-gray-100 dark:border-zinc-700 transition-all hover:shadow-sm">
                                 <label className="block text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1">
                                     One-time Admission Fee
                                 </label>
@@ -721,7 +721,7 @@ const Settings = () => {
                                             type="number"
                                             value={settings.admissionFee ?? ''}
                                             onChange={(e) => setSettings(prev => ({ ...prev, admissionFee: e.target.value === '' ? '' : parseInt(e.target.value, 10) }))}
-                                            className="w-full pl-8 pr-4 py-2 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-red-500 transition-all outline-none font-semibold text-gray-900 dark:text-white"
+                                            className="w-full pl-8 pr-4 py-2 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded-lg focus:ring-2 focus:ring-red-500 transition-all outline-none font-semibold text-gray-900 dark:text-white"
                                             placeholder="0"
                                         />
                                     </div>
@@ -761,14 +761,14 @@ const Settings = () => {
 
                             <div className="space-y-3">
                                 {(settings.plans || []).map((plan, index) => (
-                                    <div key={index} className={`p-4 rounded-xl border flex items-center justify-between group transition-all ${plan.isDefault ? 'bg-gray-50 dark:bg-slate-700/30 border-gray-100 dark:border-slate-600' : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-red-100 dark:border-red-800/30'}`}>
+                                    <div key={index} className={`p-4 rounded-xl border flex items-center justify-between group transition-all ${plan.isDefault ? 'bg-gray-50 dark:bg-zinc-800/30 border-gray-100 dark:border-zinc-700' : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200 dark:border-zinc-700/30'}`}>
                                         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
                                             {isEditingPricing ? (
                                                 <>
                                                     {plan.isDefault ? (
                                                         <div className="flex items-center gap-2">
                                                             <span className="font-semibold text-gray-900 dark:text-white text-sm">{plan.name}</span>
-                                                            <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>
+                                                            <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>
                                                         </div>
                                                     ) : (
                                                         <input
@@ -779,7 +779,7 @@ const Settings = () => {
                                                                 newPlans[index].name = e.target.value;
                                                                 setSettings({ ...settings, plans: newPlans });
                                                             }}
-                                                            className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                                            className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
                                                             placeholder="Plan Name"
                                                         />
                                                     )}
@@ -795,7 +795,7 @@ const Settings = () => {
                                                                     newPlans[index].duration = e.target.value === '' ? '' : parseInt(e.target.value, 10);
                                                                     setSettings({ ...settings, plans: newPlans });
                                                                 }}
-                                                                className="w-16 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                                                className="w-16 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
                                                             />
                                                             <select
                                                                 value={plan.durationType || 'months'}
@@ -804,7 +804,7 @@ const Settings = () => {
                                                                     newPlans[index].durationType = e.target.value;
                                                                     setSettings({ ...settings, plans: newPlans });
                                                                 }}
-                                                                className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded px-2 py-1 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                                                className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 text-xs text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
                                                             >
                                                                 <option value="days">Days</option>
                                                                 <option value="weeks">Weeks</option>
@@ -822,7 +822,7 @@ const Settings = () => {
                                                                 newPlans[index].price = e.target.value === '' ? '' : parseInt(e.target.value, 10);
                                                                 setSettings({ ...settings, plans: newPlans });
                                                             }}
-                                                            className="w-full pl-5 pr-2 py-1 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                                            className="w-full pl-5 pr-2 py-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
                                                         />
                                                     </div>
                                                 </>
@@ -830,8 +830,8 @@ const Settings = () => {
                                                 <>
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-semibold text-gray-900 dark:text-white text-sm">{plan.name}</span>
-                                                        {plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>}
-                                                        {!plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-700/50 text-red-500 px-1.5 py-0.5 rounded">Custom</span>}
+                                                        {plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>}
+                                                        {!plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 px-1.5 py-0.5 rounded">Custom</span>}
                                                     </div>
                                                     <span className="text-xs text-gray-500">{plan.duration} {plan.durationType === 'days' ? (plan.duration > 1 ? 'Days' : 'Day') : plan.durationType === 'weeks' ? (plan.duration > 1 ? 'Weeks' : 'Week') : (plan.duration > 1 ? 'Months' : 'Month')}</span>
                                                     <span className="font-bold text-gray-900 dark:text-white text-sm">₹{plan.price.toLocaleString('en-IN')}</span>
@@ -851,7 +851,7 @@ const Settings = () => {
                                                             newPlans[index].isActive = !newPlans[index].isActive;
                                                             setSettings({ ...settings, plans: newPlans });
                                                         }}
-                                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${plan.isActive ? 'bg-green-500' : 'bg-gray-300 dark:bg-slate-600'}`}
+                                                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${plan.isActive ? 'bg-green-500' : 'bg-gray-300 dark:bg-zinc-700'}`}
                                                     >
                                                         <span className="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform" style={{ transform: plan.isActive ? 'translateX(18px)' : 'translateX(2px)' }} />
                                                     </button>
@@ -863,7 +863,7 @@ const Settings = () => {
                                                         const newPlans = settings.plans.filter((_, i) => i !== index);
                                                         setSettings({ ...settings, plans: newPlans });
                                                     }}
-                                                    className="text-red-400 hover:text-red-500 p-1"
+                                                    className="text-zinc-400 hover:text-zinc-700 p-1"
                                                 >
                                                     <span className="text-xl leading-none">&times;</span>
                                                 </button>
@@ -882,24 +882,24 @@ const Settings = () => {
                 )}
 
                 {(user?.role === 'gymadmin' || user?.role === 'staff') && activeTab === 'appearance' && (
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm overflow-hidden transition-colors">
-                        <div className="p-6 border-b border-gray-50 dark:border-slate-700 flex justify-between items-center bg-gray-50/50 dark:bg-slate-700/30">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
+                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
                             <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                <FaCog className="text-red-500" />
+                                <FaCog className="text-zinc-700" />
                                 Appearance
                             </h2>
-                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-600 px-2 py-1 rounded border border-gray-200 dark:border-slate-500">Theme Settings</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-zinc-700 px-2 py-1 rounded border border-gray-200 dark:border-zinc-500">Theme Settings</span>
                         </div>
 
                         <div className="p-6">
-                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-slate-700/50 rounded-xl border border-gray-100 dark:border-slate-600 transition-all">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-xl border border-gray-100 dark:border-zinc-700 transition-all">
                                 <div>
                                     <h3 className="font-medium text-gray-900 dark:text-white">Dark Mode</h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">Switch between light and dark themes</p>
                                 </div>
                                 <button
                                     onClick={toggleTheme}
-                                    className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none ${theme === 'dark' ? 'bg-zinc-900' : 'bg-gray-200 dark:bg-slate-600'
+                                    className={`relative inline-flex h-7 w-14 items-center rounded-full transition-colors duration-200 focus:outline-none ${theme === 'dark' ? 'bg-zinc-900' : 'bg-gray-200 dark:bg-zinc-700'
                                         }`}
                                 >
                                     <span
@@ -907,7 +907,7 @@ const Settings = () => {
                                             }`}
                                     >
                                         {theme === 'dark' ? (
-                                            <FaMoon className="text-[10px] text-red-600" />
+                                            <FaMoon className="text-[10px] text-zinc-900" />
                                         ) : (
                                             <FaSun className="text-[10px] text-yellow-500" />
                                         )}
@@ -921,17 +921,17 @@ const Settings = () => {
                 {/* Password Change Modal */}
                 {showPasswordModal && (
                     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
-                        <div className="bg-white dark:bg-slate-800 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-slate-700 overflow-hidden">
-                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-slate-700">
+                        <div className="bg-white dark:bg-zinc-900 rounded-2xl w-full max-w-md shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden">
+                            <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-red-600 dark:text-red-400 flex items-center justify-center">
+                                    <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-300 flex items-center justify-center">
                                         <FaShieldAlt />
                                     </div>
                                     <h2 className="text-xl font-bold text-gray-900 dark:text-white">Change Password</h2>
                                 </div>
                                 <button
                                     onClick={() => setShowPasswordModal(false)}
-                                    className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors"
                                 >
                                     <FaTimes className="text-gray-500 dark:text-gray-400" />
                                 </button>
@@ -945,7 +945,7 @@ const Settings = () => {
                                             type={showPassword ? "text" : "password"}
                                             value={passwordData.newPassword}
                                             onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
+                                            className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
                                             placeholder="Enter new password"
                                             required
                                         />
@@ -965,7 +965,7 @@ const Settings = () => {
                                         type={showPassword ? "text" : "password"}
                                         value={passwordData.confirmPassword}
                                         onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-slate-900 border border-gray-200 dark:border-slate-700 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
+                                        className="w-full px-4 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-950 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white text-sm focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/10 transition-all outline-none"
                                         placeholder="Confirm new password"
                                         required
                                     />
@@ -975,14 +975,14 @@ const Settings = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowPasswordModal(false)}
-                                        className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+                                        className="flex-1 py-3 rounded-xl border border-gray-200 dark:border-zinc-800 text-gray-600 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
                                     >
                                         Cancel
                                     </button>
                                     <button
                                         type="submit"
                                         disabled={saving}
-                                        className="flex-1 py-3 rounded-xl bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors shadow-lg shadow-red-500/30 disabled:opacity-50"
+                                        className="flex-1 py-3 rounded-xl bg-zinc-900 text-white font-medium hover:bg-zinc-800 transition-colors shadow-lg shadow-zinc-900/20 disabled:opacity-50"
                                     >
                                         {saving ? 'Saving...' : 'Update Password'}
                                     </button>

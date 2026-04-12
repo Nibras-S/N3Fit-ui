@@ -1,6 +1,7 @@
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import LoginPage from '../pages/LoginPage';
+import { PageSkeleton } from '../../../shared/components/ui/Skeleton';
 
 /**
  * Redirect already-logged-in users away from the login page.
@@ -11,8 +12,8 @@ export default function LoginGuard() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-slate-900">
-                <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d]">
+                <PageSkeleton stats={4} tableRows={6} />
             </div>
         );
     }

@@ -54,9 +54,9 @@ const config = {
         ),
     },
     info: {
-        iconBg: "bg-brand-100 dark:bg-brand-900/30",
-        iconColor: "text-brand-600 dark:text-brand-400",
-        btnClass: "bg-brand-600 hover:bg-brand-700 focus:ring-brand-500 text-white",
+        iconBg: "bg-zinc-100 dark:bg-zinc-800/50",
+        iconColor: "text-zinc-900 dark:text-white",
+        btnClass: "bg-zinc-900 hover:bg-zinc-800 focus:ring-zinc-900 text-white",
         icon: (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round"

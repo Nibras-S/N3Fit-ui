@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from '../../auth/context/AuthContext';
 import { FaPrint, FaArrowLeft, FaDownload, FaWhatsapp } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
+import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
 
 const Invoice = () => {
     const { id } = useParams();
@@ -36,9 +37,7 @@ const Invoice = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <div className="w-10 h-10 border-4 border-zinc-900 border-t-transparent rounded-full animate-spin"></div>
-            </div>
+            <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d] p-6"><CardSkeleton className="max-w-2xl mx-auto" /></div>
         );
     }
 
@@ -46,7 +45,7 @@ const Invoice = () => {
         return (
             <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
                 <p className="text-gray-500">Invoice not found</p>
-                <button onClick={() => navigate(-1)} className="text-red-600 hover:underline">
+                <button onClick={() => navigate(-1)} className="text-zinc-900 hover:underline">
                     Go Back
                 </button>
             </div>
@@ -114,7 +113,7 @@ const Invoice = () => {
                             <p className="text-sm text-gray-500">Invoice No: <span className="font-mono font-medium text-gray-900">#{_id.slice(-6).toUpperCase()}</span></p>
                             <p className="text-sm text-gray-500">Date: <span className="font-medium text-gray-900">{invoiceDate}</span></p>
                             <p className="text-sm text-gray-500">Status:
-                                <span className={`ml-2 px-2 py-0.5 rounded text-xs font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-red-700'
+                                <span className={`ml-2 px-2 py-0.5 rounded text-xs font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-800'
                                     }`}>
                                     {paymentStatus}
                                 </span>
