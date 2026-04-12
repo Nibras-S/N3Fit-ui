@@ -61,7 +61,7 @@ const MembersPage = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'endDate', direction: 'asc' });
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalRecords, setTotalRecords] = useState(0);
@@ -710,16 +710,6 @@ const MembersPage = () => {
 
                     {/* Right controls */}
                     <div className="flex items-center gap-2 shrink-0 ml-auto flex-wrap">
-                        {/* New Member — primary action, always visible on every tab so
-                            admins don't have to bounce off into an empty state to enroll. */}
-                        <button
-                            onClick={() => navigate('/register')}
-                            className="flex items-center gap-2 px-3 py-2 bg-zinc-100 text-zinc-900 rounded-lg text-sm font-bold hover:bg-zinc-200 active:scale-95 transition-all shadow-sm shadow-zinc-100/50"
-                            title="Enroll a new member"
-                        >
-                            <FaUserPlus size={13} /><span className="hidden sm:inline">New Member</span>
-                        </button>
-
                         {/* Export to CSV — gated by feature flag, only on All Members tab */}
                         {activeTab === 'all' && hasFeature('memberExport') && (
                             <button

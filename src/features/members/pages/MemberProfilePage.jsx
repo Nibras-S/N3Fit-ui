@@ -94,17 +94,20 @@ function MemberProfile() {
 
             {/* Header */}
             <div className="mb-6">
-                <button
-                    onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white mb-4 transition-colors"
-                >
-                    <FaArrowLeft /> Back
-                </button>
+                <div className="flex items-center gap-3 mb-4">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+                    >
+                        <FaArrowLeft /> Back
+                    </button>
+                </div>
 
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+                <div className="flex items-center justify-between gap-4">
+                    {/* Avatar + info */}
+                    <div className="flex items-center gap-4 min-w-0">
                         {member.profileImage ? (
-                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-zinc-800 shadow-md">
+                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white dark:border-zinc-800 shadow-md shrink-0">
                                 <img
                                     src={member.profileImage.startsWith('http') ? member.profileImage : `${backendUrl}${member.profileImage}`}
                                     alt={member.name}
@@ -112,26 +115,28 @@ function MemberProfile() {
                                 />
                             </div>
                         ) : (
-                            <div className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${member.gender === 'Male' ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-700/50 dark:text-zinc-500' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
+                            <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold shrink-0 ${member.gender === 'Male' ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-700/50 dark:text-zinc-500' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
                                 {member.name?.charAt(0)}
                             </div>
                         )}
-                        <div>
-                            <h1 className="text-xl sm:text-3xl font-bold text-gray-900 dark:text-white">{member.name}</h1>
-                            <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1">
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews > 0 ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500"}`}>
+                        <div className="min-w-0">
+                            <h1 className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-white truncate">{member.name}</h1>
+                            <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1 flex-wrap">
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500'}`}>
                                     {statusText}
                                 </span>
-                                <span className="flex items-center gap-1 text-sm"><FaPhone className="text-xs" /> {member.phone}</span>
+                                <span className="flex items-center gap-1 text-xs sm:text-sm"><FaPhone className="text-xs" /> {member.phone}</span>
                             </div>
                         </div>
                     </div>
 
+                    {/* Edit button — icon-only on mobile, full label on desktop */}
                     <button
                         onClick={() => setIsEditing(true)}
-                        className="px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors flex items-center gap-2 font-medium"
+                        className="shrink-0 flex items-center gap-2 px-3 sm:px-4 py-2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors font-medium"
                     >
-                        <FaEdit /> Edit Member
+                        <FaEdit />
+                        <span className="hidden sm:inline">Edit Member</span>
                     </button>
                 </div>
             </div>

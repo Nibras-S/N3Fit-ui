@@ -58,63 +58,67 @@ const Invoice = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 p-4 md:p-8 print:bg-white print:p-0">
+        <div className="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 print:bg-white print:p-0">
             <Toaster position="top-right" />
 
-            {/* Toolbar (Hidden in Print) */}
-            <div className="max-w-3xl mx-auto mb-6 flex justify-between items-center print:hidden">
+            {/* Toolbar */}
+            <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center print:hidden">
                 <button
                     onClick={() => navigate(-1)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
                     <FaArrowLeft /> Back
                 </button>
-                <div className="flex gap-3">
-                    <button
-                        onClick={handlePrint}
-                        className="flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm"
-                    >
-                        <FaPrint /> Print Invoice
-                    </button>
-                </div>
+                <button
+                    onClick={handlePrint}
+                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm text-sm"
+                >
+                    <FaPrint /> <span className="hidden sm:inline">Print Invoice</span><span className="sm:hidden">Print</span>
+                </button>
             </div>
 
             {/* Invoice Paper */}
             <div
                 ref={invoiceRef}
-                className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-gray-100 print:shadow-none print:border-none print:w-full"
+                className="max-w-2xl mx-auto bg-white p-5 sm:p-8 md:p-10 rounded-2xl shadow-sm border border-gray-100 print:shadow-none print:border-none print:w-full"
             >
                 {/* Header */}
-                <div className="flex justify-between items-start border-b border-gray-100 pb-8 mb-8">
-                    <div className="flex gap-4 items-center">
-                        {gym?.logo ? (
-                            <img
-                                src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`}
-                                alt="Fit Club Logo"
-                                className="w-16 h-16 object-contain rounded-lg bg-gray-50"
-                            />
-                        ) : (
-                            <div className="w-16 h-16 bg-zinc-900 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                                {gym?.name?.charAt(0) || "G"}
+                <div className="border-b border-gray-100 pb-5 mb-6">
+                    {/* Top row: logo+name | INVOICE label */}
+                    <div className="flex justify-between items-start gap-4 mb-4">
+                        <div className="flex gap-3 items-center min-w-0">
+                            {gym?.logo ? (
+                                <img
+                                    src={gym.logo.startsWith('http') ? gym.logo : `${backendUrl}${gym.logo}`}
+                                    alt="Logo"
+                                    className="w-10 h-10 sm:w-14 sm:h-14 object-contain rounded-lg bg-gray-50 shrink-0"
+                                />
+                            ) : (
+                                <div className="w-10 h-10 sm:w-14 sm:h-14 bg-zinc-900 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-xl shrink-0">
+                                    {gym?.name?.charAt(0) || 'G'}
+                                </div>
+                            )}
+                            <div className="min-w-0">
+                                <h1 className="text-base sm:text-xl font-bold text-gray-900 truncate">{gym?.name || 'Fit'}</h1>
+                                {gym?.address && <p className="text-xs text-gray-500 leading-snug">{gym.address}</p>}
                             </div>
-                        )}
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">{gym?.name || "Fit"}</h1>
-                            <p className="text-sm text-gray-500 max-w-[250px]">{gym?.address}</p>
-                            <p className="text-sm text-gray-500 mt-1">
-                                {gym?.contactPhone && <span>Tel: {gym.contactPhone}</span>}
-                                {gym?.contactEmail && <span className="block">{gym.contactEmail}</span>}
-                            </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                            <h2 className="text-2xl sm:text-4xl font-extrabold text-gray-100 uppercase tracking-widest leading-none">Invoice</h2>
                         </div>
                     </div>
-                    <div className="text-right">
-                        <h2 className="text-4xl font-extrabold text-gray-100 uppercase tracking-widest">Invoice</h2>
-                        <div className="mt-4 space-y-1">
-                            <p className="text-sm text-gray-500">Invoice No: <span className="font-mono font-medium text-gray-900">#{_id.slice(-6).toUpperCase()}</span></p>
-                            <p className="text-sm text-gray-500">Date: <span className="font-medium text-gray-900">{invoiceDate}</span></p>
-                            <p className="text-sm text-gray-500">Status:
-                                <span className={`ml-2 px-2 py-0.5 rounded text-xs font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-800'
-                                    }`}>
+
+                    {/* Contact + invoice meta in a grid */}
+                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                        <div>
+                            {gym?.contactPhone && <p>Tel: {gym.contactPhone}</p>}
+                            {gym?.contactEmail && <p>{gym.contactEmail}</p>}
+                        </div>
+                        <div className="text-right space-y-0.5">
+                            <p>Invoice No: <span className="font-mono font-semibold text-gray-900">#{_id.slice(-6).toUpperCase()}</span></p>
+                            <p>Date: <span className="font-medium text-gray-900">{invoiceDate}</span></p>
+                            <p>Status:
+                                <span className={`ml-1.5 px-2 py-0.5 rounded text-[10px] font-bold uppercase ${paymentStatus === 'Paid' ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-800'}`}>
                                     {paymentStatus}
                                 </span>
                             </p>
@@ -123,56 +127,55 @@ const Invoice = () => {
                 </div>
 
                 {/* Bill To */}
-                <div className="mb-10">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Bill To</h3>
-                    <div className="text-gray-900">
-                        <p className="font-bold text-lg">{transaction.memberName}</p>
-                        {transaction.phone && <p className="text-sm text-gray-500">Phone: {transaction.phone}</p>}
-                        {member?.address && <p className="text-sm text-gray-500">{member.address}</p>}
-                    </div>
+                <div className="mb-6">
+                    <h3 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Bill To</h3>
+                    <p className="font-bold text-base sm:text-lg text-gray-900">{transaction.memberName}</p>
+                    {transaction.phone && <p className="text-sm text-gray-500">Phone: {transaction.phone}</p>}
                 </div>
 
                 {/* Table */}
-                <table className="w-full mb-10">
-                    <thead>
-                        <tr className="bg-gray-50 text-left">
-                            <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Description</th>
-                            <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Plan Type</th>
-                            <th className="py-3 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">Amount</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        <tr>
-                            <td className="py-4 px-4 text-sm text-gray-900">
-                                <p className="font-medium">Fit Club Membership Subscription</p>
-                                <p className="text-xs text-gray-500 mt-0.5">{plan} Plan</p>
-                            </td>
-                            <td className="py-4 px-4 text-sm text-gray-600 text-right">{plan}</td>
-                            <td className="py-4 px-4 text-sm font-bold text-gray-900 text-right">₹{amount.toLocaleString("en-IN")}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div className="mb-6 overflow-x-auto">
+                    <table className="w-full min-w-[300px]">
+                        <thead>
+                            <tr className="bg-gray-50 text-left">
+                                <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider">Description</th>
+                                <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Plan</th>
+                                <th className="py-2.5 px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider text-right">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            <tr>
+                                <td className="py-3 px-3 text-sm text-gray-900">
+                                    <p className="font-medium">Membership Subscription</p>
+                                    <p className="text-xs text-gray-500 mt-0.5">{plan} Plan</p>
+                                </td>
+                                <td className="py-3 px-3 text-sm text-gray-600 text-right whitespace-nowrap">{plan}</td>
+                                <td className="py-3 px-3 text-sm font-bold text-gray-900 text-right whitespace-nowrap">₹{amount.toLocaleString('en-IN')}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 {/* Totals */}
-                <div className="flex justify-end mb-12">
-                    <div className="w-64 space-y-3">
+                <div className="flex justify-end mb-8">
+                    <div className="w-full max-w-[220px] space-y-2.5">
                         <div className="flex justify-between text-sm text-gray-600">
                             <span>Subtotal</span>
-                            <span>₹{amount.toLocaleString("en-IN")}</span>
+                            <span>₹{amount.toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex justify-between text-sm text-gray-600">
                             <span>Discount</span>
                             <span>₹{transaction.discount || 0}</span>
                         </div>
-                        <div className="flex justify-between text-lg font-bold text-gray-900 pt-3 border-t border-gray-100">
+                        <div className="flex justify-between text-base font-bold text-gray-900 pt-2.5 border-t border-gray-100">
                             <span>Total</span>
-                            <span>₹{(amount - (transaction.discount || 0)).toLocaleString("en-IN")}</span>
+                            <span>₹{(amount - (transaction.discount || 0)).toLocaleString('en-IN')}</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className="border-t border-gray-100 pt-8 text-center text-sm text-gray-400">
+                <div className="border-t border-gray-100 pt-5 text-center text-sm text-gray-400">
                     <p>Thank you for your business!</p>
                     <p className="mt-1 text-xs">Generated via Fit Management Software</p>
                 </div>
