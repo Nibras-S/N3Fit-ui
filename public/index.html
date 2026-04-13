@@ -38,6 +38,37 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
   <title>Fit | Gym Management</title>
+
+  <!-- Inline app-shell skeleton. Paints before the React bundle parses, so the
+       user sees structure within ~50 ms of HTML response instead of a blank
+       screen. React mounts into #root and replaces it. Stays in sync with the
+       real AppLayout grid (collapsed sidebar + topbar) so there's no layout
+       shift on hand-off. -->
+  <style>
+    html,body{margin:0;padding:0;background:#f9fafb;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+    @media (prefers-color-scheme: dark){html,body{background:#0d0d0d;color:#e5e7eb}}
+    #root:empty::before{
+      content:"";
+      position:fixed;inset:0;
+      background:
+        linear-gradient(#1565C0,#1565C0) left top / 72px 100% no-repeat,
+        linear-gradient(#ffffff,#ffffff) 72px top / calc(100% - 72px) 64px no-repeat;
+    }
+    @media (prefers-color-scheme: dark){
+      #root:empty::before{
+        background:
+          linear-gradient(#0f172a,#0f172a) left top / 72px 100% no-repeat,
+          linear-gradient(#111827,#111827) 72px top / calc(100% - 72px) 64px no-repeat;
+      }
+    }
+    #root:empty::after{
+      content:"";
+      position:fixed;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;
+      border:3px solid #e5e7eb;border-top-color:#1565C0;border-radius:50%;
+      animation:n3spin .8s linear infinite;
+    }
+    @keyframes n3spin{to{transform:rotate(360deg)}}
+  </style>
 </head>
 
 <body>

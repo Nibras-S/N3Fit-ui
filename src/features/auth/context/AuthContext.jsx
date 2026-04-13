@@ -42,6 +42,32 @@ function writeAuthHint(userData) {
     }
 }
 
+// Kick off dynamic imports for the most likely next route based on role so
+// the chunk is already parsed by the time the Navigate redirect lands. Same
+// import specifiers as routes.jsx — webpack resolves to identical chunks.
+function prefetchPostLoginRoutes(role) {
+    const schedule = (fn) => {
+        if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+            return window.requestIdleCallback(fn, { timeout: 2000 });
+        }
+        return setTimeout(fn, 300);
+    };
+    schedule(() => {
+        try {
+            if (role === 'superadmin') {
+                import('../../superadmin/pages/SuperAdminDashboard');
+            } else if (role === 'staff') {
+                import('../../members/pages/MembersPage');
+            } else {
+                import('../../dashboard/pages/DashboardPage');
+                import('../../members/pages/MembersPage');
+            }
+        } catch (_) {
+            /* webpack errors on dynamic import fall through silently */
+        }
+    });
+}
+
 export const AuthProvider = ({ children }) => {
     // Hydrate synchronously from the session hint so first paint doesn't
     // wait for /auth/me. `user` here is a lightweight stub until the real
@@ -77,6 +103,7 @@ export const AuthProvider = ({ children }) => {
                 if (userData?.role || userData?.email) {
                     setUser(userData);
                     writeAuthHint(userData);
+                    prefetchPostLoginRoutes(userData.role);
                     if (userData?.gym?.features) {
                         setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
                     } else if (userData?.role !== 'superadmin') {
@@ -124,6 +151,7 @@ export const AuthProvider = ({ children }) => {
         if (userData?.role || userData?.email) {
             setUser(userData);
             writeAuthHint(userData);
+            prefetchPostLoginRoutes(userData.role);
             // Load gym features
             if (userData?.gym?.features) {
                 setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
