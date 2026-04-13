@@ -42,6 +42,32 @@ body {
 @tailwind components;
 @tailwind utilities;
 
+/* iOS Safari auto-zooms into any focused <input>/<textarea>/<select> whose
+   computed font-size is < 16px, regardless of the viewport meta. Force the
+   typable form controls to 16px on touch-sized viewports so the PWA keeps
+   its layout stable when the keyboard pops up. Checkboxes/radios are
+   excluded because they don't trigger the zoom and their sizing is driven
+   by width/height, not font-size. */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="search"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="password"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="month"],
+  input[type="time"],
+  input[type="week"],
+  input:not([type]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
 /* Hide scrollbar utility — cross-browser */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;

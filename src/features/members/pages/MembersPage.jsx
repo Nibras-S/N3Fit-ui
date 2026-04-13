@@ -404,6 +404,17 @@ const MembersPage = () => {
         },
     }), []);
 
+    // Status is redundant on the Active / Expired tabs (every row has the
+    // same status), so hide that toggle and column everywhere except the
+    // All tab. This filters the canonical list without mutating the
+    // persisted visibleColumns, so switching back to All restores it.
+    const availableToggleableColumns = useMemo(
+        () => (activeTab === 'all'
+            ? TOGGLEABLE_COLUMNS
+            : TOGGLEABLE_COLUMNS.filter(c => c.key !== 'status')),
+        [activeTab]
+    );
+
     const columns = useMemo(() => {
         const nameColumn = {
             key: 'name', label: 'Name', sortable: true,
@@ -428,16 +439,16 @@ const MembersPage = () => {
             ),
         };
 
-        // Walk TOGGLEABLE_COLUMNS (which preserves the canonical column order)
-        // and pick the ones the user has enabled.
+        // Walk availableToggleableColumns (canonical order, minus columns
+        // that are redundant on the current tab) and pick the ones enabled.
         const visibleSet = new Set(visibleColumns);
-        const extras = TOGGLEABLE_COLUMNS
+        const extras = availableToggleableColumns
             .filter(c => visibleSet.has(c.key))
             .map(c => columnRenderers[c.key])
             .filter(Boolean);
 
         return [nameColumn, ...extras];
-    }, [visibleColumns, columnRenderers, backendUrl]);
+    }, [visibleColumns, columnRenderers, backendUrl, availableToggleableColumns]);
 
     // ── Actions ─────────────────────────────────────────────────
     // stopPropagation on the wrapper so clicks on action buttons don't bubble
@@ -481,8 +492,9 @@ const MembersPage = () => {
         const visibleSet = new Set(visibleColumns);
         const showPhone = visibleSet.has('phone');
         // Everything except phone (which sits in the header subtitle) renders
-        // as a label/value row in the metadata strip, in TOGGLEABLE_COLUMNS order.
-        const metaRows = TOGGLEABLE_COLUMNS
+        // as a label/value row in the metadata strip. availableToggleableColumns
+        // drops status on Active / Expired tabs where it's redundant.
+        const metaRows = availableToggleableColumns
             .filter(c => c.key !== 'phone' && visibleSet.has(c.key))
             .map(c => ({ key: c.key, label: c.label, value: columnRenderers[c.key]?.render(row) }))
             .filter(r => r.value != null);
@@ -756,9 +768,9 @@ const MembersPage = () => {
                                             <label className="flex items-center gap-1.5 text-xs text-gray-600 dark:text-gray-300 cursor-pointer">
                                                 <input
                                                     type="checkbox"
-                                                    checked={visibleColumns.length === TOGGLEABLE_COLUMNS.length}
+                                                    checked={availableToggleableColumns.every(c => visibleColumns.includes(c.key))}
                                                     onChange={(e) => setVisibleColumns(
-                                                        e.target.checked ? TOGGLEABLE_COLUMNS.map(c => c.key) : []
+                                                        e.target.checked ? availableToggleableColumns.map(c => c.key) : []
                                                     )}
                                                     className="w-3.5 h-3.5 rounded border-gray-300 text-zinc-900 focus:ring-red-500"
                                                 />
@@ -772,7 +784,7 @@ const MembersPage = () => {
                                                 <span>Name</span>
                                                 <span className="ml-auto text-[10px] uppercase">Required</span>
                                             </label>
-                                            {TOGGLEABLE_COLUMNS.map(col => {
+                                            {availableToggleableColumns.map(col => {
                                                 const checked = visibleColumns.includes(col.key);
                                                 return (
                                                     <label
@@ -1119,7 +1131,7 @@ const MembersPage = () => {
                                         <span className="text-[10px] text-gray-400 dark:text-gray-500">Name is always shown</span>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {TOGGLEABLE_COLUMNS.map(col => {
+                                        {availableToggleableColumns.map(col => {
                                             const checked = draftVisibleColumns.includes(col.key);
                                             const toggle = () => setDraftVisibleColumns(prev => (
                                                 prev.includes(col.key)
