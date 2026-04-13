@@ -68,6 +68,12 @@ const MembersPage = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+    // Draft state for the mobile filter sheet — selections are staged here
+    // and only copied into genderFilter / visibleColumns when the user taps
+    // "Show Results". Opening the sheet reseeds these from the committed
+    // state, so backdrop-dismiss acts as an implicit cancel.
+    const [draftGender, setDraftGender] = useState('all');
+    const [draftVisibleColumns, setDraftVisibleColumns] = useState(DEFAULT_VISIBLE_COLUMNS);
     // Default sort matches the per-tab reset below so first load and post-tab-
     // switch behave the same. Previously these two defaults disagreed and the
     // list silently re-sorted the moment you touched a tab.
@@ -838,7 +844,11 @@ const MembersPage = () => {
                         )}
                     </div>
                     <button
-                        onClick={() => setIsFilterSheetOpen(true)}
+                        onClick={() => {
+                            setDraftGender(genderFilter);
+                            setDraftVisibleColumns(visibleColumns);
+                            setIsFilterSheetOpen(true);
+                        }}
                         className="w-10 h-10 border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
                     >
                         <FaFilter size={14} />
@@ -1059,8 +1069,8 @@ const MembersPage = () => {
                                 <h3 className="font-bold text-lg dark:text-white tracking-tight">Filters</h3>
                                 <button
                                     onClick={() => {
-                                        setGenderFilter('all');
-                                        setVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
+                                        setDraftGender('all');
+                                        setDraftVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
                                     }}
                                     className="text-zinc-900 font-semibold text-sm"
                                 >
@@ -1077,8 +1087,8 @@ const MembersPage = () => {
                                         {['all', 'Male', 'Female'].map(f => (
                                             <button
                                                 key={f}
-                                                onClick={() => setGenderFilter(f)}
-                                                className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${genderFilter === f
+                                                onClick={() => setDraftGender(f)}
+                                                className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-sm ${draftGender === f
                                                     ? 'bg-zinc-900 border border-zinc-900 text-white shadow-zinc-900/20'
                                                     : 'bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-600'
                                                     }`}
@@ -1097,8 +1107,8 @@ const MembersPage = () => {
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         {TOGGLEABLE_COLUMNS.map(col => {
-                                            const checked = visibleColumns.includes(col.key);
-                                            const toggle = () => setVisibleColumns(prev => (
+                                            const checked = draftVisibleColumns.includes(col.key);
+                                            const toggle = () => setDraftVisibleColumns(prev => (
                                                 prev.includes(col.key)
                                                     ? prev.filter(k => k !== col.key)
                                                     : [...prev, col.key]
@@ -1134,7 +1144,11 @@ const MembersPage = () => {
                             {/* Footer */}
                             <div className="p-4 border-t border-gray-100 dark:border-zinc-800 shrink-0 bg-white dark:bg-zinc-900">
                                 <button
-                                    onClick={() => setIsFilterSheetOpen(false)}
+                                    onClick={() => {
+                                        setGenderFilter(draftGender);
+                                        setVisibleColumns(draftVisibleColumns);
+                                        setIsFilterSheetOpen(false);
+                                    }}
                                     className="w-full py-3.5 bg-zinc-900 text-white font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-zinc-900/20"
                                 >
                                     Show Results
