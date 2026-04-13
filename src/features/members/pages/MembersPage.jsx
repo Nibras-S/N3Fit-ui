@@ -1091,22 +1091,36 @@ const MembersPage = () => {
 
                                 {/* Columns to show */}
                                 <div>
-                                    <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Columns to show</label>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block">Columns to show</label>
+                                        <span className="text-[10px] text-gray-400 dark:text-gray-500">Name is always shown</span>
+                                    </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        {/* Disabled name checkbox */}
-                                        <label className="col-span-2 flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 cursor-not-allowed">
-                                            <div className="w-5 h-5 rounded flex items-center justify-center bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 opacity-50">
-                                                <FaCheck size={10} />
-                                            </div>
-                                            <span className="text-sm font-semibold text-gray-400 dark:text-gray-500">Name</span>
-                                            <span className="ml-auto text-[10px] font-bold uppercase text-gray-400">Required</span>
-                                        </label>
-
                                         {TOGGLEABLE_COLUMNS.map(col => {
                                             const checked = visibleColumns.includes(col.key);
+                                            const toggle = () => setVisibleColumns(prev => (
+                                                prev.includes(col.key)
+                                                    ? prev.filter(k => k !== col.key)
+                                                    : [...prev, col.key]
+                                            ));
                                             return (
-                                                <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer border border-transparent dark:hover:border-zinc-600">
-                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border shrink-0 ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-zinc-500 bg-white dark:bg-zinc-900'}`}>
+                                                <label
+                                                    key={col.key}
+                                                    className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors cursor-pointer border select-none active:scale-[0.98] ${checked
+                                                        ? 'bg-zinc-50 dark:bg-zinc-800/70 border-zinc-200 dark:border-zinc-700'
+                                                        : 'bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-800/40'
+                                                    }`}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={checked}
+                                                        onChange={toggle}
+                                                        className="sr-only"
+                                                    />
+                                                    <div
+                                                        aria-hidden="true"
+                                                        className={`w-5 h-5 rounded flex items-center justify-center transition-colors border shrink-0 ${checked ? 'bg-zinc-900 border-zinc-900 text-white dark:bg-white dark:border-white dark:text-zinc-900' : 'border-gray-300 dark:border-zinc-600 bg-white dark:bg-zinc-900'}`}
+                                                    >
                                                         {checked && <FaCheck size={10} />}
                                                     </div>
                                                     <span className={`text-sm font-semibold truncate ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
