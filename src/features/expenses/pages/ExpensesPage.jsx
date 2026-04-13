@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
+import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import { AnimatePresence, motion } from 'framer-motion';
 
 const CATEGORIES = [
@@ -74,7 +75,31 @@ const Expenses = () => {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    useGymSocket(['expense:created', 'expense:updated', 'expense:deleted'], fetchData);
+    // Summary is a server-side aggregate — can't patch it from a single row event.
+    // Debounced so a burst of events only refetches the summary once.
+    const refetchSummary = useDebouncedCallback(async () => {
+        try {
+            const r = await api.get('/expenses/summary');
+            setSummary(r.data);
+        } catch (_) { /* non-critical */ }
+    }, 400);
+
+    // Handle each socket event by patching the list in place from the full
+    // payload (backend now emits the saved doc, not just the id).
+    const handleExpenseEvent = useCallback((event, data) => {
+        if (event === 'expense:created') {
+            setExpenses(prev => prev.some(e => e._id === data._id) ? prev : [data, ...prev]);
+        } else if (event === 'expense:updated') {
+            setExpenses(prev => prev.map(e => e._id === data._id ? data : e));
+        } else if (event === 'expense:deleted') {
+            const id = data.expenseId || data._id;
+            setExpenses(prev => prev.filter(e => e._id !== id));
+            setSelectedIds(prev => prev.filter(sid => sid !== id));
+        }
+        refetchSummary();
+    }, [refetchSummary]);
+
+    useGymSocket(['expense:created', 'expense:updated', 'expense:deleted'], handleExpenseEvent);
 
     const handleDelete = async () => {
         const { id } = deleteModal;

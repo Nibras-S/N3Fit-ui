@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import socket from '../../../shared/hooks/useSocket';
@@ -13,7 +13,7 @@ export const NotificationProvider = ({ children }) => {
     const [loading, setLoading] = useState(false);
     const socketRef = useRef(null);
 
-    const fetchNotifications = async () => {
+    const fetchNotifications = useCallback(async () => {
         if (!user || user.role === 'superadmin') return;
         setLoading(true);
         try {
@@ -28,9 +28,9 @@ export const NotificationProvider = ({ children }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [user, api]);
 
-    const checkWarning = async () => {
+    const checkWarning = useCallback(async () => {
         if (!user || user.role === 'superadmin') return;
         try {
             const res = await api.get('/notifications/active-warning');
@@ -42,9 +42,9 @@ export const NotificationProvider = ({ children }) => {
         } catch (err) {
             console.error('Failed to fetch warning', err);
         }
-    };
+    }, [user, api]);
 
-    const markAsRead = async (id) => {
+    const markAsRead = useCallback(async (id) => {
         try {
             await api.patch(`/notifications/${id}/read`);
             setNotifications(prev => prev.map(n => n._id === id ? { ...n, isRead: true } : n));
@@ -55,9 +55,9 @@ export const NotificationProvider = ({ children }) => {
         } catch (err) {
             console.error('Failed to mark notification as read', err);
         }
-    };
+    }, [api, activeWarning]);
 
-    const markAllAsRead = async () => {
+    const markAllAsRead = useCallback(async () => {
         try {
             const unread = notifications.filter(n => !n.isRead);
             if (unread.length === 0) return;
@@ -67,7 +67,7 @@ export const NotificationProvider = ({ children }) => {
         } catch (err) {
             console.error('Failed to mark all as read', err);
         }
-    };
+    }, [api, notifications]);
 
     useEffect(() => {
         // Disconnect the singleton from any previous session before re-connecting.
@@ -126,7 +126,7 @@ export const NotificationProvider = ({ children }) => {
         setUnreadCount(notifications.filter(n => !n.isRead).length);
     }, [notifications]);
 
-    const value = {
+    const value = useMemo(() => ({
         notifications,
         unreadCount,
         activeWarning,
@@ -136,7 +136,7 @@ export const NotificationProvider = ({ children }) => {
         markAllAsRead,
         setActiveWarning,
         socket: socketRef, // expose ref for useGymSocket hook
-    };
+    }), [notifications, unreadCount, activeWarning, loading, fetchNotifications, markAsRead, markAllAsRead]);
 
     return (
         <NotificationContext.Provider value={value}>

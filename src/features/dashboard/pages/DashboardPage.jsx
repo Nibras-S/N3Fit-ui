@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
+import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import {
-    FaWallet, FaUsers, FaChartPie, FaCalendarAlt,
+    FaWallet, FaChartPie, FaCalendarAlt,
     FaMoneyCheckAlt, FaUserPlus, FaChartLine,
     FaExclamationCircle, FaPhone, FaUserClock, FaExchangeAlt,
-    FaArrowUp, FaArrowDown, FaFileInvoiceDollar
+    FaFileInvoiceDollar
 } from 'react-icons/fa';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +21,7 @@ const Dashboard = () => {
     const [todayModalOpen, setTodayModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
 
-    const fetchStats = async () => {
+    const fetchStats = useCallback(async () => {
         try {
             const [res, expenseRes] = await Promise.all([
                 api.get('/transactions/stats'),
@@ -32,7 +33,7 @@ const Dashboard = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     useEffect(() => {
         if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
@@ -40,13 +41,14 @@ const Dashboard = () => {
             return;
         }
         fetchStats();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [user]);
+    }, [user, navigate, fetchStats]);
 
-    // Refetch whenever any member, transaction, or expense changes in this gym
+    // Refetch whenever any member, transaction, or expense changes in this gym.
+    // Debounced so a burst of events (e.g. bulk import) collapses to one refetch.
+    const debouncedFetchStats = useDebouncedCallback(fetchStats, 400);
     useGymSocket(
         ['member:created', 'member:updated', 'member:deleted', 'transaction:created', 'transaction:updated', 'expense:created', 'expense:updated', 'expense:deleted'],
-        fetchStats,
+        debouncedFetchStats,
     );
 
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#6366f1', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
@@ -82,7 +84,6 @@ const Dashboard = () => {
     const pendingPayments = stats?.pendingPayments || [];
     const expiringSoon = stats?.expiringSoon || [];
     const recentTransactions = stats?.recentTransactions || [];
-    const monthChange = stats?.income?.monthChange || 0;
 
     return (
         <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
@@ -296,7 +297,7 @@ const Dashboard = () => {
                                             <a
                                                 href={`tel:${m.phone}`}
                                                 onClick={(e) => e.stopPropagation()}
-                                                className="p-1.5 text-gray-400 hover:text-zinc-900 rounded-lg hover:bg-zinc-100 transition-colors"
+                                                className="p-1.5 text-gray-400 hover:text-zinc-900 dark:hover:text-white rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/40 transition-colors"
                                             >
                                                 <FaPhone className="text-xs" />
                                             </a>

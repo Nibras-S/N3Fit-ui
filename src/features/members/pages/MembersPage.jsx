@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
+import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
@@ -9,7 +10,6 @@ import EditMemberModal from '../components/EditMemberModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,7 +67,6 @@ const MembersPage = () => {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
     const [totalRecords, setTotalRecords] = useState(0);
-    const [paginationMeta, setPaginationMeta] = useState({});
     const [loading, setLoading] = useState(true);
 
     // ── Modals & Inline Actions ──────────────────────────────────
@@ -156,7 +155,6 @@ const MembersPage = () => {
 
             setMembers(Array.isArray(data) ? data : []);
             setTotalRecords(pagination.total || 0);
-            setPaginationMeta(pagination);
         } catch (error) {
             console.error('Failed to load members', error);
         } finally {
@@ -169,7 +167,9 @@ const MembersPage = () => {
         fetchMembers();
     }, [fetchMembers]);
 
-    useGymSocket(['member:created', 'member:updated', 'member:deleted'], fetchMembers);
+    // Debounced so bursts of events (bulk import, batch actions) collapse to a single refetch.
+    const debouncedFetchMembers = useDebouncedCallback(fetchMembers, 300);
+    useGymSocket(['member:created', 'member:updated', 'member:deleted'], debouncedFetchMembers);
 
     // ── Fetch settings for plans ────────────────────────────────
     useEffect(() => {
@@ -193,13 +193,6 @@ const MembersPage = () => {
             })
             .catch((err) => console.error('Error fetching pending:', err));
     }, [backendUrl]);
-
-    // ── Stats: from current page pagination meta ──────────────────
-    const stats = useMemo(() => ({
-        total: paginationMeta.total ?? totalRecords,
-        male: paginationMeta.male ?? 0,
-        female: paginationMeta.female ?? 0,
-    }), [paginationMeta, totalRecords]);
 
     // ── Fetch global stats (all-time, not filtered by gender/search) ──
     useEffect(() => {
@@ -225,7 +218,7 @@ const MembersPage = () => {
 
     // ── Delete ──────────────────────────────────────────────────
     const handleDeleteClick = async () => {
-        const { id, name } = deleteModal;
+        const { id } = deleteModal;
         try {
             await api.delete(`/contacts/${id}`);
             setMembers(prev => prev.filter(u => u._id !== id));
@@ -859,13 +852,13 @@ const MembersPage = () => {
                     </div>
                     <button
                         onClick={() => setIsFilterSheetOpen(true)}
-                        className="w-[38px] h-[38px] border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
+                        className="w-10 h-10 border border-gray-200 dark:border-zinc-700 rounded-xl bg-white dark:bg-zinc-900 flex items-center justify-center text-gray-600 dark:text-gray-300 shadow-sm shrink-0 active:bg-gray-50 transition-colors"
                     >
                         <FaFilter size={14} />
                     </button>
                     <button
                         onClick={() => navigate('/register')}
-                        className="w-[38px] h-[38px] bg-zinc-900 rounded-xl flex items-center justify-center text-white shadow-md shadow-zinc-900/25 active:scale-95 transition-all shrink-0"
+                        className="w-10 h-10 bg-zinc-900 rounded-xl flex items-center justify-center text-white shadow-md shadow-zinc-900/25 active:scale-95 transition-all shrink-0"
                     >
                         <FaPlus size={16} />
                     </button>

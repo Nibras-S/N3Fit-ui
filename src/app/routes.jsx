@@ -3,13 +3,17 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from '../shared/components/guards/ProtectedRoute';
 import LoginGuard from '../features/auth/components/LoginGuard';
 import { PageSkeleton } from '../shared/components/ui/Skeleton';
-import AppLayout from '../shared/components/layout/AppLayout';
+import ScrollToTop from '../shared/components/ScrollToTop';
 
-/** Fallback shown while a lazy page chunk loads — keeps sidebar visible */
+/**
+ * Fallback shown while a lazy page chunk loads. Kept deliberately bare —
+ * wrapping this in <AppLayout/> would pull AppLayout (and framer-motion)
+ * into the main bundle, which defeats the point of lazy routing.
+ */
 const LayoutSkeleton = () => (
-    <AppLayout showGenderSwitch={false}>
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d]" aria-busy="true">
         <PageSkeleton />
-    </AppLayout>
+    </div>
 );
 
 // ── Feature Pages (lazy-loaded for code splitting) ───────────────
@@ -59,6 +63,7 @@ const isPWA = window.matchMedia('(display-mode: standalone)').matches
 export default function AppRoutes() {
     return (
         <Suspense fallback={<LayoutSkeleton />}>
+            <ScrollToTop />
             <Routes>
                 {/* ── Public ──────────────────────────────────────────── */}
                 <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />

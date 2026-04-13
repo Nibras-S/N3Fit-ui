@@ -6,6 +6,7 @@ import { FaSearch, FaSlidersH, FaTimes } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import useGymSocket from '../../../shared/hooks/useGymSocket';
+import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import { AnimatePresence, motion } from 'framer-motion';
 import usePersistedFilters from '../../../shared/hooks/usePersistedFilters';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
@@ -67,7 +68,9 @@ const TransactionsPage = () => {
     }, []);
 
     useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
-    useGymSocket(['transaction:created', 'transaction:updated'], fetchTransactions);
+    // Debounced so bursts of events collapse to a single refetch.
+    const debouncedFetchTransactions = useDebouncedCallback(fetchTransactions, 300);
+    useGymSocket(['transaction:created', 'transaction:updated'], debouncedFetchTransactions);
 
     const filteredTransactions = useMemo(() => {
         let list = transactions;

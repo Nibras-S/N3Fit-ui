@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../../../shared/services/api';
 
 const AuthContext = createContext(null);
@@ -54,7 +54,7 @@ export const AuthProvider = ({ children }) => {
      * Login — sends credentials, server sets httpOnly cookie.
      * No token is stored in localStorage or memory.
      */
-    const login = async (email, password, gymCode) => {
+    const login = useCallback(async (email, password, gymCode) => {
         const payload = { email, password };
         if (gymCode) payload.gymCode = gymCode;
 
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
             return userData;
         }
         throw new Error('Login failed. Please try again.');
-    };
+    }, []);
 
     /**
      * Refresh current user profile from server.
@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }) => {
         return gymFeatures[featureName] !== false;
     }, [gymFeatures]);
 
-    const value = {
+    const value = useMemo(() => ({
         user,
         loading,
         login,
@@ -148,7 +148,7 @@ export const AuthProvider = ({ children }) => {
         gymFeatures,
         hasFeature,
         api, // Pre-configured axios instance
-    };
+    }), [user, loading, login, refreshUser, logout, switchGym, gymFeatures, hasFeature]);
 
     return (
         <AuthContext.Provider value={value}>
