@@ -29,27 +29,37 @@ function MemberProfile() {
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchData = async () => {
-        try {
-            const [memberRes, txnRes, auditRes] = await Promise.all([
-                api.get(`/contacts/${id}`),
-                api.get(`/transactions?memberId=${id}`),
-                api.get(`/contacts/${id}/audit`),
-            ]);
-            setMember(memberRes.data);
-            // Transactions endpoint returns { data: [...], pagination: {...} }
-            // after the api interceptor unwraps the { success, data } envelope.
-            const txnData = txnRes.data;
+        const [memberResult, txnResult, auditResult] = await Promise.allSettled([
+            api.get(`/contacts/${id}`),
+            api.get(`/transactions?memberId=${id}`),
+            api.get(`/contacts/${id}/audit`),
+        ]);
+
+        if (memberResult.status === 'fulfilled') {
+            setMember(memberResult.value.data);
+        } else {
+            console.error('Failed to load member:', memberResult.reason);
+        }
+
+        if (txnResult.status === 'fulfilled') {
+            const txnData = txnResult.value.data;
             const list = Array.isArray(txnData)
                 ? txnData
                 : (Array.isArray(txnData?.data) ? txnData.data : []);
             setTransactions(list);
-            setAuditLogs(Array.isArray(auditRes.data) ? auditRes.data : []);
-        } catch (error) {
-            console.error("Error fetching member details:", error);
-            toast.error("Failed to load member details");
-        } finally {
-            setLoading(false);
+        } else {
+            console.error('Failed to load transactions:', txnResult.reason);
+            setTransactions([]);
         }
+
+        if (auditResult.status === 'fulfilled') {
+            setAuditLogs(Array.isArray(auditResult.value.data) ? auditResult.value.data : []);
+        } else {
+            console.error('Failed to load audit logs:', auditResult.reason);
+            setAuditLogs([]);
+        }
+
+        setLoading(false);
     };
 
     useEffect(() => {

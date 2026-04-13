@@ -6,9 +6,9 @@ import AddExpenseModal from '../components/AddExpenseModal';
 import ViewExpenseModal from '../components/ViewExpenseModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
-    FaWallet, FaHistory, FaPlus, FaFilter, FaArrowDown,
-    FaChartPie, FaMoneyBillWave, FaTrash, FaEdit, FaFileExport,
-    FaPaperclip, FaTimesCircle, FaCheckCircle, FaFilePdf, FaImage, FaEye, FaTimes,
+    FaWallet, FaHistory, FaPlus, FaFilter,
+    FaTrash, FaEdit, FaFileExport,
+    FaTimesCircle, FaFilePdf, FaImage, FaEye, FaTimes,
     FaSearch, FaSlidersH
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
@@ -23,8 +23,6 @@ const CATEGORIES = [
     'Maintenance', 'Marketing', 'Cleaning', 'Internet', 'Software', 'Others'
 ];
 
-const PAYMENT_METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer'];
-
 const Expenses = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -33,7 +31,7 @@ const Expenses = () => {
         if (user && user.role === 'staff' && !user.permissions?.includes('expenses')) {
             navigate('/members');
         }
-    }, [user]);
+    }, [user, navigate]);
 
     const [expenses, setExpenses] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
@@ -54,8 +52,6 @@ const Expenses = () => {
     // Mobile bottom sheet draft state
     const [draft, setDraft] = useState({ period: 'All Time', fromDate: '', toDate: '', category: '' });
     const [sheetOpen, setSheetOpen] = useState(false);
-
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const fetchData = useCallback(async () => {
         setLoading(true);
