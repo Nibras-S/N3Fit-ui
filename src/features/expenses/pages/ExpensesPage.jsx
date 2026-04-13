@@ -162,7 +162,13 @@ const Expenses = () => {
         });
     }, [expenses, period, fromDate, toDate, filterCategory, search]);
 
+    const filteredTotal = useMemo(
+        () => filteredExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0),
+        [filteredExpenses],
+    );
+
     const hasActiveFilters = period !== 'All Time' || fromDate || toDate || filterCategory || search;
+    const hasMobileFilters = period !== 'All Time' || fromDate || toDate || filterCategory;
 
     const clearFilters = () => {
         setPeriod('All Time');
@@ -227,10 +233,51 @@ const Expenses = () => {
     ];
 
     return (
-        <AppLayout title="Expense Tracker" description="Monitor your gym's spending and financial health" icon={FaWallet} showGenderSwitch={false}>
-            <div className="space-y-6">
-                {/* Header Actions */}
-                <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
+        <AppLayout title="Expenses" description="Monitor your gym's spending and financial health" icon={FaWallet} showGenderSwitch={false}>
+            <div className="space-y-4 md:space-y-6">
+                {/* ── Mobile top: Total + compact search / filter / add row ── */}
+                <div className="md:hidden space-y-3">
+                    <div className="flex items-baseline gap-2 text-sm px-1">
+                        <span className="text-gray-500 dark:text-gray-400">Total:</span>
+                        <span className="font-bold text-gray-900 dark:text-white">{formatCurrency(filteredTotal)}</span>
+                        <span className="text-gray-300 dark:text-zinc-700">•</span>
+                        <span className="text-gray-500 dark:text-gray-400">
+                            {filteredExpenses.length} {filteredExpenses.length === 1 ? 'entry' : 'entries'}
+                        </span>
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="relative flex-1">
+                            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+                            <input
+                                type="text"
+                                placeholder="Search expenses..."
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="w-full pl-9 pr-3 h-10 rounded-xl bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 transition-all"
+                            />
+                        </div>
+                        <button
+                            onClick={() => { setDraft({ period, fromDate, toDate, category: filterCategory }); setSheetOpen(true); }}
+                            aria-label="Filters"
+                            className={`relative flex items-center justify-center w-10 h-10 rounded-xl border transition-all ${hasMobileFilters ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
+                        >
+                            <FaSlidersH size={14} />
+                            {hasMobileFilters && (
+                                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-900 dark:border-white" />
+                            )}
+                        </button>
+                        <button
+                            onClick={() => setIsAddModalOpen(true)}
+                            aria-label="Add Expense"
+                            className="flex items-center justify-center w-10 h-10 rounded-xl bg-zinc-900 text-white active:scale-95 transition-all shadow-sm"
+                        >
+                            <FaPlus size={14} />
+                        </button>
+                    </div>
+                </div>
+
+                {/* ── Desktop Header Actions ── */}
+                <div className="hidden md:flex items-center justify-end gap-4">
                     <div className="flex items-center gap-3">
                         {selectedIds.length > 0 && (
                             <button
@@ -249,8 +296,8 @@ const Expenses = () => {
                     </div>
                 </div>
 
-                {/* Summary Cards */}
-                <div className="grid grid-cols-2 gap-4">
+                {/* ── Desktop Summary Cards ── */}
+                <div className="hidden md:grid grid-cols-2 gap-4">
                     <div className="bg-white dark:bg-zinc-900 p-5 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm transition-colors">
                         <div className="flex items-center gap-3 mb-3">
                             <div className="w-10 h-10 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300 flex items-center justify-center">
@@ -279,8 +326,8 @@ const Expenses = () => {
                 {/* Table Section */}
                 <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden no-scrollbar">
 
-                    {/* Title row */}
-                    <div className="flex items-center justify-between p-4 sm:p-5">
+                    {/* Title row — desktop only (topbar already shows "Expenses" on mobile) */}
+                    <div className="hidden md:flex items-center justify-between p-4 sm:p-5">
                         <div className="flex items-center gap-2">
                             <FaHistory className="text-gray-400" />
                             <h3 className="font-bold text-gray-900 dark:text-white">Expense History</h3>
@@ -347,29 +394,6 @@ const Expenses = () => {
                         )}
                     </div>
 
-                    {/* ── Mobile: search + filter button ── */}
-                    <div className="md:hidden flex gap-2 p-4 border-b border-gray-100 dark:border-zinc-800">
-                        <div className="relative flex-1">
-                            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
-                            <input
-                                type="text"
-                                placeholder="Search expenses..."
-                                value={search}
-                                onChange={e => setSearch(e.target.value)}
-                                className="w-full pl-8 pr-3 py-2 rounded-xl bg-gray-50 dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 transition-all"
-                            />
-                        </div>
-                        <button
-                            onClick={() => { setDraft({ period, fromDate, toDate, category: filterCategory }); setSheetOpen(true); }}
-                            className={`relative flex items-center gap-2 px-3 py-2 rounded-xl border font-medium text-sm transition-all ${(period !== 'All Time' || fromDate || toDate || filterCategory) ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white dark:bg-zinc-900 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-zinc-700'}`}
-                        >
-                            <FaSlidersH size={14} />
-                            {(period !== 'All Time' || fromDate || toDate || filterCategory) && (
-                                <span className="w-4 h-4 rounded-full bg-white text-zinc-900 text-[10px] font-bold flex items-center justify-center">!</span>
-                            )}
-                        </button>
-                    </div>
-
                     <DataTable
                         data={filteredExpenses}
                         columns={columns}
@@ -377,6 +401,60 @@ const Expenses = () => {
                         showSelection={true}
                         selectedIds={selectedIds}
                         onSelectionChange={setSelectedIds}
+                        renderMobileCard={(row) => {
+                            const methodStyles = {
+                                Cash: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400',
+                                UPI: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400',
+                                Card: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-400',
+                                'Bank Transfer': 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400',
+                            };
+                            return (
+                                <div className="flex items-start justify-between gap-3 pr-8">
+                                    <div className="min-w-0 flex-1">
+                                        <div className="flex items-baseline gap-2">
+                                            <span className="text-lg font-black text-gray-900 dark:text-white">{formatCurrency(row.amount)}</span>
+                                            <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                {new Date(row.date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                        {row.vendor && (
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">Paid to {row.vendor}</p>
+                                        )}
+                                        <div className="flex items-center gap-1.5 mt-2">
+                                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300">
+                                                {row.category}
+                                            </span>
+                                            <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${methodStyles[row.paymentMethod] || 'bg-gray-100 text-gray-600'}`}>
+                                                {row.paymentMethod}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-0.5 shrink-0">
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setViewingExpense(row); }}
+                                            className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                                            aria-label="View"
+                                        >
+                                            <FaEye size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setEditingExpense(row); setIsAddModalOpen(true); }}
+                                            className="p-2 text-zinc-700 dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                                            aria-label="Edit"
+                                        >
+                                            <FaEdit size={14} />
+                                        </button>
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); setDeleteModal({ isOpen: true, id: row._id }); }}
+                                            className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                                            aria-label="Delete"
+                                        >
+                                            <FaTrash size={14} />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        }}
                         renderActions={(row) => (
                             <div className="flex items-center gap-1.5">
                                 <button
