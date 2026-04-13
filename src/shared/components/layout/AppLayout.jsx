@@ -25,8 +25,6 @@ import {
   FaBell,
   FaExclamationTriangle,
   FaCheckDouble,
-  FaMoon,
-  FaSun,
   FaChartLine,
   FaAngleDoubleLeft,
   FaArrowLeft,
@@ -54,7 +52,12 @@ export function AppLayout({
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [sidebarProfileOpen, setSidebarProfileOpen] = useState(false);
   const [gymSwitcherOpen, setGymSwitcherOpen] = useState(false);
+
+  useEffect(() => {
+    if (!mobileMenuOpen) setSidebarProfileOpen(false);
+  }, [mobileMenuOpen]);
 
   // Network indicator + page-title source for the mobile header.
   const { status: networkStatus } = useOnlineStatus();
@@ -287,6 +290,45 @@ export function AppLayout({
     return `${backendUrl}${path}`;
   };
 
+  const canManageAccount = user?.role !== 'staff';
+
+  const renderProfilePopoverBody = (onClose) => (
+    <>
+      <div className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+            {user?.profileImage ? (
+              <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+            ) : userInitial}
+            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-zinc-800" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userName}</p>
+            <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
+          </div>
+        </div>
+      </div>
+      <div className="p-2 space-y-0.5">
+        {canManageAccount && (
+          <button
+            onClick={() => { safeNavigate('/account'); onClose(); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <FaUserCog className="text-zinc-500 text-base shrink-0" />
+            Manage Account
+          </button>
+        )}
+        <button
+          onClick={() => { handleLogout(); onClose(); }}
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+        >
+          <FaSignOutAlt className="text-base shrink-0" />
+          Logout
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d] font-sans flex flex-col lg:flex-row transition-colors duration-200">
 
@@ -466,8 +508,39 @@ export function AppLayout({
             })}
           </nav>
 
+          {/* Sidebar profile */}
+          <div className="relative mt-4 pt-4 border-t border-gray-200 dark:border-white/8">
+            <button
+              onClick={() => setSidebarProfileOpen(v => !v)}
+              title={isCollapsed ? userName : undefined}
+              className={`w-full flex items-center rounded-xl transition-all ${isCollapsed ? 'justify-center p-2' : 'gap-3 px-2 py-2 hover:bg-gray-50 dark:hover:bg-zinc-800/50'} ${sidebarProfileOpen ? 'bg-gray-100 dark:bg-zinc-800/50' : ''}`}
+            >
+              <div className="relative w-9 h-9 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                {user?.profileImage ? (
+                  <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+                ) : userInitial}
+                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-zinc-900" />
+              </div>
+              {!isCollapsed && (
+                <div className="min-w-0 flex-1 text-left">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                  <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate capitalize">{userRole}</p>
+                </div>
+              )}
+            </button>
+
+            {sidebarProfileOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setSidebarProfileOpen(false)} />
+                <div className={`absolute bottom-full mb-2 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40 animate-popup-in ${isCollapsed ? 'left-full ml-2 w-56' : 'left-0 right-0'}`}>
+                  {renderProfilePopoverBody(() => setSidebarProfileOpen(false))}
+                </div>
+              </>
+            )}
+          </div>
+
           {/* Sidebar footer */}
-          <div className="pt-4 border-t border-gray-200 dark:border-white/8 mt-4 flex justify-center items-center">
+          <div className="pt-4 mt-3 flex justify-center items-center">
             {isCollapsed ? (
               <img src={n3Logo} alt="N3 Fit" className="w-6 h-6 opacity-60 grayscale" />
             ) : (
@@ -554,48 +627,7 @@ export function AppLayout({
                   <div
                     className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40 origin-top-right animate-popup-in"
                   >
-                      {/* User info header */}
-                      <div className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40">
-                        <div className="flex items-center gap-3">
-                          <div className="relative w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
-                            {user?.profileImage ? (
-                              <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
-                            ) : userInitial}
-                            <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-zinc-800" />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-sm font-bold text-gray-900 dark:text-white truncate">{userName}</p>
-                            <p className="text-[10px] text-gray-400 truncate">{user?.email}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-2 space-y-0.5">
-                        <button
-                          onClick={() => {
-                            safeNavigate('/account');
-                            setProfileModalOpen(false);
-                          }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                          <FaUserCog className="text-zinc-500 text-base shrink-0" />
-                          Manage Account
-                        </button>
-                        <button
-                          onClick={() => { toggleTheme(); setProfileModalOpen(false); }}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                          {theme === 'dark' ? <FaSun className="text-amber-400 text-base shrink-0" /> : <FaMoon className="text-slate-500 text-base shrink-0" />}
-                          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
-                        </button>
-                        <div className="h-px bg-gray-100 dark:bg-zinc-800 my-1" />
-                        <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
-                        >
-                          <FaSignOutAlt className="text-base shrink-0" />
-                          Logout
-                        </button>
-                    </div>
+                    {renderProfilePopoverBody(() => setProfileModalOpen(false))}
                   </div>
                 </>
               )}
@@ -750,28 +782,38 @@ export function AppLayout({
                       );
                     })}
                   </nav>
+                </div>
+
+                {/* Pinned profile row (outside scroll area) */}
+                <div
+                  className="relative border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-3 pt-3"
+                  style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 0.75rem)' }}
+                >
                   <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="mt-6 w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                    onClick={() => setSidebarProfileOpen(v => !v)}
+                    className={`w-full flex items-center gap-3 px-2 py-2 rounded-xl transition-all ${sidebarProfileOpen ? 'bg-gray-100 dark:bg-zinc-800/50' : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50'}`}
                   >
-                    <FaSignOutAlt /> Logout
+                    <div className="relative w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                      {user?.profileImage ? (
+                        <img src={getImageUrl(user.profileImage)} alt="Profile" className="w-full h-full object-cover" />
+                      ) : userInitial}
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white dark:border-zinc-900" />
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{userName}</p>
+                      <p className="text-[11px] text-gray-500 dark:text-gray-400 truncate capitalize">{userRole}</p>
+                    </div>
+                    <FaChevronDown className={`text-[10px] text-gray-400 transition-transform ${sidebarProfileOpen ? '' : 'rotate-180'}`} />
                   </button>
 
-                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                    <button
-                      onClick={() => {
-                        toggleTheme();
+                  {sidebarProfileOpen && (
+                    <div className="absolute bottom-full left-2 right-2 mb-2 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40 animate-popup-in">
+                      {renderProfilePopoverBody(() => {
+                        setSidebarProfileOpen(false);
                         setMobileMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
-                    >
-                      {theme === 'dark' ? <FaSun className="text-amber-500" /> : <FaMoon className="text-slate-500" />}
-                      <span>Appearance: {theme === 'dark' ? 'Dark' : 'Light'}</span>
-                    </button>
-                  </div>
+                      })}
+                    </div>
+                  )}
                 </div>
             </div>
           </div>
