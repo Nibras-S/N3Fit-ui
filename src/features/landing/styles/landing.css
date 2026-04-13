@@ -583,14 +583,16 @@
     width: 2.25rem;
     height: 2.25rem;
     border-radius: 0.5rem;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.06);
+    color: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: all 0.2s ease;
 }
 
 .landing-footer-social:hover {
-    background: var(--landing-primary);
-    color: #ffffff;
+    background: #ffffff;
+    color: #09090b;
+    border-color: #ffffff;
 }
 
 /* ─── CTA Section ─── */

@@ -81,17 +81,19 @@ api.interceptors.response.use(
         return response;
     },
     (error) => {
+        // Callers can pass `{ silent: true }` in the request config to
+        // suppress the global toast for non-critical background fetches
+        // (e.g. audit logs). 401 handling still runs regardless.
+        const silent = error.config?.silent === true;
+
         if (error.code === 'ECONNABORTED') {
-            showToast.error('Request timed out. Please try again.');
+            if (!silent) showToast.error('Request timed out. Please try again.');
         } else if (!error.response) {
-            showToast.error('Network error. Please check your connection.');
+            if (!silent) showToast.error('Network error. Please check your connection.');
         } else {
             const status = error.response.status;
             const message = extractErrorString(error.response.data);
 
-            // Stash the extracted string back on the response so callers
-            // doing `err.response.data.message` still get a usable value
-            // even when the new envelope put it under `error.message`.
             if (error.response.data && typeof error.response.data === 'object') {
                 error.response.data.message = message;
             }
@@ -101,14 +103,16 @@ api.interceptors.response.use(
                 if (path !== '/login' && path !== '/' && path !== '/admin') {
                     window.location.href = '/login';
                 }
-            } else if (status === 403) {
-                showToast.error(message || 'You do not have permission to do this.');
-            } else if (status === 422 || status === 400) {
-                showToast.error(message || 'Please check the form and try again.');
-            } else if (status >= 500) {
-                showToast.error('Server error. Please try again later.');
-            } else {
-                showToast.error(message || 'Something went wrong.');
+            } else if (!silent) {
+                if (status === 403) {
+                    showToast.error(message || 'You do not have permission to do this.');
+                } else if (status === 422 || status === 400) {
+                    showToast.error(message || 'Please check the form and try again.');
+                } else if (status >= 500) {
+                    showToast.error('Server error. Please try again later.');
+                } else {
+                    showToast.error(message || 'Something went wrong.');
+                }
             }
         }
         return Promise.reject(error);

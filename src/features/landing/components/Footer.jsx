@@ -31,6 +31,11 @@ const socials = [
   { icon: FaYoutube, href: '#' },
 ];
 
+const legalLinks = [
+  { label: 'Privacy Policy', href: '#' },
+  { label: 'Terms of Service', href: '#' },
+];
+
 export default function Footer() {
   const navigate = useNavigate();
 
@@ -45,8 +50,9 @@ export default function Footer() {
     <footer
       className="pt-16 pb-8"
       style={{
-        background: 'var(--landing-text)',
+        background: 'var(--landing-primary-dark)',
         color: 'rgba(255,255,255,0.6)',
+        borderTop: '1px solid rgba(255,255,255,0.06)',
       }}
     >
       <div className="landing-container">
@@ -128,12 +134,21 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} N3 Fit. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a href="#" className="landing-footer-link-dim">
-              Privacy Policy
-            </a>
-            <a href="#" className="landing-footer-link-dim">
-              Terms of Service
-            </a>
+            {legalLinks.map((link, i) => (
+              <a
+                key={i}
+                href={link.href}
+                onClick={(e) => {
+                  if (link.href.startsWith('#')) {
+                    e.preventDefault();
+                    scrollTo(link.href);
+                  }
+                }}
+                className="landing-footer-link-dim"
+              >
+                {link.label}
+              </a>
+            ))}
           </div>
         </div>
       </div>

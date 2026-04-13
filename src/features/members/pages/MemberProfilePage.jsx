@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
     FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle
@@ -32,7 +31,7 @@ function MemberProfile() {
         const [memberResult, txnResult, auditResult] = await Promise.allSettled([
             api.get(`/contacts/${id}`),
             api.get(`/transactions?memberId=${id}`),
-            api.get(`/contacts/${id}/audit`),
+            api.get(`/contacts/${id}/audit`, { silent: true }),
         ]);
 
         if (memberResult.status === 'fulfilled') {
@@ -95,7 +94,6 @@ function MemberProfile() {
 
     if (!member) return <AppLayout><div>Member not found</div></AppLayout>;
 
-    const statusColor = member.dews > 0 ? "bg-green-100 text-green-700" : "bg-zinc-100 text-zinc-700";
     const statusText = member.dews > 0 ? "Active" : "Expired";
 
     return (
