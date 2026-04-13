@@ -110,12 +110,6 @@ export function AppLayout({
     return () => sock.off('enquiry:new', handler);
   }, [user, socket]);
 
-  const isActive = (path) => {
-    const [pathPart] = path.split('?');
-    if (pathPart === '/members') return location.pathname === '/members' || location.pathname.startsWith('/members');
-    return location.pathname === pathPart;
-  };
-
   const [showWarningModal, setShowWarningModal] = useState(false);
 
   useEffect(() => {
@@ -225,6 +219,25 @@ export function AppLayout({
       }
       return item;
     });
+
+  // Highlight the nav item that most specifically matches the current URL.
+  // Exact match wins; otherwise the longest nav path that is a parent segment
+  // of the current pathname wins — so /reports stays active on /reports/income,
+  // while /superadmin/plans beats /superadmin when pathname is /superadmin/plans.
+  const isActive = (path) => {
+    const pathname = location.pathname;
+    const pathPart = (path || '').split('?')[0];
+    if (!pathPart) return false;
+    if (pathname !== pathPart && !pathname.startsWith(pathPart + '/')) return false;
+    for (const item of navItems) {
+      const other = (item.path || '').split('?')[0];
+      if (!other || other === pathPart) continue;
+      if (other.length > pathPart.length && (pathname === other || pathname.startsWith(other + '/'))) {
+        return false;
+      }
+    }
+    return true;
+  };
 
   const [expandedItems, setExpandedItems] = useState(() => {
     const expanded = {};
