@@ -244,12 +244,6 @@ const DataTable = ({
                             onClick={onRowClick ? () => onRowClick(row, index) : undefined}
                             className={`p-4 relative ${onRowClick ? 'cursor-pointer' : ''} ${isSelected ? 'bg-zinc-100 dark:bg-zinc-800/50' : index % 2 === 0 ? 'bg-white dark:bg-zinc-900' : 'bg-gray-50/60 dark:bg-zinc-900/70'}`}
                         >
-                            {showSelection && (
-                                <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
-                                    <input type="checkbox" checked={isSelected} onChange={() => handleSelectRow(rowId)}
-                                        className="w-5 h-5 rounded border-gray-300 text-zinc-900 focus:ring-zinc-200 cursor-pointer shadow-sm transition-all" />
-                                </div>
-                            )}
                             {renderMobileCard ? renderMobileCard(row, index) : (
                                 <div>
                                     {columns.slice(0, 2).map((col, i) => (
