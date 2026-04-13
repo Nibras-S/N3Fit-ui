@@ -604,7 +604,7 @@ export function AppLayout({
         </header>
 
         {/* Mobile top bar */}
-        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 py-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 shadow-sm">
+        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 pb-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 shadow-sm safe-area-pt">
           {/* Left: hamburger or back */}
           <button
             onClick={() => showBackToList ? safeNavigate('/members') : setMobileMenuOpen(true)}
