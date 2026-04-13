@@ -1085,9 +1085,9 @@ const MembersPage = () => {
                                         setDraftGender('all');
                                         setDraftVisibleColumns(DEFAULT_VISIBLE_COLUMNS);
                                     }}
-                                    className="text-zinc-900 font-semibold text-sm"
+                                    className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white border border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-700 active:scale-95 transition-all"
                                 >
-                                    Reset all
+                                    Reset to Default
                                 </button>
                             </div>
 
