@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import useGymSocket from '../../../shared/hooks/useGymSocket';
-import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
+import { useQuery } from '@tanstack/react-query';
 import api from '../../../shared/services/api';
+import {
+    useMembers,
+    useMembersStats,
+    useDeleteMember,
+} from '../hooks/useMembersQueries';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
@@ -57,8 +61,9 @@ const MembersPage = () => {
     const activeTab = searchParams.get('tab') || 'active';
     const setActiveTab = (tab) => setSearchParams({ tab }, { replace: true });
 
-    // ── Data state ──────────────────────────────────────────────
-    const [members, setMembers] = useState([]);
+    // ── UI state (search, sort, filters) ────────────────────────
+    // Server state (members list, totals, loading) comes from useMembers
+    // below — don't add useState for data that lives on the server.
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
@@ -66,8 +71,6 @@ const MembersPage = () => {
     const [sortConfig, setSortConfig] = useState({ key: 'endDate', direction: 'asc' });
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [loading, setLoading] = useState(true);
 
     // ── Modals & Inline Actions ──────────────────────────────────
     const [deleteModal, setDeleteModal] = useState({ isOpen: false, id: null, name: '' });
@@ -107,11 +110,6 @@ const MembersPage = () => {
     const [renewalTxn, setRenewalTxn] = useState(null); // transaction awaiting payment recording
     const [settings, setSettings] = useState(null);
 
-    // ── Expiring Soon count (for warning FAB) ───────────────────
-    const [pendingCount, setPendingCount] = useState(0);
-    // ── Global member counts (tab-independent, for stats row) ───
-    const [allStats, setAllStats] = useState({ total: 0, male: 0, female: 0 });
-
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     // ── Search debounce ─────────────────────────────────────────
@@ -132,44 +130,31 @@ const MembersPage = () => {
         setPage(1);
     }, [activeTab]);
 
-    // ── Fetch members ───────────────────────────────────────────
-    const fetchMembers = useCallback(async () => {
-        setLoading(true);
-        try {
-            const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
-            const params = {
-                page,
-                limit,
-                status: tabCfg.status,
-                search: debouncedSearch,
-                gender: genderFilter,
-                sortBy: sortConfig.key,
-                sortOrder: sortConfig.direction,
-            };
-            if (tabCfg.key === 'all') params.includeExpired = true;
-
-            const response = await api.get(`/contacts/`, { params });
-            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
-            const data = response.data?.data || [];
-            const pagination = response.data?.pagination || {};
-
-            setMembers(Array.isArray(data) ? data : []);
-            setTotalRecords(pagination.total || 0);
-        } catch (error) {
-            console.error('Failed to load members', error);
-        } finally {
-            setLoading(false);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // ── Fetch members via TanStack Query ────────────────────────
+    // Filters are memoized so the query key stays stable between renders.
+    // Cache invalidation on member:* socket events is handled app-wide by
+    // RealtimeSync (app/RealtimeSync.jsx) — no per-page socket subscription
+    // needed here.
+    const membersFilters = useMemo(() => {
+        const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
+        const params = {
+            page,
+            limit,
+            status: tabCfg.status,
+            search: debouncedSearch,
+            gender: genderFilter,
+            sortBy: sortConfig.key,
+            sortOrder: sortConfig.direction,
+        };
+        if (tabCfg.key === 'all') params.includeExpired = true;
+        return params;
     }, [page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
 
-    useEffect(() => {
-        fetchMembers();
-    }, [fetchMembers]);
-
-    // Debounced so bursts of events (bulk import, batch actions) collapse to a single refetch.
-    const debouncedFetchMembers = useDebouncedCallback(fetchMembers, 300);
-    useGymSocket(['member:created', 'member:updated', 'member:deleted'], debouncedFetchMembers);
+    const membersQuery = useMembers(membersFilters);
+    const members = membersQuery.data?.items ?? [];
+    const totalRecords = membersQuery.data?.pagination?.total ?? 0;
+    const loading = membersQuery.isFetching;
+    const fetchMembers = membersQuery.refetch;
 
     // ── Fetch settings for plans ────────────────────────────────
     useEffect(() => {
@@ -182,33 +167,23 @@ const MembersPage = () => {
             .catch(err => console.error('Failed to load settings', err));
     }, [backendUrl]);
 
-    // ── Fetch expiring soon count ───────────────────────────────
-    useEffect(() => {
-        api.get(`/reminders/with-status`)
-            .then((res) => {
-                const filtered = res.data
-                    .filter((u) => u.dews <= 4 && u.dews >= 0)
-                    .filter((u) => u.reminderStatus === 'Pending');
-                setPendingCount(filtered.length);
-            })
-            .catch((err) => console.error('Error fetching pending:', err));
-    }, [backendUrl]);
+    // ── Expiring soon count (for warning FAB) ───────────────────
+    // Also refetched by RealtimeSync on member:* events because reminders
+    // and members share a lifecycle.
+    const pendingRemindersQuery = useQuery({
+        queryKey: ['reminders', 'with-status', 'pending-count'],
+        queryFn: async () => {
+            const res = await api.get('/reminders/with-status');
+            const rows = Array.isArray(res.data) ? res.data : [];
+            return rows.filter((u) => u.dews <= 4 && u.dews >= 0 && u.reminderStatus === 'Pending').length;
+        },
+    });
+    const pendingCount = pendingRemindersQuery.data ?? 0;
 
-    // ── Fetch global stats (all-time, not filtered by gender/search) ──
-    useEffect(() => {
-        const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
-        api.get('/contacts/', { params: { status: tabCfg.status, page: 1, limit: 1 } })
-            .then(res => {
-                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
-                const p = res.data?.pagination || {};
-                setAllStats({
-                    total: p.total || 0,
-                    male: p.male || 0,
-                    female: p.female || 0,
-                });
-            })
-            .catch(() => { });
-    }, [activeTab]);
+    // ── Global member counts (tab-independent, for stats row) ───
+    const activeTabStatus = (TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0]).status;
+    const statsQuery = useMembersStats(activeTabStatus);
+    const allStats = statsQuery.data ?? { total: 0, male: 0, female: 0 };
 
     // ── Sort ────────────────────────────────────────────────────
     const handleSort = (key) => setSortConfig(prev => ({
@@ -217,16 +192,18 @@ const MembersPage = () => {
     }));
 
     // ── Delete ──────────────────────────────────────────────────
-    const handleDeleteClick = async () => {
+    const deleteMemberMutation = useDeleteMember();
+    const handleDeleteClick = () => {
         const { id } = deleteModal;
-        try {
-            await api.delete(`/contacts/${id}`);
-            setMembers(prev => prev.filter(u => u._id !== id));
-            toast.success('Member deleted');
-            setDeleteModal({ isOpen: false, id: null, name: '' });
-        } catch {
-            toast.error('Failed to delete');
-        }
+        deleteMemberMutation.mutate(id, {
+            onSuccess: () => {
+                toast.success('Member deleted');
+                setDeleteModal({ isOpen: false, id: null, name: '' });
+            },
+            onError: () => {
+                toast.error('Failed to delete');
+            },
+        });
     };
 
     // ── Renew ───────────────────────────────────────────────────

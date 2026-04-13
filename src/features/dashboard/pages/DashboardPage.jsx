@@ -1,8 +1,5 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import api from '../../../shared/services/api';
+import React, { useEffect, useState } from 'react';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import useGymSocket from '../../../shared/hooks/useGymSocket';
-import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import {
     FaWallet, FaChartPie, FaCalendarAlt,
     FaMoneyCheckAlt, FaUserPlus, FaChartLine,
@@ -12,44 +9,26 @@ import {
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
+import { useDashboardStats } from '../hooks/useDashboardQueries';
 
 const Dashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-    const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [todayModalOpen, setTodayModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
 
-    const fetchStats = useCallback(async () => {
-        try {
-            const [res, expenseRes] = await Promise.all([
-                api.get('/transactions/stats'),
-                api.get('/expenses/summary'),
-            ]);
-            setStats({ ...res.data, expenses: expenseRes.data });
-        } catch (error) {
-            console.error('Error fetching dashboard stats:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Socket-driven invalidation is centralized in app/RealtimeSync.jsx, which
+    // flushes ['dashboard'] on member/transaction/expense events. No local
+    // useGymSocket needed here — TQ picks it up automatically.
+    const statsQuery = useDashboardStats();
+    const stats = statsQuery.data;
+    const loading = statsQuery.isPending;
 
     useEffect(() => {
         if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
             navigate('/members');
-            return;
         }
-        fetchStats();
-    }, [user, navigate, fetchStats]);
-
-    // Refetch whenever any member, transaction, or expense changes in this gym.
-    // Debounced so a burst of events (e.g. bulk import) collapses to one refetch.
-    const debouncedFetchStats = useDebouncedCallback(fetchStats, 400);
-    useGymSocket(
-        ['member:created', 'member:updated', 'member:deleted', 'transaction:created', 'transaction:updated', 'expense:created', 'expense:updated', 'expense:deleted'],
-        debouncedFetchStats,
-    );
+    }, [user, navigate]);
 
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#6366f1', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
     const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#3f3f46' };
@@ -433,7 +412,7 @@ const Dashboard = () => {
                     paidSoFar={paymentTxn.paidAmount || 0}
                     memberName={paymentTxn.memberName}
                     onClose={() => setPaymentTxn(null)}
-                    onPaid={() => { setPaymentTxn(null); fetchStats(); }}
+                    onPaid={() => { setPaymentTxn(null); }}
                 />
             )}
         </AppLayout>

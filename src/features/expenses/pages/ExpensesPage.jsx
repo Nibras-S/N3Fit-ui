@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import api from '../../../shared/services/api';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
 import AddExpenseModal from '../components/AddExpenseModal';
@@ -14,14 +14,22 @@ import {
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import useGymSocket from '../../../shared/hooks/useGymSocket';
-import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import { AnimatePresence, motion } from 'framer-motion';
+import {
+    expenseKeys,
+    useExpenses,
+    useExpenseSummary,
+    useDeleteExpense,
+} from '../hooks/useExpensesQueries';
 
 const CATEGORIES = [
     'Rent', 'Electricity', 'Water', 'Staff Salary', 'Equipment',
     'Maintenance', 'Marketing', 'Cleaning', 'Internet', 'Software', 'Others'
 ];
+
+// Stable empty-array fallback so useMemo deps don't churn when the query
+// hasn't resolved yet.
+const EMPTY = [];
 
 const Expenses = () => {
     const { user } = useAuth();
@@ -33,10 +41,15 @@ const Expenses = () => {
         }
     }, [user, navigate]);
 
-    const [expenses, setExpenses] = useState([]);
+    const queryClient = useQueryClient();
+    const expensesQuery = useExpenses();
+    const summaryQuery = useExpenseSummary();
+    const expenses = expensesQuery.data ?? EMPTY;
+    const summary = summaryQuery.data;
+    const loading = expensesQuery.isPending;
+    const deleteMutation = useDeleteExpense();
+
     const [selectedIds, setSelectedIds] = useState([]);
-    const [summary, setSummary] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [editingExpense, setEditingExpense] = useState(null);
     const [viewingExpense, setViewingExpense] = useState(null);
@@ -53,62 +66,20 @@ const Expenses = () => {
     const [draft, setDraft] = useState({ period: 'All Time', fromDate: '', toDate: '', category: '' });
     const [sheetOpen, setSheetOpen] = useState(false);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const [expensesRes, summaryRes] = await Promise.all([
-                api.get(`/expenses`),
-                api.get(`/expenses/summary`)
-            ]);
-            setExpenses(expensesRes.data);
-            setSummary(summaryRes.data);
-        } catch (error) {
-            toast.error('Failed to fetch expense data');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Data fetching, server-aggregate summary, and socket invalidation are
+    // all handled centrally: useExpenses/useExpenseSummary hit the API via
+    // TanStack Query, and RealtimeSync (app/RealtimeSync.jsx) invalidates
+    // the ['expenses'] prefix on expense:* socket events from any device.
 
-    useEffect(() => { fetchData(); }, [fetchData]);
-
-    // Summary is a server-side aggregate — can't patch it from a single row event.
-    // Debounced so a burst of events only refetches the summary once.
-    const refetchSummary = useDebouncedCallback(async () => {
-        try {
-            const r = await api.get('/expenses/summary');
-            setSummary(r.data);
-        } catch (_) { /* non-critical */ }
-    }, 400);
-
-    // Handle each socket event by patching the list in place from the full
-    // payload (backend now emits the saved doc, not just the id).
-    const handleExpenseEvent = useCallback((event, data) => {
-        if (event === 'expense:created') {
-            setExpenses(prev => prev.some(e => e._id === data._id) ? prev : [data, ...prev]);
-        } else if (event === 'expense:updated') {
-            setExpenses(prev => prev.map(e => e._id === data._id ? data : e));
-        } else if (event === 'expense:deleted') {
-            const id = data.expenseId || data._id;
-            setExpenses(prev => prev.filter(e => e._id !== id));
-            setSelectedIds(prev => prev.filter(sid => sid !== id));
-        }
-        refetchSummary();
-    }, [refetchSummary]);
-
-    useGymSocket(['expense:created', 'expense:updated', 'expense:deleted'], handleExpenseEvent);
-
-    const handleDelete = async () => {
+    const handleDelete = () => {
         const { id } = deleteModal;
         setDeleteModal({ isOpen: false, id: null });
-        try {
-            await api.delete(`/expenses/${id}`);
-            setExpenses(prev => prev.filter(e => e._id !== id));
-            setSelectedIds(prev => prev.filter(sid => sid !== id));
-            toast.success('Expense deleted');
-        } catch (error) {
-            toast.error('Failed to delete expense');
-            fetchData();
-        }
+        deleteMutation.mutate(id, {
+            onSuccess: () => {
+                setSelectedIds(prev => prev.filter(sid => sid !== id));
+                toast.success('Expense deleted');
+            },
+        });
     };
 
     const handleExport = () => {
@@ -440,7 +411,7 @@ const Expenses = () => {
             <AddExpenseModal
                 isOpen={isAddModalOpen}
                 onClose={() => { setIsAddModalOpen(false); setEditingExpense(null); }}
-                onRefresh={fetchData}
+                onRefresh={() => queryClient.invalidateQueries({ queryKey: expenseKeys.all })}
                 expense={editingExpense}
             />
 

@@ -65,7 +65,9 @@ Order matters — NotificationProvider needs AuthProvider (it subscribes to sock
 - `FormStateContext` — cross-page form draft persistence.
 - `ThemeContext` — lives outside in `shared/context/ThemeContext.jsx`, wrapped at the Router level in `index.js`.
 
-Context only — no Redux, no Zustand, no Tanstack Query. Don't introduce them opportunistically; if state is getting complex, lift it or break it into multiple contexts first.
+**Server state** (anything fetched from the API) uses [TanStack Query v5](https://tanstack.com/query) via feature-local hooks modules like [features/members/hooks/useMembersQueries.js](src/features/members/hooks/useMembersQueries.js). The app-wide `QueryClient` lives at [src/shared/lib/queryClient.js](src/shared/lib/queryClient.js) and is mounted in [providers.jsx](src/app/providers.jsx). Query keys follow the `['<feature>', 'list', filters]` / `['<feature>', 'detail', id, ...sub]` convention — see `memberKeys` in the members hooks file for the reference shape. Socket-driven invalidation happens centrally in [src/app/RealtimeSync.jsx](src/app/RealtimeSync.jsx); when adding a new TQ-backed feature, add its events there, not in the feature page.
+
+**UI state** (form drafts, modals, tab selection, theme) still uses plain `useState` or Context. No Redux, no Zustand. If UI state is getting complex, lift it or break it into multiple contexts before reaching for a store library.
 
 ## Socket.io
 
@@ -106,11 +108,17 @@ Repeating from the root rules because this is the most common footgun:
 
 ## Testing
 
-RTL + Jest are configured via CRA, but **no tests exist yet**. When the task is to add tests:
+Jest + RTL are configured via CRA. Render helper: [src/test/renderWithProviders.jsx](src/test/renderWithProviders.jsx) — wraps in `MemoryRouter` and a fresh test `QueryClient` (retries off, no cache) per render. Exemplar tests to copy from:
 
-- Smoke tests per page: render + check landmark text/buttons.
-- Mock the axios instance via `jest.mock('shared/services/api')`.
-- The `test-bootstrap-engineer` subagent can scaffold the initial setup and write the first 2–3 exemplar tests.
+- [src/features/auth/pages/LoginPage.test.jsx](src/features/auth/pages/LoginPage.test.jsx) — mocks the `AuthContext` module directly (avoids the `/auth/me` fetch on mount).
+- [src/features/members/pages/MembersPage.test.jsx](src/features/members/pages/MembersPage.test.jsx) — mocks `shared/services/api`, asserts query params, covers pending state.
+
+Mocking rules:
+
+- Mock the axios instance via `jest.mock('shared/services/api', () => ({ __esModule: true, default: { get: (...a) => mockApiGet(...a), ... } }))`. The factory is hoisted above `const` declarations by jest, so **any captured handle must start with `mock`** (`mockApiGet`, not `apiGet`) — otherwise jest throws "out-of-scope variable" at transform time.
+- Mock `shared/hooks/useGymSocket` to a no-op for any page that uses it (the real hook pulls in a socket.io client). See MembersPage.test.jsx.
+
+**Every feature PR must include at least one smoke test** for any new page, hook, or non-trivial component. The `frontend-engineer` sub-agent enforces this — if you're delegating feature work, tests are part of the deliverable, not a follow-up. Use the `test-bootstrap-engineer` subagent only when bootstrapping a brand-new test suite, not for day-to-day test writing.
 
 ## Common tasks
 

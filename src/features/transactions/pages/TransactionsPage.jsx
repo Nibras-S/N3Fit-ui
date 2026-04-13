@@ -1,15 +1,16 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import api from '../../../shared/services/api';
+import React, { useState, useMemo } from 'react';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
 import { FaSearch, FaSlidersH, FaTimes } from 'react-icons/fa';
-import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import useGymSocket from '../../../shared/hooks/useGymSocket';
-import useDebouncedCallback from '../../../shared/hooks/useDebouncedCallback';
 import { AnimatePresence, motion } from 'framer-motion';
 import usePersistedFilters from '../../../shared/hooks/usePersistedFilters';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
+import { useTransactions } from '../hooks/useTransactionsQueries';
+
+// Module-level empty array keeps the `data ?? EMPTY` fallback referentially
+// stable across renders so useMemo deps don't churn on every pending tick.
+const EMPTY = [];
 
 const STATUS_OPTS  = ['All Statuses', 'Paid', 'Partial', 'Pending'];
 const METHOD_OPTS  = ['All Methods', 'Cash', 'UPI', 'Card', 'Bank Transfer'];
@@ -24,8 +25,11 @@ const DEFAULT_FILTERS = {
 
 const TransactionsPage = () => {
     const navigate = useNavigate();
-    const [transactions, setTransactions] = useState([]);
-    const [loading, setLoading] = useState(true);
+    // TanStack Query owns the fetch + cache. Socket-driven invalidation happens
+    // centrally in app/RealtimeSync.jsx — no local useGymSocket needed here.
+    const transactionsQuery = useTransactions();
+    const transactions = transactionsQuery.data ?? EMPTY;
+    const loading = transactionsQuery.isPending;
     const [sortConfig, setSortConfig] = useState({ key: 'transactionDate', direction: 'desc' });
 
     // Unified filter state — persisted to DB via usePersistedFilters
@@ -51,26 +55,10 @@ const TransactionsPage = () => {
 
     const openPayModal = (tx) => setPayModal(tx);
     const closePayModal = () => setPayModal(null);
-    const handlePaid = () => { closePayModal(); fetchTransactions(); };
-
-    const fetchTransactions = useCallback(async () => {
-        setLoading(true);
-        try {
-            const response = await api.get('/transactions');
-            // response.data IS already the unwrapped payload — don't re-unwrap in feature code
-            const list = response.data?.data;
-            setTransactions(Array.isArray(list) ? list : []);
-        } catch {
-            toast.error('Failed to load transactions');
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
-    useEffect(() => { fetchTransactions(); }, [fetchTransactions]);
-    // Debounced so bursts of events collapse to a single refetch.
-    const debouncedFetchTransactions = useDebouncedCallback(fetchTransactions, 300);
-    useGymSocket(['transaction:created', 'transaction:updated'], debouncedFetchTransactions);
+    // Mutation lives in RecordPaymentModal (raw api.post). Backend emits
+    // `transaction:updated`, RealtimeSync invalidates ['transactions'] → TQ
+    // auto-refetches. No manual fetch call needed here.
+    const handlePaid = () => { closePayModal(); };
 
     const filteredTransactions = useMemo(() => {
         let list = transactions;

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../../shared/services/api';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
@@ -12,76 +11,57 @@ import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import EditEndDateModal from '../components/EditEndDateModal';
 import { ProfileSkeleton } from '../../../shared/components/ui/Skeleton';
+import { useQueryClient } from '@tanstack/react-query';
+import {
+    useMember,
+    useMemberTransactions,
+    useMemberAudit,
+    useDeleteMember,
+    memberKeys,
+} from '../hooks/useMembersQueries';
 
 function MemberProfile() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [member, setMember] = useState(null);
-    const [transactions, setTransactions] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('overview');
     const [isEditing, setIsEditing] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
     const [isExtendOpen, setIsExtendOpen] = useState(false);
-    const [auditLogs, setAuditLogs] = useState([]);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
-    const fetchData = async () => {
-        const [memberResult, txnResult, auditResult] = await Promise.allSettled([
-            api.get(`/contacts/${id}`),
-            api.get(`/transactions?memberId=${id}`),
-            api.get(`/contacts/${id}/audit`, { silent: true }),
-        ]);
+    // Three parallel queries — TanStack Query runs them in parallel and
+    // each caches independently, so revisiting this page or opening a
+    // modal that also reads /contacts/:id is free after the first load.
+    const memberQuery = useMember(id);
+    const transactionsQuery = useMemberTransactions(id);
+    const auditQuery = useMemberAudit(id);
+    const queryClient = useQueryClient();
 
-        if (memberResult.status === 'fulfilled') {
-            setMember(memberResult.value.data);
-        } else {
-            console.error('Failed to load member:', memberResult.reason);
-        }
+    const member = memberQuery.data;
+    const transactions = transactionsQuery.data ?? [];
+    const auditLogs = auditQuery.data ?? [];
+    const loading = memberQuery.isPending;
 
-        if (txnResult.status === 'fulfilled') {
-            const txnData = txnResult.value.data;
-            const list = Array.isArray(txnData)
-                ? txnData
-                : (Array.isArray(txnData?.data) ? txnData.data : []);
-            setTransactions(list);
-        } else {
-            console.error('Failed to load transactions:', txnResult.reason);
-            setTransactions([]);
-        }
-
-        if (auditResult.status === 'fulfilled') {
-            setAuditLogs(Array.isArray(auditResult.value.data) ? auditResult.value.data : []);
-        } else {
-            console.error('Failed to load audit logs:', auditResult.reason);
-            setAuditLogs([]);
-        }
-
-        setLoading(false);
-    };
-
-    useEffect(() => {
-        fetchData();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [id, backendUrl]);
-
-    // EditMemberModal calls onUpdate with the *patch* payload, not a full
-    // member document — so just refetch to keep both the member card and
-    // the transaction list in sync after a renewal.
+    // Invalidate the whole member-detail subtree so detail + transactions +
+    // audit all refetch. One call covers all three because memberKeys.detail(id)
+    // is the prefix for detailTransactions and detailAudit.
     const handleUpdateSuccess = () => {
-        fetchData();
+        queryClient.invalidateQueries({ queryKey: memberKeys.detail(id) });
     };
 
-    const handleDelete = async () => {
-        try {
-            await api.delete(`/contacts/${id}`);
-            toast.success("Member deleted successfully");
-            navigate('/manageUsers');
-        } catch (error) {
-            console.error("Delete error:", error);
-            toast.error("Failed to delete member");
-        }
+    const deleteMemberMutation = useDeleteMember();
+    const handleDelete = () => {
+        deleteMemberMutation.mutate(id, {
+            onSuccess: () => {
+                toast.success('Member deleted successfully');
+                navigate('/manageUsers');
+            },
+            onError: (error) => {
+                console.error('Delete error:', error);
+                toast.error('Failed to delete member');
+            },
+        });
     };
 
     if (loading) {
@@ -467,7 +447,7 @@ function MemberProfile() {
                     paidSoFar={paymentTxn.paidAmount || 0}
                     memberName={member.name}
                     onClose={() => setPaymentTxn(null)}
-                    onPaid={() => { setPaymentTxn(null); fetchData(); }}
+                    onPaid={() => { setPaymentTxn(null); handleUpdateSuccess(); }}
                 />
             )}
 
@@ -476,7 +456,7 @@ function MemberProfile() {
                 isOpen={isExtendOpen}
                 onClose={() => setIsExtendOpen(false)}
                 member={member}
-                onSuccess={() => { setIsExtendOpen(false); fetchData(); }}
+                onSuccess={() => { setIsExtendOpen(false); handleUpdateSuccess(); }}
             />
 
             {/* Edit Modal */}

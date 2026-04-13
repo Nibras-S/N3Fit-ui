@@ -92,7 +92,7 @@ export const NotificationProvider = ({ children }) => {
         socketRef.current = socket;
 
         socket.on('connect', () => {
-            if (user.gymId) socket.emit('join_gym', user.gymId);
+            socket.emit('join_gym');
         });
 
         socket.on('new_notification', (notif) => {
