@@ -1,9 +1,11 @@
 // Basic service worker for Fit PWA
-const CACHE_NAME = 'fit-v2';
+const CACHE_NAME = 'fit-v3';
 const PRECACHE_URLS = [
     '/',
     '/index.html',
-    '/n3Logo.png',
+    '/n3Logo-192.png',
+    '/n3Logo-192.webp',
+    '/manifest.json',
 ];
 
 // Install — cache app shell

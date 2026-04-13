@@ -1,6 +1,8 @@
 // Hot reload trigger
 import React, { useState, useEffect } from "react";
-import n3Logo from '../../../assets/n3Logo.png';
+// Optimized 192x192 WebP — 3.7 KB vs the 1.4 MB original PNG. The full-res
+// asset is kept in public/ for manifest splash use only.
+import n3Logo from '../../../assets/n3Logo-192.webp';
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";

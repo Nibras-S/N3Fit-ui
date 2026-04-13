@@ -84,40 +84,67 @@ export const NotificationProvider = ({ children }) => {
             return undefined;
         }
 
-        fetchNotifications();
-        checkWarning();
+        // Defer socket handshake + initial fetches until the browser is
+        // idle so the first paint is not held up by WebSocket negotiation.
+        // `requestIdleCallback` with a 1s deadline, fallback to setTimeout
+        // for Safari / older browsers.
+        let cancelled = false;
+        const schedule = (fn) => {
+            if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+                return window.requestIdleCallback(fn, { timeout: 1000 });
+            }
+            return setTimeout(fn, 200);
+        };
+        const cancel = (handle) => {
+            if (handle == null) return;
+            if (typeof window !== 'undefined' && typeof window.cancelIdleCallback === 'function') {
+                try { window.cancelIdleCallback(handle); return; } catch (_) { /* fall through */ }
+            }
+            clearTimeout(handle);
+        };
 
-        // Use the singleton socket — never call io() directly in feature code
-        socket.connect();
-        socketRef.current = socket;
+        const handle = schedule(() => {
+            if (cancelled) return;
 
-        socket.on('connect', () => {
-            socket.emit('join_gym');
-        });
+            fetchNotifications();
+            checkWarning();
 
-        socket.on('new_notification', (notif) => {
-            setNotifications((prev) => {
-                if (prev.some((n) => n._id === notif._id)) return prev;
-                return [notif, ...prev];
+            // Use the singleton socket — never call io() directly in feature code
+            socket.connect();
+            socketRef.current = socket;
+
+            socket.on('connect', () => {
+                socket.emit('join_gym');
             });
 
-            if (notif.type === 'warning') setActiveWarning(notif);
+            socket.on('new_notification', (notif) => {
+                setNotifications((prev) => {
+                    if (prev.some((n) => n._id === notif._id)) return prev;
+                    return [notif, ...prev];
+                });
 
-            toast.success('New notification received!', { icon: '🔔', duration: 4000 });
-        });
+                if (notif.type === 'warning') setActiveWarning(notif);
 
-        socket.on('notification_read', ({ notificationId, userId }) => {
-            if (userId === user._id) {
-                setNotifications((prev) => prev.map((n) =>
-                    n._id === notificationId ? { ...n, isRead: true } : n,
-                ));
-            }
+                toast.success('New notification received!', { icon: '🔔', duration: 4000 });
+            });
+
+            socket.on('notification_read', ({ notificationId, userId }) => {
+                if (userId === user._id) {
+                    setNotifications((prev) => prev.map((n) =>
+                        n._id === notificationId ? { ...n, isRead: true } : n,
+                    ));
+                }
+            });
         });
 
         return () => {
-            socket.removeAllListeners();
-            socket.disconnect();
-            socketRef.current = null;
+            cancelled = true;
+            cancel(handle);
+            if (socketRef.current) {
+                socketRef.current.removeAllListeners();
+                socketRef.current.disconnect();
+                socketRef.current = null;
+            }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);

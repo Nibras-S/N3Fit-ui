@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX } from 'react-icons/fi';
-import n3Logo from '../../../assets/n3Logo.png';
+import n3Logo from '../../../assets/n3Logo-192.webp';
 
 export default function Navbar({ onOpenTrial }) {
   const navigate = useNavigate();

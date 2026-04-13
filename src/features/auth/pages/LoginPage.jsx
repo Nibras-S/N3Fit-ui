@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import n3Logo from '../../../assets/n3Logo.png';
+import n3Logo from '../../../assets/n3Logo-192.webp';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaBuilding } from "react-icons/fa";

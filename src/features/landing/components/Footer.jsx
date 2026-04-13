@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaInstagram, FaTwitter, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
-import n3Logo from '../../../assets/n3Logo.png';
+import n3Logo from '../../../assets/n3Logo-192.webp';
 
 const footerLinks = {
   Product: [

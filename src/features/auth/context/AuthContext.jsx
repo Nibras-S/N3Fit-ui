@@ -3,9 +3,60 @@ import api from '../../../shared/services/api';
 
 const AuthContext = createContext(null);
 
+// Non-sensitive hint stored in sessionStorage so the guards can render
+// optimistically on reload instead of blocking on /auth/me. The httpOnly
+// JWT cookie is still the only source of truth for authentication — this
+// hint only controls which placeholder UI is shown while /auth/me is in
+// flight. If the background verification fails, the hint is cleared and
+// the guards redirect to /login.
+const AUTH_HINT_KEY = 'n3fit:auth-hint';
+
+function readAuthHint() {
+    try {
+        const raw = sessionStorage.getItem(AUTH_HINT_KEY);
+        if (!raw) return null;
+        const hint = JSON.parse(raw);
+        if (!hint || typeof hint !== 'object') return null;
+        return hint;
+    } catch (_) {
+        return null;
+    }
+}
+
+function writeAuthHint(userData) {
+    try {
+        if (!userData) {
+            sessionStorage.removeItem(AUTH_HINT_KEY);
+            return;
+        }
+        // Only a minimal shape — enough for the guards to decide layout +
+        // redirect target. Never persist anything sensitive.
+        const hint = {
+            _id: userData._id,
+            role: userData.role,
+            name: userData.name,
+        };
+        sessionStorage.setItem(AUTH_HINT_KEY, JSON.stringify(hint));
+    } catch (_) {
+        /* storage disabled — fall back to blocking path */
+    }
+}
+
 export const AuthProvider = ({ children }) => {
-    const [user, setUser] = useState(null);
+    // Hydrate synchronously from the session hint so first paint doesn't
+    // wait for /auth/me. `user` here is a lightweight stub until the real
+    // /auth/me response lands (it typically has _id/role/name only, no
+    // gym.features) — components that need the full object should read
+    // `initialAuthChecked` and wait.
+    const [user, setUser] = useState(() => readAuthHint());
+    // `loading` only gates actions that genuinely need the verified user
+    // (not first paint). Starts `true` on first mount regardless of hint
+    // so the background verification is visible to components that care.
     const [loading, setLoading] = useState(true);
+    // Tracks whether /auth/me has actually resolved this session. Guards
+    // use `user` for optimistic render but fall back to this flag when
+    // they need certainty.
+    const [initialAuthChecked, setInitialAuthChecked] = useState(false);
     const [gymFeatures, setGymFeatures] = useState({
         profilePhoto: true,
         expenses: true,
@@ -15,36 +66,42 @@ export const AuthProvider = ({ children }) => {
         memberImport: false,
     });
 
-    // Load user on mount — cookie is sent automatically by the browser
+    // Verify session on mount — cookie is sent automatically by the browser.
+    // First paint does NOT wait on this: guards render using the session
+    // hint, and this effect hydrates the real user data in the background.
     useEffect(() => {
         const loadUser = async () => {
             try {
-                // Fix 3: paths are now relative to baseURL (/api/v1)
-                // /auth/me → http://localhost:5000/api/v1/auth/me
                 const res = await api.get('/auth/me');
                 const userData = res.data;
                 if (userData?.role || userData?.email) {
                     setUser(userData);
-                    // Load gym features from the me endpoint (already embedded in response)
+                    writeAuthHint(userData);
                     if (userData?.gym?.features) {
                         setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
                     } else if (userData?.role !== 'superadmin') {
-                        // Fallback: fetch gym profile separately (skip for superadmin — no gymId)
                         try {
                             const gymRes = await api.get('/gym/profile');
                             if (gymRes.data?.features) {
                                 setGymFeatures(prev => ({ ...prev, ...gymRes.data.features }));
                             }
                         } catch (_) {
-                            // non-critical, use defaults
+                            /* non-critical, use defaults */
                         }
                     }
+                } else {
+                    setUser(null);
+                    writeAuthHint(null);
                 }
             } catch (err) {
-                // 401 means not logged in — clear user state silently
+                // 401 means the session cookie is gone or expired — clear
+                // the hint so the guards stop rendering optimistically and
+                // redirect to /login on the next render.
                 setUser(null);
+                writeAuthHint(null);
             } finally {
                 setLoading(false);
+                setInitialAuthChecked(true);
             }
         };
         loadUser();
@@ -66,6 +123,7 @@ export const AuthProvider = ({ children }) => {
         const userData = resData?.user || resData;
         if (userData?.role || userData?.email) {
             setUser(userData);
+            writeAuthHint(userData);
             // Load gym features
             if (userData?.gym?.features) {
                 setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
@@ -84,6 +142,7 @@ export const AuthProvider = ({ children }) => {
             const userData = res.data;
             if (userData?.role || userData?.email) {
                 setUser(userData);
+                writeAuthHint(userData);
                 if (userData?.gym?.features) {
                     setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
                 }
@@ -105,6 +164,7 @@ export const AuthProvider = ({ children }) => {
             // ignore — we clear local state regardless
         }
         setUser(null);
+        writeAuthHint(null);
     }, []);
 
     /**
@@ -119,6 +179,7 @@ export const AuthProvider = ({ children }) => {
         const userData = meRes.data;
         if (userData?.role || userData?.email) {
             setUser(userData);
+            writeAuthHint(userData);
             if (userData?.gym?.features) {
                 setGymFeatures(prev => ({ ...prev, ...userData.gym.features }));
             }
@@ -136,6 +197,7 @@ export const AuthProvider = ({ children }) => {
     const value = useMemo(() => ({
         user,
         loading,
+        initialAuthChecked,
         login,
         refreshUser,
         logout,
@@ -148,7 +210,7 @@ export const AuthProvider = ({ children }) => {
         gymFeatures,
         hasFeature,
         api, // Pre-configured axios instance
-    }), [user, loading, login, refreshUser, logout, switchGym, gymFeatures, hasFeature]);
+    }), [user, loading, initialAuthChecked, login, refreshUser, logout, switchGym, gymFeatures, hasFeature]);
 
     return (
         <AuthContext.Provider value={value}>
