@@ -68,6 +68,14 @@ module.exports = {
         "pulse-slow": "pulse 4s ease-in-out infinite",
         "gradient": "gradientShift 8s ease infinite",
         "bounce-dot": "bounceDot 1.2s infinite ease-in-out",
+        // Used by AppLayout dropdowns/modals after we ripped out framer-motion.
+        // Open-only animations — closes are instant unmounts (the standard
+        // tradeoff for dropping AnimatePresence's exit choreography).
+        "dropdown-in": "dropdownIn 0.15s ease-out",
+        "popup-in": "popupIn 0.15s ease-out",
+        "modal-in": "modalIn 0.2s ease-out",
+        "slide-in-left": "slideInLeft 0.2s ease-out",
+        "page-in": "pageIn 0.2s ease-out",
       },
       keyframes: {
         fadeIn: {
@@ -76,6 +84,26 @@ module.exports = {
         },
         slideUp: {
           "0%": { opacity: "0", transform: "translateY(20px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        dropdownIn: {
+          "0%": { opacity: "0", transform: "translateY(-4px) scale(0.97)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        popupIn: {
+          "0%": { opacity: "0", transform: "translateY(8px) scale(0.96)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        modalIn: {
+          "0%": { opacity: "0", transform: "translateY(20px) scale(0.9)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+        slideInLeft: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(0)" },
+        },
+        pageIn: {
+          "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
         },
         float: {

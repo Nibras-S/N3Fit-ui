@@ -1,7 +1,20 @@
+import { lazy, Suspense } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
-import LoginPage from '../pages/LoginPage';
 import { PageSkeleton } from '../../../shared/components/ui/Skeleton';
+
+// Lazy so framer-motion + react-icons (only used inside LoginPage) stay out
+// of the main bundle. Authed users — the common cold-launch case — never
+// download them. The SW precaches the chunk after first visit.
+const LoginPage = lazy(() => import('../pages/LoginPage'));
+
+function LoginFallback() {
+    return (
+        <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d]">
+            <PageSkeleton stats={4} tableRows={6} />
+        </div>
+    );
+}
 
 /**
  * Redirect already-logged-in users away from the login page.
@@ -22,13 +35,11 @@ export default function LoginGuard() {
 
     // Genuine first visit: wait for /auth/me before showing the login form
     // so a valid session gets auto-redirected instead of flashing the form.
-    if (!initialAuthChecked) {
-        return (
-            <div className="min-h-screen bg-gray-50 dark:bg-[#0d0d0d]">
-                <PageSkeleton stats={4} tableRows={6} />
-            </div>
-        );
-    }
+    if (!initialAuthChecked) return <LoginFallback />;
 
-    return <LoginPage />;
+    return (
+        <Suspense fallback={<LoginFallback />}>
+            <LoginPage />
+        </Suspense>
+    );
 }

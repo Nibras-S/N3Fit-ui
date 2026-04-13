@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 // asset is kept in public/ for manifest splash use only.
 import n3Logo from '../../../assets/n3Logo-192.webp';
 import { useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "../../context/ThemeContext";
 import { useFormState } from "../../context/FormStateContext";
 import { useAuth } from "../../../features/auth/context/AuthContext";
@@ -332,14 +331,10 @@ export function AppLayout({
                 </div>
                 <FaExchangeAlt className={`text-gray-400 dark:text-zinc-500 text-xs shrink-0 transition-transform ${gymSwitcherOpen ? 'rotate-90' : ''}`} />
               </button>
-              <AnimatePresence>
-                {gymSwitcherOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -4, scale: 0.97 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -4, scale: 0.97 }}
-                    className="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden"
-                  >
+              {gymSwitcherOpen && (
+                <div
+                  className="absolute left-0 right-0 top-full mt-1 z-50 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-700 rounded-xl shadow-xl overflow-hidden origin-top animate-dropdown-in"
+                >
                     {user.allGyms.map((gym) => {
                       const isActive = (gym._id?.toString()) === ((user.activeGymId || user.gymId)?.toString());
                       return (
@@ -363,9 +358,8 @@ export function AppLayout({
                         </button>
                       );
                     })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                </div>
+              )}
             </div>
           )}
 
@@ -403,32 +397,28 @@ export function AppLayout({
                       )}
                     </button>
                     {!isCollapsed && (
-                      <AnimatePresence initial={false}>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: "auto", opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="ml-4 pl-4 border-l border-gray-200 dark:border-white/10 space-y-0.5 mt-0.5">
-                              {subItems.map((sub) => (
-                                <button
-                                  key={sub.path}
-                                  onClick={() => safeNavigate(sub.path)}
-                                  className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
-                                    ? "bg-zinc-100/80 text-zinc-900 dark:bg-zinc-800/40 dark:text-white"
-                                    : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
-                                    }`}
-                                >
-                                  {sub.label}
-                                </button>
-                              ))}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                      // grid-rows-[0fr]/[1fr] trick: animates the implicit
+                      // grid track height so the inner div smoothly expands
+                      // from 0 to its natural height. Replaces framer-motion's
+                      // height: auto animation, which has no CSS equivalent.
+                      <div className={`grid transition-[grid-template-rows] duration-200 ease-out ${isExpanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+                        <div className="overflow-hidden">
+                          <div className="ml-4 pl-4 border-l border-gray-200 dark:border-white/10 space-y-0.5 mt-0.5">
+                            {subItems.map((sub) => (
+                              <button
+                                key={sub.path}
+                                onClick={() => safeNavigate(sub.path)}
+                                className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
+                                  ? "bg-zinc-100/80 text-zinc-900 dark:bg-zinc-800/40 dark:text-white"
+                                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white/8 hover:text-gray-900 dark:hover:text-white"
+                                  }`}
+                              >
+                                {sub.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 );
@@ -545,17 +535,12 @@ export function AppLayout({
               </button>
 
               {/* Profile dropdown — opens below the button */}
-              <AnimatePresence>
-                {profileModalOpen && (
-                  <>
-                    <div className="fixed inset-0 z-30" onClick={() => setProfileModalOpen(false)} />
-                    <motion.div
-                      initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40"
-                    >
+              {profileModalOpen && (
+                <>
+                  <div className="fixed inset-0 z-30" onClick={() => setProfileModalOpen(false)} />
+                  <div
+                    className="absolute top-full right-0 mt-2 w-56 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden z-40 origin-top-right animate-popup-in"
+                  >
                       {/* User info header */}
                       <div className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50 dark:bg-zinc-800/40">
                         <div className="flex items-center gap-3">
@@ -597,11 +582,10 @@ export function AppLayout({
                           <FaSignOutAlt className="text-base shrink-0" />
                           Logout
                         </button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </header>
@@ -643,23 +627,15 @@ export function AppLayout({
         </header>
 
         {/* Mobile Menu Overlay */}
-        <AnimatePresence>
-          {mobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
-              onClick={() => setMobileMenuOpen(false)}
+        {mobileMenuOpen && (
+          <div
+            className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm animate-fade-in"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <div
+              className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-zinc-900 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-zinc-800 flex flex-col animate-slide-in-left"
+              onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                initial={{ x: "-100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ type: "tween", duration: 0.2 }}
-                className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-zinc-900 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-zinc-800 flex flex-col"
-                onClick={(e) => e.stopPropagation()}
-              >
                 <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
@@ -778,20 +754,16 @@ export function AppLayout({
                     </button>
                   </div>
                 </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </div>
+        )}
 
-        <motion.div
+        <div
           key={location.pathname}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          className="flex-1 p-4 md:p-6 pb-28 lg:pb-6"
+          className="flex-1 p-4 md:p-6 pb-28 lg:pb-6 animate-page-in"
         >
           {children}
-        </motion.div>
+        </div>
 
         {/* Global Confirmation Modal */}
         <ConfirmModal
@@ -806,44 +778,37 @@ export function AppLayout({
         />
 
         {/* Global Warning Modal */}
-        <AnimatePresence>
-          {showWarningModal && activeWarning && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
-              >
-                <div className="p-8 text-center">
-                  <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-700 dark:text-zinc-300 animate-bounce">
-                    <FaExclamationTriangle size={40} />
-                  </div>
-                  <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2 uppercase tracking-tight">Urgent Message</h2>
-                  <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-6 px-4 py-1 bg-zinc-50 dark:bg-zinc-700/50 rounded-full inline-block">Attention Required</p>
-
-                  <div className="bg-gray-50 dark:bg-zinc-800/50 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-zinc-800 shadow-inner">
-                    <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-medium">
-                      {activeWarning.message}
-                    </p>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      markAsRead(activeWarning._id);
-                      setShowWarningModal(false);
-                    }}
-                    className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black uppercase tracking-wider shadow-xl shadow-zinc-900/25 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
-                  >
-                    <FaCheckDouble />
-                    Acknowledge & Close
-                  </button>
-                  <p className="mt-4 text-[10px] text-gray-400 font-medium">This message was sent by the Super Administrator</p>
+        {showWarningModal && activeWarning && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 animate-modal-in">
+              <div className="p-8 text-center">
+                <div className="w-20 h-20 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 text-zinc-700 dark:text-zinc-300 animate-bounce">
+                  <FaExclamationTriangle size={40} />
                 </div>
-              </motion.div>
+                <h2 className="text-2xl font-black text-gray-900 dark:text-white mb-2 uppercase tracking-tight">Urgent Message</h2>
+                <p className="text-xs font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest mb-6 px-4 py-1 bg-zinc-50 dark:bg-zinc-700/50 rounded-full inline-block">Attention Required</p>
+
+                <div className="bg-gray-50 dark:bg-zinc-800/50 p-6 rounded-2xl mb-8 border border-gray-100 dark:border-zinc-800 shadow-inner">
+                  <p className="text-gray-700 dark:text-gray-200 text-base leading-relaxed font-medium">
+                    {activeWarning.message}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    markAsRead(activeWarning._id);
+                    setShowWarningModal(false);
+                  }}
+                  className="w-full py-4 bg-zinc-900 hover:bg-zinc-800 text-white rounded-2xl font-black uppercase tracking-wider shadow-xl shadow-zinc-900/25 transition-all active:scale-[0.98] flex items-center justify-center gap-3"
+                >
+                  <FaCheckDouble />
+                  Acknowledge & Close
+                </button>
+                <p className="mt-4 text-[10px] text-gray-400 font-medium">This message was sent by the Super Administrator</p>
+              </div>
             </div>
-          )}
-        </AnimatePresence>
+          </div>
+        )}
       </main>
 
       {/* PWA Install Floating Modal */}

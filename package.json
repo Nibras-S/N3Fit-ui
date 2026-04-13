@@ -27,9 +27,9 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build && node scripts/sw-inject.js",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build && node scripts/sw-inject.js",
+    "test": "craco test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
