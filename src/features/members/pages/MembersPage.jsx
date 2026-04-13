@@ -477,65 +477,78 @@ const MembersPage = () => {
     );
 
     // ── Mobile card ─────────────────────────────────────────────
-    const renderMobileCard = (row) => (
-        <>
-            <div className="flex justify-between items-start mb-3 relative">
-                <div className="flex items-center gap-3">
-                    {row.profileImage ? (
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm">
-                            <img
-                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
-                                alt={row.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                        </div>
-                    ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
-                            {row.name?.charAt(0)}
-                        </div>
-                    )}
-                    <div>
-                        <div className="font-semibold text-gray-900 dark:text-white">{row.name}</div>
-                        <div className="text-sm text-gray-500 dark:text-gray-400">{row.phone}</div>
-                    </div>
-                </div>
+    const renderMobileCard = (row) => {
+        const visibleSet = new Set(visibleColumns);
+        const showPhone = visibleSet.has('phone');
+        // Everything except phone (which sits in the header subtitle) renders
+        // as a label/value row in the metadata strip, in TOGGLEABLE_COLUMNS order.
+        const metaRows = TOGGLEABLE_COLUMNS
+            .filter(c => c.key !== 'phone' && visibleSet.has(c.key))
+            .map(c => ({ key: c.key, label: c.label, value: columnRenderers[c.key]?.render(row) }))
+            .filter(r => r.value != null);
 
-                <div className="flex flex-col items-end gap-2 ml-auto shrink-0">
-                    {/* Top Right Placement of WhatsApp inside the card */}
+        return (
+            <>
+                <div className="flex justify-between items-start mb-3 relative">
+                    <div className="flex items-center gap-3 min-w-0">
+                        {row.profileImage ? (
+                            <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm shrink-0">
+                                <img
+                                    src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                    alt={row.name}
+                                    className="w-full h-full object-cover"
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                            </div>
+                        ) : (
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
+                                {row.name?.charAt(0)}
+                            </div>
+                        )}
+                        <div className="min-w-0">
+                            <div className="font-semibold text-gray-900 dark:text-white truncate">{row.name}</div>
+                            {showPhone && row.phone && (
+                                <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{row.phone}</div>
+                            )}
+                        </div>
+                    </div>
+
                     {row.phone && (
                         <button
                             onClick={(e) => { e.stopPropagation(); handleWhatsApp(row); }}
-                            className="w-8 h-8 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center transition-colors"
+                            className="w-8 h-8 bg-green-50 hover:bg-green-100 dark:bg-green-900/20 text-green-600 rounded-full flex items-center justify-center transition-colors shrink-0 ml-2"
                             title={whatsAppTitle(row)}
                         >
                             <FaWhatsapp size={16} />
                         </button>
                     )}
-                    {activeTab === 'all' && (
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
-                            {row.dews > 0 ? 'Active' : 'Expired'}
-                        </span>
-                    )}
                 </div>
-            </div>
-            <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400 mb-3">
-                <span className={row.dews <= 0 ? 'text-zinc-700 font-medium' : ''}>{row.dews <= 0 ? `${row.dews} days (Expired)` : `${row.dews} days`}</span>
-                <span>{formatDate(row.endDate)}</span>
-            </div>
-            <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800" onClick={(e) => e.stopPropagation()}>
-                <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
-                    <FaRedo size={11} /> Renew
-                </button>
-                <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
-                    <FaEdit /> Edit
-                </button>
-                <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
-                    <FaTrash /> Delete
-                </button>
-            </div>
-        </>
-    );
+
+                {metaRows.length > 0 && (
+                    <div className="flex flex-col gap-1.5 mb-3 pt-2 border-t border-gray-100 dark:border-zinc-800">
+                        {metaRows.map(r => (
+                            <div key={r.key} className="flex items-center justify-between gap-3">
+                                <span className="text-xs text-gray-500 dark:text-gray-400 font-medium shrink-0">{r.label}</span>
+                                <div className="text-sm text-right min-w-0 truncate">{r.value}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+
+                <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                        <FaRedo size={11} /> Renew
+                    </button>
+                    <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                        <FaEdit /> Edit
+                    </button>
+                    <button onClick={() => setDeleteModal({ isOpen: true, id: row._id, name: row.name })} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                        <FaTrash /> Delete
+                    </button>
+                </div>
+            </>
+        );
+    };
 
     // ── Selected Renewing Member for Modal ──────────────────────
     const renewingMember = members.find(m => m._id === renewingMemberId);
