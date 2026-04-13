@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
@@ -6,9 +7,9 @@ import { TableSkeleton } from '../../../shared/components/ui/Skeleton';
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import {
-    FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers, FaUserCheck, FaUserTimes,
+    FaPlus, FaEdit, FaTrash, FaUserShield, FaUsers,
     FaTimes, FaEye, FaEyeSlash, FaSearch, FaFilePdf, FaFileImage, FaPaperclip,
-    FaArchive, FaUndo, FaCalendarAlt
+    FaArchive, FaUndo, FaCalendarAlt, FaChevronRight
 } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -30,6 +31,7 @@ const AVAILABLE_PERMISSIONS = [
 
 const StaffManagement = () => {
     const { api } = useAuth();
+    const navigate = useNavigate();
     // Both lists are kept around so the stats cards (which always summarise
     // the active roster) stay accurate even while the user is browsing the
     // archive bin.
@@ -288,108 +290,85 @@ const StaffManagement = () => {
         <AppLayout showGenderSwitch={false}>
             <Toaster position="top-right" />
             <div className="space-y-6 pb-10">
-                {/* Header */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Management</h1>
-                        <p className="text-gray-500 dark:text-gray-400 text-sm">
-                            {view === 'archived'
-                                ? 'Soft-deleted staff. Restore to bring them back into the roster.'
-                                : "Manage your fit club's team members"}
-                        </p>
+                {/* Back to Settings — matches the in-page back button on /settings sub-tabs */}
+                <button
+                    onClick={() => navigate('/settings')}
+                    className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-zinc-900 dark:hover:text-white transition-colors"
+                >
+                    <FaChevronRight className="rotate-180" size={12} />
+                    Back to Settings
+                </button>
+
+                {/* View tabs row — Active / Archived on the left, Add Staff (+) icon on the right */}
+                <div className="flex items-center justify-between gap-3">
+                    <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800">
+                        <button
+                            onClick={() => setView('active')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                                view === 'active'
+                                    ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-500 shadow-sm'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                            }`}
+                        >
+                            <FaUsers size={12} /> Active
+                        </button>
+                        <button
+                            onClick={() => setView('archived')}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+                                view === 'archived'
+                                    ? 'bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-sm'
+                                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                            }`}
+                        >
+                            <FaArchive size={12} /> Archived
+                            {archivedCount > 0 && (
+                                <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
+                                    view === 'archived'
+                                        ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                                        : 'bg-gray-200 dark:bg-zinc-800 text-gray-600 dark:text-gray-300'
+                                }`}>
+                                    {archivedCount}
+                                </span>
+                            )}
+                        </button>
                     </div>
                     {view === 'active' && (
                         <button
                             onClick={openCreateModal}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-xl font-medium hover:bg-zinc-800 active:scale-95 transition-all shadow-lg shadow-zinc-900/25 text-sm"
+                            aria-label="Add staff"
+                            title="Add staff"
+                            className="flex items-center justify-center w-10 h-10 bg-zinc-900 text-white rounded-xl hover:bg-zinc-800 active:scale-95 transition-all shadow-lg shadow-zinc-900/25"
                         >
-                            <FaPlus size={12} /> Add Staff
+                            <FaPlus size={14} />
                         </button>
                     )}
                 </div>
 
-                {/* View tabs — Active vs Archived */}
-                <div className="inline-flex p-1 rounded-xl bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800">
-                    <button
-                        onClick={() => setView('active')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                            view === 'active'
-                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-500 shadow-sm'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                        }`}
-                    >
-                        <FaUsers size={12} /> Active
-                    </button>
-                    <button
-                        onClick={() => setView('archived')}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                            view === 'archived'
-                                ? 'bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-sm'
-                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-                        }`}
-                    >
-                        <FaArchive size={12} /> Archived
-                        {archivedCount > 0 && (
-                            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-bold ${
-                                view === 'archived'
-                                    ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-                                    : 'bg-gray-200 dark:bg-zinc-800 text-gray-600 dark:text-gray-300'
-                            }`}>
-                                {archivedCount}
-                            </span>
+                {/* Stats Row — single card with 3 equal sections divided vertically.
+                    Compact on mobile (smaller numbers / tighter padding), scales
+                    up on sm+. Dropping the per-card icon chip keeps the row
+                    thumb-reach friendly at narrow widths. */}
+                <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm grid grid-cols-3 divide-x divide-gray-100 dark:divide-zinc-800">
+                    <div className="px-2 py-3 sm:py-4 text-center">
+                        <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white leading-tight">{activeStaff.length}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 uppercase tracking-wide">Total</p>
+                    </div>
+                    <div className="px-2 py-3 sm:py-4 text-center">
+                        <p className="text-xl sm:text-2xl font-bold text-green-600 dark:text-green-400 leading-tight">{activeCount}</p>
+                        <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 uppercase tracking-wide">Active</p>
+                    </div>
+                    <div className="px-2 py-3 sm:py-4 text-center">
+                        {view === 'archived' ? (
+                            <>
+                                <p className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400 leading-tight">{archivedCount}</p>
+                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 uppercase tracking-wide">Archived</p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-500 leading-tight">{inactiveCount}</p>
+                                <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 mt-0.5 uppercase tracking-wide">Inactive</p>
+                            </>
                         )}
-                    </button>
-                </div>
-
-                {/* Stats Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-zinc-100 dark:bg-zinc-700/50 flex items-center justify-center">
-                                <FaUsers className="text-zinc-900 dark:text-zinc-500" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-white">{activeStaff.length}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Total Staff</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                <FaUserCheck className="text-green-600 dark:text-green-400" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-green-600 dark:text-green-400">{activeCount}</p>
-                                <p className="text-xs text-gray-500 dark:text-gray-400">Active</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-gray-100 dark:border-zinc-800 shadow-sm">
-                        <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                                view === 'archived'
-                                    ? 'bg-amber-100 dark:bg-amber-900/30'
-                                    : 'bg-zinc-100 dark:bg-zinc-700/50'
-                            }`}>
-                                {view === 'archived'
-                                    ? <FaArchive className="text-amber-600 dark:text-amber-400" />
-                                    : <FaUserTimes className="text-zinc-900 dark:text-zinc-500" />}
-                            </div>
-                            <div>
-                                {view === 'archived' ? (
-                                    <>
-                                        <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{archivedCount}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Archived</p>
-                                    </>
-                                ) : (
-                                    <>
-                                        <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-500">{inactiveCount}</p>
-                                        <p className="text-xs text-gray-500 dark:text-gray-400">Inactive</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
                     </div>
                 </div>
 

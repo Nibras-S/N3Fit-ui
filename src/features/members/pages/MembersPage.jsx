@@ -68,7 +68,10 @@ const MembersPage = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
     const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
-    const [sortConfig, setSortConfig] = useState({ key: 'endDate', direction: 'asc' });
+    // Default sort matches the per-tab reset below so first load and post-tab-
+    // switch behave the same. Previously these two defaults disagreed and the
+    // list silently re-sorted the moment you touched a tab.
+    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
 
@@ -84,7 +87,10 @@ const MembersPage = () => {
             const stored = localStorage.getItem(COLUMN_PREF_KEY);
             if (stored) {
                 const parsed = JSON.parse(stored);
-                if (Array.isArray(parsed)) return parsed;
+                if (Array.isArray(parsed)) {
+                    const valid = new Set(TOGGLEABLE_COLUMNS.map((c) => c.key));
+                    return parsed.filter((k) => valid.has(k));
+                }
             }
         } catch (_) { /* ignore corrupt prefs */ }
         return DEFAULT_VISIBLE_COLUMNS;
@@ -129,6 +135,10 @@ const MembersPage = () => {
         setSortConfig({ key: 'createdAt', direction: 'desc' });
         setPage(1);
     }, [activeTab]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [genderFilter, sortConfig, limit]);
 
     // ── Fetch members via TanStack Query ────────────────────────
     // Filters are memoized so the query key stays stable between renders.
@@ -1082,9 +1092,9 @@ const MembersPage = () => {
                                 {/* Columns to show */}
                                 <div>
                                     <label className="text-[11px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-3 block">Columns to show</label>
-                                    <div className="space-y-1">
+                                    <div className="grid grid-cols-2 gap-2">
                                         {/* Disabled name checkbox */}
-                                        <label className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 cursor-not-allowed">
+                                        <label className="col-span-2 flex items-center gap-3 px-3 py-2.5 rounded-xl bg-gray-50 dark:bg-zinc-800/50 cursor-not-allowed">
                                             <div className="w-5 h-5 rounded flex items-center justify-center bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 opacity-50">
                                                 <FaCheck size={10} />
                                             </div>
@@ -1096,10 +1106,10 @@ const MembersPage = () => {
                                             const checked = visibleColumns.includes(col.key);
                                             return (
                                                 <label key={col.key} className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-colors hover:bg-gray-50 dark:hover:bg-zinc-800/50 cursor-pointer border border-transparent dark:hover:border-zinc-600">
-                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-zinc-500 bg-white dark:bg-zinc-900'}`}>
+                                                    <div className={`w-5 h-5 rounded flex items-center justify-center transition-colors border shrink-0 ${checked ? 'bg-zinc-900 border-zinc-900 text-white' : 'border-gray-300 dark:border-zinc-500 bg-white dark:bg-zinc-900'}`}>
                                                         {checked && <FaCheck size={10} />}
                                                     </div>
-                                                    <span className={`text-sm font-semibold ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
+                                                    <span className={`text-sm font-semibold truncate ${checked ? 'text-gray-900 dark:text-white' : 'text-gray-600 dark:text-gray-300'}`}>{col.label}</span>
                                                 </label>
                                             );
                                         })}

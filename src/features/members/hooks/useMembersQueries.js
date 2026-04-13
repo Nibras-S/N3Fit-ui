@@ -45,9 +45,11 @@ export function useMembersStats(tabStatus) {
     return useQuery({
         queryKey: memberKeys.stats(tabStatus),
         queryFn: async () => {
-            const res = await api.get('/contacts/', {
-                params: { status: tabStatus, page: 1, limit: 1 },
-            });
+            const params = { status: tabStatus, page: 1, limit: 1 };
+            // The list query on the All tab passes includeExpired=true; the
+            // stats badge must match or it undercounts expired members.
+            if (tabStatus === 'all') params.includeExpired = true;
+            const res = await api.get('/contacts/', { params });
             const p = res.data?.pagination || {};
             return { total: p.total || 0, male: p.male || 0, female: p.female || 0 };
         },

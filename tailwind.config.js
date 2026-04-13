@@ -76,6 +76,10 @@ module.exports = {
         "modal-in": "modalIn 0.2s ease-out",
         "slide-in-left": "slideInLeft 0.2s ease-out",
         "page-in": "pageIn 0.2s ease-out",
+        // Mobile bottom-sheet entry: slides the panel from below the viewport
+        // up to its resting position. Used on mobile breakpoints where modals
+        // anchor to the bottom edge for thumb-reach.
+        "sheet-up": "sheetUp 0.25s cubic-bezier(0.32, 0.72, 0, 1)",
       },
       keyframes: {
         fadeIn: {
@@ -105,6 +109,10 @@ module.exports = {
         pageIn: {
           "0%": { opacity: "0", transform: "translateY(8px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        sheetUp: {
+          "0%": { transform: "translateY(100%)" },
+          "100%": { transform: "translateY(0)" },
         },
         float: {
           "0%, 100%": { transform: "translateY(0px)" },

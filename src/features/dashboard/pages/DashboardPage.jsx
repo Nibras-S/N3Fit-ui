@@ -69,59 +69,59 @@ const Dashboard = () => {
             <div className="space-y-6 pb-10">
 
                 {/* ── Daily Report ──────────────────────────────────────── */}
-                <div className="bg-zinc-100 border border-zinc-200 p-6 rounded-2xl shadow-sm">
+                <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm">
                     <div className="flex items-center gap-2 mb-5">
-                        <FaCalendarAlt className="text-zinc-900" />
-                        <h2 className="text-lg font-bold text-zinc-800">Daily Report</h2>
-                        <span className="text-sm text-zinc-900/80 font-medium ml-auto">
+                        <FaCalendarAlt className="text-zinc-900 dark:text-zinc-400" />
+                        <h2 className="text-lg font-bold text-zinc-800 dark:text-zinc-200">Daily Report</h2>
+                        <span className="text-sm text-zinc-900/80 dark:text-zinc-400 font-medium ml-auto">
                             {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Kolkata' })}
                         </span>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {/* Joined Today */}
-                        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
+                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <FaUserPlus className="text-zinc-700 text-sm" />
-                                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Joined Today</p>
+                                <FaUserPlus className="text-zinc-700 dark:text-zinc-400 text-sm" />
+                                <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Joined Today</p>
                             </div>
-                            <p className="text-2xl font-black text-zinc-900">{stats?.members?.joinedToday || 0}</p>
-                            <p className="text-[10px] text-gray-400 font-medium">new members</p>
+                            <p className="text-2xl font-black text-zinc-900 dark:text-white">{stats?.members?.joinedToday || 0}</p>
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">new members</p>
                         </div>
 
                         {/* Revenue Booked */}
-                        <div className="bg-white p-4 rounded-xl border border-zinc-200 shadow-sm">
+                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <FaChartLine className="text-zinc-700 text-sm" />
-                                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Revenue</p>
+                                <FaChartLine className="text-zinc-700 dark:text-zinc-400 text-sm" />
+                                <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Revenue</p>
                             </div>
-                            <p className="text-2xl font-black text-gray-800">{formatCurrency(stats?.income?.daily)}</p>
-                            <p className="text-[10px] text-gray-400 font-medium">{stats?.income?.dailyCount || 0} transactions</p>
+                            <p className="text-2xl font-black text-gray-800 dark:text-white">{formatCurrency(stats?.income?.daily)}</p>
+                            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">{stats?.income?.dailyCount || 0} transactions</p>
                         </div>
 
                         {/* Collected — clickable */}
                         <button
                             onClick={() => setTodayModalOpen(true)}
-                            className="bg-white p-4 rounded-xl border-2 border-green-500/50 shadow-md hover:shadow-lg hover:border-green-500 transition-all text-left"
+                            className="bg-white dark:bg-zinc-900 p-4 rounded-xl border-2 border-green-500/50 dark:border-green-500/40 shadow-md hover:shadow-lg hover:border-green-500 dark:hover:border-green-500/70 transition-all text-left"
                         >
                             <div className="flex items-center gap-2 mb-1">
-                                <FaMoneyCheckAlt className="text-green-600 text-sm" />
-                                <p className="text-[10px] uppercase font-bold text-green-600 tracking-wider">Collected</p>
+                                <FaMoneyCheckAlt className="text-green-600 dark:text-green-400 text-sm" />
+                                <p className="text-[10px] uppercase font-bold text-green-600 dark:text-green-400 tracking-wider">Collected</p>
                             </div>
-                            <p className="text-2xl font-black text-green-700">{formatCurrency(stats?.income?.dailyActual)}</p>
-                            <p className="text-[10px] text-green-600/70 font-bold">View Breakdown →</p>
+                            <p className="text-2xl font-black text-green-700 dark:text-green-400">{formatCurrency(stats?.income?.dailyActual)}</p>
+                            <p className="text-[10px] text-green-600/70 dark:text-green-400/70 font-bold">View Breakdown →</p>
                         </button>
 
                         {/* Pending Today */}
-                        <div className="bg-white p-4 rounded-xl border border-yellow-400/50 shadow-sm">
+                        <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-yellow-400/50 dark:border-yellow-400/30 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
-                                <FaExclamationCircle className="text-yellow-600 text-sm" />
-                                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Pending</p>
+                                <FaExclamationCircle className="text-yellow-600 dark:text-yellow-400 text-sm" />
+                                <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Pending</p>
                             </div>
-                            <p className="text-2xl font-black text-yellow-700">
+                            <p className="text-2xl font-black text-yellow-700 dark:text-yellow-400">
                                 {formatCurrency(dailyByStatus.find(s => s._id === 'Pending')?.total || 0)}
                             </p>
-                            <p className="text-[10px] text-yellow-600/70 font-medium">
+                            <p className="text-[10px] text-yellow-600/70 dark:text-yellow-400/70 font-medium">
                                 {dailyByStatus.find(s => s._id === 'Pending')?.count || 0} dues today
                             </p>
                         </div>
@@ -300,17 +300,27 @@ const Dashboard = () => {
             </div>
 
             {/* ── Today's Breakdown Modal ───────────────────────────────── */}
+            {/* Mobile: bottom sheet (anchored to bottom, slides up, drag-handle).
+                Desktop (sm+): centered modal. Same DOM, responsive classes flip
+                anchor / radius / animation at the breakpoint. */}
             {todayModalOpen && (
                 <div
-                    className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+                    className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
                     onClick={() => setTodayModalOpen(false)}
                 >
                     <div
-                        className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto"
+                        className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-lg max-h-[90vh] overflow-y-auto animate-sheet-up sm:animate-modal-in pb-[env(safe-area-inset-bottom)]"
                         onClick={(e) => e.stopPropagation()}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Today's breakdown"
                     >
+                        {/* Drag-handle pill — mobile-only affordance for the bottom sheet */}
+                        <div className="sm:hidden flex justify-center pt-3 pb-1">
+                            <div className="w-10 h-1.5 rounded-full bg-zinc-300 dark:bg-zinc-700" />
+                        </div>
                         {/* Header */}
-                        <div className="sticky top-0 bg-zinc-100 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700/30 p-6 rounded-t-2xl">
+                        <div className="sticky top-0 bg-zinc-100 dark:bg-zinc-800/50 border-b border-zinc-200 dark:border-zinc-700/30 p-6 rounded-t-3xl sm:rounded-t-2xl">
                             <div className="flex items-center justify-between">
                                 <div>
                                     <h2 className="text-xl font-bold flex items-center gap-2 text-zinc-800 dark:text-zinc-200">
