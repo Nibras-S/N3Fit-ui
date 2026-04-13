@@ -42,20 +42,6 @@ body {
 @tailwind components;
 @tailwind utilities;
 
-/* Safe-area utilities for the PWA. viewport-fit=cover in index.html lets the
-   app paint into the notch and home-indicator regions, so anything docked to
-   the top/bottom edges needs to push itself off those hardware zones via
-   env(safe-area-inset-*). The calc() adds the component's own internal
-   padding on top of the inset so there's still breathing room below the
-   notch and above the home indicator. safe-area-pb existed as a className on
-   the bottom nav but was never defined — defining it here fixes that too. */
-.safe-area-pt {
-  padding-top: calc(env(safe-area-inset-top) + 0.75rem);
-}
-.safe-area-pb {
-  padding-bottom: calc(env(safe-area-inset-bottom) + 0.5rem);
-}
-
 /* iOS Safari auto-zooms into any focused <input>/<textarea>/<select> whose
    computed font-size is < 16px, regardless of the viewport meta. Force the
    typable form controls to 16px on touch-sized viewports so the PWA keeps

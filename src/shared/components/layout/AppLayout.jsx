@@ -604,7 +604,10 @@ export function AppLayout({
         </header>
 
         {/* Mobile top bar */}
-        <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 pb-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 shadow-sm safe-area-pt">
+        <header
+          className="lg:hidden sticky top-0 z-30 flex items-center justify-between px-4 pb-3 bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800/60 shadow-sm"
+          style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
+        >
           {/* Left: hamburger or back */}
           <button
             onClick={() => showBackToList ? safeNavigate('/members') : setMobileMenuOpen(true)}
@@ -649,7 +652,10 @@ export function AppLayout({
               className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-zinc-900 shadow-[4px_0_24px_rgba(0,0,0,0.1)] border-r dark:border-zinc-800 flex flex-col animate-slide-in-left"
               onClick={(e) => e.stopPropagation()}
             >
-                <div className="p-4 flex-1 overflow-y-auto custom-scrollbar">
+                <div
+                  className="px-4 pb-4 flex-1 overflow-y-auto custom-scrollbar"
+                  style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
+                >
                   <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-3">
                       {gymLogo ? (
