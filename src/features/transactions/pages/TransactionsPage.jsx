@@ -256,14 +256,6 @@ const TransactionsPage = () => {
     return (
         <AppLayout showGenderSwitch={false}>
             <div className="space-y-4">
-                {/* Header */}
-                <div>
-                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Transactions</h1>
-                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                        {filteredTransactions.length} of {transactions.length} records
-                    </p>
-                </div>
-
                 {/* ── DESKTOP filter bar (hidden on mobile) ── */}
                 <div className="hidden lg:flex items-center gap-3 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 shadow-sm">
                     {/* Search */}
