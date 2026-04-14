@@ -5,7 +5,7 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { useFormState } from '../../../shared/context/FormStateContext';
 import {
   FaUser, FaCamera, FaUpload,
-  FaCheckCircle, FaTrash, FaCrown,
+  FaTrash, FaCrown,
   FaMoneyBillWave, FaArrowLeft, FaArrowRight, FaTimes, FaCropAlt,
   FaDumbbell, FaWeight, FaRulerVertical, FaSyncAlt
 } from 'react-icons/fa';
@@ -32,6 +32,10 @@ const FITNESS_GOAL_OPTIONS = [
 function NewMember() {
   const { setDirty } = useFormState();
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [step]);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("+91");
@@ -338,23 +342,95 @@ function NewMember() {
     }
   };
 
-  const renderStepIndicator = () => (
-    <div className="flex items-center justify-center gap-3 mb-6">
-      {[1, 2, 3].map((s) => (
-        <div key={s} className="flex items-center gap-2">
-          <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs transition-all ${step === s ? 'bg-zinc-900 text-white scale-105 shadow-md' :
-            step > s ? 'bg-green-500 text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-400'
-            }`}>
-            {step > s ? <FaCheckCircle size={14} /> : s}
-          </div>
-          {s < 3 && <div className={`w-8 h-0.5 rounded ${step > s ? 'bg-green-500' : 'bg-gray-100 dark:bg-zinc-800'}`} />}
-        </div>
-      ))}
+  const renderMobileActionBar = () => {
+    let left = null;
+    let right = null;
+    if (step === 1) {
+      right = (
+        <button
+          onClick={nextStep}
+          type="button"
+          className="px-6 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+        >
+          Continue <FaArrowRight size={12} />
+        </button>
+      );
+    } else if (step === 2) {
+      left = (
+        <button
+          onClick={prevStep}
+          type="button"
+          className="px-5 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-300 rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-gray-100 transition-all text-[10px]"
+        >
+          <FaArrowLeft size={10} /> Back
+        </button>
+      );
+      right = (
+        <button
+          onClick={nextStep}
+          type="button"
+          className="px-6 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+        >
+          Review <FaArrowRight size={12} />
+        </button>
+      );
+    } else if (step === 3) {
+      left = (
+        <button
+          onClick={prevStep}
+          type="button"
+          className="px-5 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-500 dark:text-gray-300 rounded-xl font-black uppercase tracking-widest hover:bg-gray-100 transition-all text-[10px]"
+        >
+          Modify
+        </button>
+      );
+      right = (
+        <button
+          onClick={Submit}
+          type="button"
+          disabled={submitting}
+          className="px-6 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 transition-all text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          Add Member
+        </button>
+      );
+    }
+    return (
+      <div
+        className="lg:hidden fixed left-0 right-0 z-30 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3"
+        style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}
+      >
+        <div className="flex-1 flex justify-start">{left}</div>
+        <div className="shrink-0">{renderStepDots()}</div>
+        <div className="flex-1 flex justify-end">{right}</div>
+      </div>
+    );
+  };
+
+  const renderStepDots = () => (
+    <div className="flex items-center justify-center gap-1.5">
+      {[1, 2, 3].map((s) => {
+        const isDone = step > s;
+        const isCurrent = step === s;
+        return (
+          <span
+            key={s}
+            className={`h-2 rounded-full transition-all ${
+              isCurrent
+                ? 'w-5 bg-zinc-900 dark:bg-white'
+                : isDone
+                ? 'w-2 bg-green-500'
+                : 'w-2 bg-gray-200 dark:bg-zinc-700'
+            }`}
+            aria-current={isCurrent ? 'step' : undefined}
+          />
+        );
+      })}
     </div>
   );
 
   return (
-    <div className="max-w-4xl mx-auto p-2 lg:p-6 min-h-[85vh] flex flex-col justify-center">
+    <div className="max-w-4xl mx-auto p-2 lg:p-6 pb-[88px] lg:pb-6">
       <Toaster position="top-right" />
       {submitting && (
         <div className="fixed inset-0 bg-black/70 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
@@ -365,9 +441,7 @@ function NewMember() {
         </div>
       )}
 
-      {renderStepIndicator()}
-
-      <div className="flex-1 flex flex-col justify-center">
+      <div>
         <AnimatePresence mode="wait">
           {step === 1 && (
             <motion.div
@@ -433,35 +507,34 @@ function NewMember() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Phone</label>
-                      <div className="flex">
-                        <input
-                          type="text"
-                          value={countryCode}
-                          onChange={(e) => setCountryCode(e.target.value)}
-                          className="w-16 px-2 py-2.5 bg-gray-50 dark:bg-zinc-950/50 border border-r-0 border-gray-100 dark:border-zinc-800 rounded-l-xl outline-none focus:border-zinc-900 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
-                          placeholder="+91"
-                        />
-                        <input
-                          type="tel"
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
-                          className="flex-1 w-full px-3 py-2.5 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-r-xl outline-none focus:border-zinc-900 text-sm font-medium"
-                          placeholder="9876543210"
-                          maxLength={10}
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">DOB</label>
-                      <DatePicker
-                        value={dob}
-                        onChange={(e) => setDob(e.target.value)}
-                        className="!bg-gray-50 dark:!bg-zinc-950/50 !border-gray-100 dark:!border-zinc-800 !rounded-xl !py-2.5 !px-10 font-medium"
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">Phone</label>
+                    <div className="flex">
+                      <input
+                        type="text"
+                        value={countryCode}
+                        onChange={(e) => setCountryCode(e.target.value)}
+                        className="w-16 shrink-0 px-2 py-2.5 bg-gray-50 dark:bg-zinc-950/50 border border-r-0 border-gray-100 dark:border-zinc-800 rounded-l-xl outline-none focus:border-zinc-900 text-sm font-bold text-center text-gray-600 dark:text-gray-300"
+                        placeholder="+91"
+                      />
+                      <input
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+                        className="flex-1 min-w-0 px-3 py-2.5 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-r-xl outline-none focus:border-zinc-900 text-sm font-medium"
+                        placeholder="9876543210"
+                        maxLength={10}
                       />
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1 block">DOB</label>
+                    <DatePicker
+                      value={dob}
+                      onChange={(e) => setDob(e.target.value)}
+                      className="!bg-gray-50 dark:!bg-zinc-950/50 !border-gray-100 dark:!border-zinc-800 !rounded-xl !py-2.5 !pl-9 !pr-3 font-medium"
+                    />
                   </div>
 
                   <div>
@@ -565,14 +638,18 @@ function NewMember() {
                 </div>
               </div>
 
-              <div className="flex justify-end pt-6 border-t border-gray-50 dark:border-zinc-800 mt-6">
-                <button
-                  onClick={nextStep}
-                  type="button"
-                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
-                >
-                  Continue <FaArrowRight size={12} />
-                </button>
+              <div className="hidden lg:flex items-center justify-between pt-6 border-t border-gray-50 dark:border-zinc-800 mt-6">
+                <div className="flex-1" />
+                <div className="flex-1 flex justify-center">{renderStepDots()}</div>
+                <div className="flex-1 flex justify-end">
+                  <button
+                    onClick={nextStep}
+                    type="button"
+                    className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+                  >
+                    Continue <FaArrowRight size={12} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -707,21 +784,26 @@ function NewMember() {
                 </div>
               </div>
 
-              <div className="flex justify-between pt-6 border-t border-gray-50 dark:border-zinc-800 mt-6">
-                <button
-                  onClick={prevStep}
-                  type="button"
-                  className="px-6 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-300 rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-gray-100 transition-all text-[10px]"
-                >
-                  <FaArrowLeft size={10} /> Back
-                </button>
-                <button
-                  onClick={nextStep}
-                  type="button"
-                  className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
-                >
-                  Review <FaArrowRight size={12} />
-                </button>
+              <div className="hidden lg:flex items-center justify-between pt-6 border-t border-gray-50 dark:border-zinc-800 mt-6">
+                <div className="flex-1 flex justify-start">
+                  <button
+                    onClick={prevStep}
+                    type="button"
+                    className="px-6 py-3 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-300 rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-gray-100 transition-all text-[10px]"
+                  >
+                    <FaArrowLeft size={10} /> Back
+                  </button>
+                </div>
+                <div className="flex-1 flex justify-center">{renderStepDots()}</div>
+                <div className="flex-1 flex justify-end">
+                  <button
+                    onClick={nextStep}
+                    type="button"
+                    className="px-8 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-800 transition-all text-[11px]"
+                  >
+                    Review <FaArrowRight size={12} />
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
@@ -777,19 +859,23 @@ function NewMember() {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 pt-2">
-                    <button
-                      onClick={prevStep}
-                      className="flex-1 py-3.5 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-200 rounded-xl font-black uppercase tracking-widest hover:bg-gray-100 text-[10px]"
-                    >
-                      Modify
-                    </button>
-                    <button
-                      onClick={Submit}
-                      className="flex-[1.5] py-3.5 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 text-[11px]"
-                    >
-                      Add Member
-                    </button>
+                  <div className="hidden lg:block pt-2">
+                    <div className="flex justify-center mb-4">{renderStepDots()}</div>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={prevStep}
+                        className="flex-1 py-3.5 bg-gray-50 dark:bg-zinc-800 text-gray-400 dark:text-gray-200 rounded-xl font-black uppercase tracking-widest hover:bg-gray-100 text-[10px]"
+                      >
+                        Modify
+                      </button>
+                      <button
+                        onClick={Submit}
+                        disabled={submitting}
+                        className="flex-[1.5] py-3.5 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Add Member
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -797,6 +883,8 @@ function NewMember() {
           )}
         </AnimatePresence>
       </div>
+
+      {renderMobileActionBar()}
 
       {/* Camera Modal */}
       <AnimatePresence>
