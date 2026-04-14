@@ -819,7 +819,7 @@ export function AppLayout({
 
         <div
           key={location.pathname}
-          className="flex-1 p-4 md:p-6 pb-24 lg:pb-6 animate-page-in"
+          className="flex-1 p-4 md:p-6 pb-20 lg:pb-6 animate-page-in"
         >
           {children}
         </div>
