@@ -66,28 +66,16 @@ function NewMember() {
   // Photo State
   const [photoBlob, setPhotoBlob] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
 
   // Payment State
   const [amount, setAmount] = useState('');
   const [admissionFee, setAdmissionFee] = useState('');
   const [discount, setDiscount] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState("Cash");
-  const [paymentStatus, setPaymentStatus] = useState("Paid");
   const [settings, setSettings] = useState(null);
 
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { hasFeature } = useAuth();
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `${backendUrl}${path}`;
-  };
 
   useEffect(() => {
     api.get(`/settings`)
@@ -105,7 +93,7 @@ function NewMember() {
         }
       })
       .catch(err => console.error("Failed to fetch settings", err));
-  }, [backendUrl]);
+  }, []);
 
   useEffect(() => {
     if (settings?.plans && settings.plans.length > 0) {
@@ -123,9 +111,10 @@ function NewMember() {
 
   // Cleanup camera on unmount
   useEffect(() => {
+    const video = modalVideoRef.current;
     return () => {
-      if (modalVideoRef.current && modalVideoRef.current.srcObject) {
-        const stream = modalVideoRef.current.srcObject;
+      if (video && video.srcObject) {
+        const stream = video.srcObject;
         const tracks = stream.getTracks();
         tracks.forEach(track => track.stop());
       }
@@ -397,7 +386,7 @@ function NewMember() {
     }
     return (
       <div
-        className="lg:hidden fixed left-0 right-0 z-30 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] px-4 py-3 flex items-center gap-3"
+        className="lg:hidden fixed left-0 right-0 z-30 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 px-4 pt-2 pb-1.5 flex items-center gap-3"
         style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}
       >
         <div className="flex-1 flex justify-start">{left}</div>

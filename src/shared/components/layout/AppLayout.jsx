@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 // asset is kept in public/ for manifest splash use only.
 import n3Logo from '../../../assets/n3Logo-192.webp';
 import { useLocation, useNavigate } from "react-router-dom";
-import { useTheme } from "../../context/ThemeContext";
 import { useFormState } from "../../context/FormStateContext";
 import { useAuth } from "../../../features/auth/context/AuthContext";
 import { useNotifications } from "../../../features/notifications/context/NotificationContext";
@@ -84,7 +83,6 @@ export function AppLayout({
     try { localStorage.setItem('n3_sidebar_collapsed', '1'); } catch (_) { }
   };
 
-  const { theme, toggleTheme } = useTheme();
   const { isDirty, setDirty } = useFormState();
   const { user, logout, hasFeature, switchGym, api } = useAuth();
   const {
@@ -876,7 +874,10 @@ export function AppLayout({
       <InstallPWA />
 
       {/* Mobile Bottom Navigation */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] pb-[env(safe-area-inset-bottom)]">
+      <nav
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+      >
         <div className="relative flex items-center justify-around px-2 pt-2 pb-1.5 h-[68px]">
           {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
             <BottomNavButton
