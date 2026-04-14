@@ -876,9 +876,9 @@ export function AppLayout({
       {/* Mobile Bottom Navigation */}
       <nav
         className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]"
-        style={{ paddingBottom: 'max(0.25rem, calc(env(safe-area-inset-bottom) - 0.75rem))' }}
+        style={{ paddingBottom: 'max(0.125rem, calc(env(safe-area-inset-bottom) - 1.5rem))' }}
       >
-        <div className="relative flex items-center justify-around px-2 pt-2 pb-1">
+        <div className="relative flex items-center justify-around px-2 pt-1.5 pb-0.5">
           {bottomNavItems.map(({ path, label, icon: Icon, badge }) => (
             <BottomNavButton
               key={path}
