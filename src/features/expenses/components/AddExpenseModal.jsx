@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaUserTie, FaStickyNote, FaFileInvoice, FaPaperclip } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
@@ -19,7 +19,6 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
     const [loading, setLoading] = useState(false);
     const [staffOptions, setStaffOptions] = useState([]);
     const [staffLoading, setStaffLoading] = useState(false);
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const isStaffSalary = formData.category === 'Staff Salary';
 

@@ -83,7 +83,7 @@ export default function InstallPWA() {
                             <FaMobileAlt className="text-white" size={18} />
                         </div>
                         <div>
-                            <p className="text-white font-bold text-sm leading-tight">Install Fit App</p>
+                            <p className="text-white font-bold text-sm leading-tight">Install N3FitBook App</p>
                             <p className="text-red-200 text-[11px] mt-0.5">Faster &amp; works offline</p>
                         </div>
                     </div>

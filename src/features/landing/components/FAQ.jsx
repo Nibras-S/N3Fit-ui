@@ -4,20 +4,20 @@ import { FiChevronDown } from 'react-icons/fi';
 
 const faqs = [
   {
-    q: 'Is N3 Fit cloud-based?',
-    a: 'Yes! N3 Fit is 100% cloud-based. Access your gym\'s data from any device — laptop, tablet, or phone — securely from anywhere.',
+    q: 'Is N3FitBook cloud-based?',
+    a: 'Yes! N3FitBook is 100% cloud-based. Access your gym\'s data from any device — laptop, tablet, or phone — securely from anywhere.',
   },
   {
-    q: 'Does N3 Fit support multi-branch gyms?',
+    q: 'Does N3FitBook support multi-branch gyms?',
     a: 'Absolutely! Our Premium plan supports unlimited branches. Manage all locations from a single Super Admin dashboard with per-branch analytics.',
   },
   {
     q: 'Can I migrate data from Excel or another software?',
-    a: 'Yes, we offer free CSV/Excel data import. Upload your member list and N3 Fit auto-maps the fields. Our team assists with complex migrations.',
+    a: 'Yes, we offer free CSV/Excel data import. Upload your member list and N3FitBook auto-maps the fields. Our team assists with complex migrations.',
   },
   {
     q: 'How does the WhatsApp integration work?',
-    a: 'N3 Fit connects to the WhatsApp Cloud API to send automated renewal reminders, bulk announcements, and personalized birthday wishes — all from your dashboard.',
+    a: 'N3FitBook connects to the WhatsApp Cloud API to send automated renewal reminders, bulk announcements, and personalized birthday wishes — all from your dashboard.',
   },
   {
     q: 'Is there a free trial?',
@@ -58,7 +58,7 @@ export default function FAQ() {
             Got <span className="landing-heading-gradient">Questions?</span>
           </h2>
           <p className="landing-subheading mx-auto text-center">
-            Everything you need to know about N3 Fit.
+            Everything you need to know about N3FitBook.
           </p>
         </motion.div>
 

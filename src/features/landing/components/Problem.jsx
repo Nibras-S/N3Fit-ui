@@ -37,7 +37,7 @@ export default function Problem() {
           transition={{ duration: 0.5 }}
           className="text-center max-w-2xl mx-auto mb-14"
         >
-          <span className="landing-section-label">Why N3 Fit</span>
+          <span className="landing-section-label">Why N3FitBook</span>
           <h2
             className="landing-heading"
             style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)' }}
@@ -107,7 +107,7 @@ export default function Problem() {
             </ul>
           </motion.div>
 
-          {/* N3 Fit Way */}
+          {/* N3FitBook Way */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -125,7 +125,7 @@ export default function Problem() {
                 className="w-2.5 h-2.5 rounded-full"
                 style={{ background: 'var(--landing-primary)' }}
               />
-              <span style={{ color: 'var(--landing-text)' }}>N3 Fit</span>
+              <span style={{ color: 'var(--landing-text)' }}>N3FitBook</span>
             </h3>
             <ul className="space-y-4">
               {newWay.map((item, i) => (

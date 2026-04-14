@@ -55,7 +55,7 @@ export default function Testimonials() {
           </h2>
           <p className="landing-subheading mx-auto text-center">
             Join hundreds of fitness centers that have transformed their
-            management with N3 Fit.
+            management with N3FitBook.
           </p>
         </motion.div>
 

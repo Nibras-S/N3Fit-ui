@@ -1,8 +1,8 @@
 // Hot reload trigger
 import React, { useState, useEffect } from "react";
-// Optimized 192x192 WebP — 3.7 KB vs the 1.4 MB original PNG. The full-res
-// asset is kept in public/ for manifest splash use only.
-import n3Logo from '../../../assets/n3Logo-192.webp';
+// Optimized 192x192 WebP — kept small for the sidebar footer.
+// The full-res asset is kept in public/ for manifest splash use only.
+import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 import { useLocation, useNavigate } from "react-router-dom";
 import { useFormState } from "../../context/FormStateContext";
 import { useAuth } from "../../../features/auth/context/AuthContext";
@@ -354,7 +354,7 @@ export function AppLayout({
               </div>
             ) : (
               <div className="w-9 h-9 rounded-xl shrink-0 bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-zinc-900/20">
-                <img src={n3Logo} alt="Fit" className="w-7 h-7 object-contain" />
+                <img src={n3fitbookLogo} alt="N3FitBook" className="w-7 h-7 object-contain" />
               </div>
             )}
             {!isCollapsed && (
@@ -540,11 +540,11 @@ export function AppLayout({
           {/* Sidebar footer */}
           <div className="pt-4 mt-3 flex justify-center items-center">
             {isCollapsed ? (
-              <img src={n3Logo} alt="N3 Fit" className="w-6 h-6 opacity-60 grayscale" />
+              <img src={n3fitbookLogo} alt="N3FitBook" className="w-6 h-6 opacity-80 rounded" />
             ) : (
               <div className="flex items-center gap-2">
-                <img src={n3Logo} alt="N3 Fit" className="w-5 h-5 opacity-60 grayscale" />
-                <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 opacity-60">Powered by N3 Fit</p>
+                <img src={n3fitbookLogo} alt="N3FitBook" className="w-5 h-5 opacity-80 rounded" />
+                <p className="text-[9px] font-bold uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400 opacity-60">Powered by N3FitBook</p>
               </div>
             )}
           </div>
@@ -694,7 +694,7 @@ export function AppLayout({
                         </div>
                       ) : (
                         <div className="w-8 h-8 rounded-lg bg-zinc-900 flex items-center justify-center ring-2 ring-zinc-900/15 shadow-lg shadow-zinc-900/20 shrink-0">
-                          <img src={n3Logo} alt="N3" className="w-6 h-6 object-contain" />
+                          <img src={n3fitbookLogo} alt="N3FitBook" className="w-6 h-6 object-contain" />
                         </div>
                       )}
                       <span className="font-bold text-gray-900 dark:text-white truncate" style={{ fontSize: "16px" }}>{gymName}</span>

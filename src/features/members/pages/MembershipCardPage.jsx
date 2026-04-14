@@ -127,7 +127,7 @@ export default function MembershipCardPage() {
     const balanceDue = Math.max(0, totalAmount - paidSoFar);
     const isPendingOrPartial = status === 'Pending' || status === 'Partial';
 
-    const gymName = user?.gym?.name || 'N3 Fit';
+    const gymName = user?.gym?.name || 'N3FitBook';
     const gymLogo = user?.gym?.logo
         ? (user.gym.logo.startsWith('http') ? user.gym.logo : `${backendUrl}${user.gym.logo}`)
         : null;

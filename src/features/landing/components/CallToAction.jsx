@@ -43,7 +43,7 @@ export default function CallToAction({ onOpenTrial }) {
               Your Fitness Business?
             </h2>
             <p className="text-lg text-white/75 mb-8 max-w-xl mx-auto leading-relaxed">
-              Join 500+ gym owners who switched to N3 Fit and never looked back.
+              Join 500+ gym owners who switched to N3FitBook and never looked back.
               Start your free trial today — setup takes under 10 minutes.
             </p>
 

@@ -6,7 +6,7 @@
  * (member detail, invoice, etc).
  *
  * Keep this list in lockstep with src/app/routes.jsx — adding a route
- * without a title here will fall back to "N3 Fit" instead of crashing.
+ * without a title here will fall back to "N3FitBook" instead of crashing.
  */
 
 const EXACT = {
@@ -41,7 +41,7 @@ export function getRouteTitle(pathname) {
     for (const { test, title } of PREFIX) {
         if (test.test(pathname)) return title;
     }
-    return 'N3 Fit';
+    return 'N3FitBook';
 }
 
 export default getRouteTitle;

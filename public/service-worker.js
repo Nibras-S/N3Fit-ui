@@ -1,14 +1,15 @@
-// Basic service worker for Fit PWA
+// Basic service worker for N3FitBook PWA
 // CACHE_NAME is rewritten at build time so every deploy gets a fresh cache
 // and the activate handler evicts the previous version's entries.
-const CACHE_NAME = 'fit-__BUILD_ID__';
+const CACHE_NAME = 'n3fitbook-__BUILD_ID__';
 
 // Static app-shell entries that exist in /public at dev time.
 const STATIC_PRECACHE = [
     '/',
     '/index.html',
-    '/n3Logo-192.png',
-    '/n3Logo-192.webp',
+    '/n3fitbook-192.png',
+    '/n3fitbook-192.webp',
+    '/n3fitbook.svg',
     '/manifest.json',
 ];
 

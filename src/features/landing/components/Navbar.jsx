@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiMenu, FiX } from 'react-icons/fi';
-import n3Logo from '../../../assets/n3Logo-192.webp';
+import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 
 export default function Navbar({ onOpenTrial }) {
   const navigate = useNavigate();
@@ -48,8 +48,8 @@ export default function Navbar({ onOpenTrial }) {
       >
         <div className="landing-nav-inner">
           <div className="landing-nav-logo" onClick={() => navigate('/')}>
-            <img src={n3Logo} alt="N3 Fit" />
-            <span>N3 Fit</span>
+            <img src={n3fitbookLogo} alt="N3FitBook" />
+            <span>N3FitBook</span>
           </div>
 
           <div className="landing-nav-links">

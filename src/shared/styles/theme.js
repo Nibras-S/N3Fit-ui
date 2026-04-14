@@ -1,5 +1,5 @@
 /**
- * N3Fit Global Color Theme
+ * N3FitBook Global Color Theme
  * ─────────────────────────────────────────────────────────────────────────────
  * Single source of truth for every color used in the application.
  *

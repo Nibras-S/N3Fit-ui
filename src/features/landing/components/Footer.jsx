@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaInstagram, FaTwitter, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
-import n3Logo from '../../../assets/n3Logo-192.webp';
+import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 
 const footerLinks = {
   Product: [
@@ -64,16 +64,16 @@ export default function Footer() {
               onClick={() => navigate('/')}
             >
               <img
-                src={n3Logo}
-                alt="N3 Fit"
+                src={n3fitbookLogo}
+                alt="N3FitBook"
                 style={{
                   height: '36px',
                   width: 'auto',
                   objectFit: 'contain',
-                  filter: 'brightness(2)',
+                  borderRadius: '7px',
                 }}
               />
-              <span className="text-lg font-extrabold text-white">N3 Fit</span>
+              <span className="text-lg font-extrabold text-white">N3FitBook</span>
             </div>
             <p className="leading-relaxed max-w-sm mb-5 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
               The all-in-one SaaS platform for modern gym management. Built for
@@ -131,7 +131,7 @@ export default function Footer() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
         >
           <p style={{ color: 'rgba(255,255,255,0.3)' }}>
-            &copy; {new Date().getFullYear()} N3 Fit. All rights reserved.
+            &copy; {new Date().getFullYear()} N3FitBook. All rights reserved.
           </p>
           <div className="flex gap-6">
             {legalLinks.map((link, i) => (

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import n3Logo from '../../../assets/n3Logo-192.webp';
+import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from '../context/AuthContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaBuilding } from "react-icons/fa";
@@ -76,8 +76,8 @@ function AdminAuth() {
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <img src={n3Logo} alt="Fit" style={{ height: '40px', width: 'auto', objectFit: 'contain' }} />
-            <span className="text-white/90 font-semibold text-lg">Fit · Fitness Management</span>
+            <img src={n3fitbookLogo} alt="N3FitBook" style={{ height: '40px', width: 'auto', objectFit: 'contain', borderRadius: '8px' }} />
+            <span className="text-white/90 font-semibold text-lg">N3FitBook · Fitness Management</span>
           </div>
 
           {/* Hero Content */}
@@ -125,7 +125,7 @@ function AdminAuth() {
 
           {/* Footer */}
           <p className="text-white/30 text-sm">
-            Powered by Fit &middot; Fitness Management Platform
+            Powered by N3FitBook &middot; Fitness Management Platform
           </p>
         </div>
       </div>
@@ -140,8 +140,8 @@ function AdminAuth() {
         >
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
-            <img src={n3Logo} alt="Fit" style={{ height: '36px', width: 'auto', objectFit: 'contain' }} />
-            <span className="text-gray-900 dark:text-white font-semibold text-lg">Fit · Fitness Management</span>
+            <img src={n3fitbookLogo} alt="N3FitBook" style={{ height: '36px', width: 'auto', objectFit: 'contain', borderRadius: '7px' }} />
+            <span className="text-gray-900 dark:text-white font-semibold text-lg">N3FitBook · Fitness Management</span>
           </div>
 
           <div className="mb-8">

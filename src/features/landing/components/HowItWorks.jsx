@@ -19,7 +19,7 @@ const steps = [
     num: '03',
     icon: FiZap,
     title: 'Automate & Grow',
-    desc: 'Let N3 Fit handle billing, reminders, and analytics while you focus on scaling.',
+    desc: 'Let N3FitBook handle billing, reminders, and analytics while you focus on scaling.',
   },
 ];
 

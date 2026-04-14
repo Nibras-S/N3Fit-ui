@@ -276,7 +276,7 @@ const Invoice = () => {
                 {/* ── Footer ── */}
                 <div className="border-t border-gray-100 pt-5 text-center text-sm text-gray-400">
                     <p>Thank you for your business!</p>
-                    <p className="mt-1 text-xs">Generated via Fit Management Software</p>
+                    <p className="mt-1 text-xs">Generated via N3FitBook Management Software</p>
                 </div>
             </div>
 

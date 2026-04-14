@@ -26,7 +26,7 @@ export default function LandingPage() {
   });
 
   useEffect(() => {
-    document.title = 'N3 Fit — All-in-One Fitness Management Platform';
+    document.title = 'N3FitBook — All-in-One Fitness Management Platform';
   }, []);
 
   return (
