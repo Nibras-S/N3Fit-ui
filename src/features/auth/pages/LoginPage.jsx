@@ -62,7 +62,7 @@ function AdminAuth() {
 
   return (
     <div className="min-h-screen flex items-stretch">
-      <Toaster position="top-right" />
+      <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
       {/* Left Panel — Branding */}
       <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-zinc-800 to-zinc-700">

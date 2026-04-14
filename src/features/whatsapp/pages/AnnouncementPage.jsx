@@ -213,7 +213,7 @@ const Announcement = () => {
             showGenderSwitch={false}
         >
             <div className="mx-auto pb-10">
-                <Toaster position="top-right" />
+                <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
                 {/* Auto-reminder status info card (gym users only) */}
                 {user?.role !== 'superadmin' && (

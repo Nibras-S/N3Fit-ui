@@ -56,7 +56,7 @@ const SuperAdminSettings = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="max-w-6xl mx-auto pb-20">
                 <PageHeader
                     title="Platform Settings"

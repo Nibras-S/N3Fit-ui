@@ -98,7 +98,7 @@ const Invoice = () => {
             className="min-h-screen bg-gray-50 px-3 pb-3 sm:px-6 sm:pb-6 md:px-8 md:pb-8 print:bg-white print:p-0"
             style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
         >
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
             {/* Toolbar */}
             <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center print:hidden">

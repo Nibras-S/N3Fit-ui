@@ -184,7 +184,7 @@ const GymDetails = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="max-w-4xl mx-auto pb-20">
                 {/* Navigation & Header */}
                 <button

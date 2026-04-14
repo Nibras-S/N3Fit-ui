@@ -288,7 +288,7 @@ const StaffManagement = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="space-y-6 pb-10">
                 {/* Back to Settings — matches the in-page back button on /settings sub-tabs */}
                 <button

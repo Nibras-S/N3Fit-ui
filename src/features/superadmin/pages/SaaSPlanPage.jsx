@@ -103,7 +103,7 @@ const SaaSPlanManagement = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="space-y-6 pb-10">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

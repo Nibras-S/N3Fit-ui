@@ -236,7 +236,7 @@ const Settings = () => {
     return (
         <AppLayout title="Settings" description="Manage your account and preferences" icon={FaCog} showGenderSwitch={false}>
             <div className={`mx-auto px-2 py-6 sm:py-10`}>
-                <Toaster position="top-right" />
+                <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
                 {/* Back button for sub-pages */}
                 {activeTab !== 'main' && (

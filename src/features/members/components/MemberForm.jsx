@@ -431,7 +431,7 @@ function NewMember() {
 
   return (
     <div className="max-w-4xl mx-auto p-2 lg:p-6 pb-[88px] lg:pb-6">
-      <Toaster position="top-right" />
+      <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
       {submitting && (
         <div className="fixed inset-0 bg-black/70 z-[100] flex flex-col items-center justify-center backdrop-blur-md">
           <div className="bg-[#1c1c1c] rounded-2xl px-8 py-6 flex flex-col items-center gap-4 border border-[#2a2a2a]">

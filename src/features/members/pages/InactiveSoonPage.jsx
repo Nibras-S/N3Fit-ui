@@ -201,7 +201,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
             },
           }}
           containerStyle={{
-            bottom: 80,
+            top: 'calc(env(safe-area-inset-top) + 24px)',
           }}
         />
 

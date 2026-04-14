@@ -78,7 +78,7 @@ function MemberProfile() {
 
     return (
         <AppLayout>
-            <Toaster position="top-right" />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
             {/* Header */}
             <div className="mb-6">

@@ -216,7 +216,7 @@ const AllMembers = () => {
 
     return (
         <div>
-            <Toaster position="top-right" toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
+            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
 
             {/* Page Header */}
             <PageHeader
