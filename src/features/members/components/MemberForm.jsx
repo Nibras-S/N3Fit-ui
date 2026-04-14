@@ -545,8 +545,8 @@ function NewMember() {
                           key={g}
                           type="button"
                           onClick={() => setGender(g)}
-                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-zinc-900 dark:border-zinc-100 dark:bg-zinc-800/50 dark:text-white' :
-                            'border-gray-50 dark:border-zinc-800 text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800/30'
+                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-zinc-800/50' :
+                            'border-gray-50 dark:border-zinc-800 text-gray-400 hover:bg-gray-50'
                             }`}
                         >
                           {g}
