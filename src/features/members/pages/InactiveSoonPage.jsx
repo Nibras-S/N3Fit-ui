@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from '../../../shared/services/api';
-import { FaPhone, FaClock, FaUser, FaWhatsapp, FaCheck, FaExclamationTriangle, FaSync, FaSearch, FaUserSlash } from "react-icons/fa";
+import { FaPhone, FaClock, FaUser, FaWhatsapp, FaCheck, FaSync, FaSearch, FaUserSlash, FaSlidersH, FaTimes } from "react-icons/fa";
 import toast, { Toaster } from 'react-hot-toast';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 
 // Skeleton Components
@@ -47,6 +46,8 @@ const InactiveSoon = () => {
   const [daysFilter, setDaysFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isFilterSheetOpen, setIsFilterSheetOpen] = useState(false);
+  const activeFilterCount = (statusFilter !== "All" ? 1 : 0) + (daysFilter !== "All" ? 1 : 0) + (searchTerm ? 1 : 0);
   const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
   useEffect(() => {
@@ -127,6 +128,65 @@ Send payment screenshot to confirm. Stay fit! 💪`;
     return 'text-yellow-600 bg-yellow-50';
   };
 
+  const renderFilters = () => (
+    <div className="flex flex-col gap-4">
+      {/* Search */}
+      <div className="relative w-full">
+        <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search by name or phone..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
+            aria-label="Clear search"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+
+      {/* Status filter chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {["All", "Pending", "Sent"].map((filter) => (
+          <button
+            key={filter}
+            onClick={() => setStatusFilter(filter)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${statusFilter === filter
+              ? filter === "Pending" ? 'bg-orange-500 text-white shadow-sm'
+                : filter === "Sent" ? 'bg-green-500 text-white shadow-sm'
+                  : 'bg-zinc-900 text-white shadow-sm'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+          >
+            {filter}
+          </button>
+        ))}
+      </div>
+
+      {/* Days filter chips */}
+      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+        {["All", "4", "3", "2", "1", "0"].map((day) => (
+          <button
+            key={day}
+            onClick={() => setDaysFilter(day)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${daysFilter === day
+              ? 'bg-zinc-900 text-white shadow-sm'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+          >
+            {day === "All" ? "All Days" : `${day} Day${day !== '1' ? 's' : ''}`}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <AppLayout showGenderSwitch={false}>
       <div className="space-y-6">
@@ -145,86 +205,103 @@ Send payment screenshot to confirm. Stay fit! 💪`;
           }}
         />
 
-        {/* Page Header */}
-        <PageHeader
-          title="Expiring Soon"
-          stats={[
-            { label: 'Pending', value: loading ? '...' : pendingCount, icon: FaExclamationTriangle },
-            { label: 'Sent', value: loading ? '...' : sentCount, icon: FaCheck }
-          ]}
-          action={
+        {/* Inline header — title + actions on a single row even on mobile */}
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white tracking-tight truncate min-w-0">
+            Expiring Soon
+          </h1>
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={fetchData}
               className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
               disabled={loading}
               title="Refresh"
+              aria-label="Refresh"
             >
               <FaSync className={loading ? 'animate-spin' : ''} />
             </button>
-          }
-        />
-
-        {/* Toolbar */}
-        <div className="bg-white p-4 rounded-xl border border-gray-200 mb-6 shadow-sm">
-          <div className="flex flex-col gap-4">
-            {/* Search */}
-            <div className="relative w-full">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search by name or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all text-sm"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
-                >
-                  ✕
-                </button>
+            <button
+              onClick={() => setIsFilterSheetOpen(true)}
+              className="lg:hidden relative p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+              title="Filters"
+              aria-label="Open filters"
+            >
+              <FaSlidersH />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-zinc-900 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
               )}
-            </div>
-
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-              <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar w-full sm:w-auto">
-                {["All", "Pending", "Sent"].map((filter) => (
-                  <button
-                    key={filter}
-                    onClick={() => setStatusFilter(filter)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${statusFilter === filter
-                      ? filter === "Pending" ? 'bg-orange-500 text-white shadow-sm'
-                        : filter === "Sent" ? 'bg-green-500 text-white shadow-sm'
-                          : 'bg-zinc-900 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    {filter}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar w-full sm:w-auto">
-                {["All", "4", "3", "2", "1", "0"].map((day) => (
-                  <button
-                    key={day}
-                    onClick={() => setDaysFilter(day)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${daysFilter === day
-                      ? 'bg-zinc-900 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
-                  >
-                    {day === "All" ? "All Days" : `${day} Day${day !== '1' ? 's' : ''}`}
-                  </button>
-                ))}
-              </div>
-            </div>
+            </button>
           </div>
         </div>
 
+        {/* Stats line — kept from the old PageHeader stats prop */}
+        <div className="hidden lg:flex items-center gap-4 -mt-2">
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <FaSync className="text-gray-400" />
+            <span>Pending:</span>
+            <span className="font-semibold text-gray-900">{loading ? '...' : pendingCount}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+            <FaCheck className="text-gray-400" />
+            <span>Sent:</span>
+            <span className="font-semibold text-gray-900">{loading ? '...' : sentCount}</span>
+          </div>
+        </div>
 
+        {/* Toolbar — inline on desktop, hidden on mobile (mobile uses the bottom sheet) */}
+        <div className="hidden lg:block bg-white p-4 rounded-xl border border-gray-200 mb-6 shadow-sm">
+          {renderFilters()}
+        </div>
+
+        {/* Mobile filter bottom sheet */}
+        {isFilterSheetOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 flex items-end justify-center">
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
+              onClick={() => setIsFilterSheetOpen(false)}
+            />
+            <div className="relative w-full bg-white dark:bg-zinc-900 rounded-t-3xl shadow-2xl border-t border-gray-100 dark:border-zinc-800 max-h-[85vh] flex flex-col animate-sheet-up">
+              <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800 shrink-0">
+                <div className="flex items-center gap-2">
+                  <FaSlidersH className="text-zinc-700" />
+                  <h2 className="font-bold text-gray-900 dark:text-white text-lg">Filters</h2>
+                </div>
+                <button
+                  onClick={() => setIsFilterSheetOpen(false)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+                  aria-label="Close filters"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+              <div className="p-5 flex-1 overflow-y-auto custom-scrollbar" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}>
+                {renderFilters()}
+                <div className="flex gap-3 pt-5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStatusFilter('All');
+                      setDaysFilter('All');
+                      setSearchTerm('');
+                    }}
+                    className="flex-1 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-gray-300 text-sm font-medium hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsFilterSheetOpen(false)}
+                    className="flex-1 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Cards */}
         {loading ? (

@@ -666,10 +666,10 @@ const Settings = () => {
 
                 {(user?.role === 'gymadmin' || user?.role === 'staff') && activeTab === 'billing' && (
                     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
-                        <div className="p-4 sm:p-6 border-b border-gray-50 dark:border-zinc-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-gray-50/50 dark:bg-zinc-800/30">
-                            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                <FaMoneyBillWave className="text-green-500" />
-                                Plan Management
+                        <div className="p-4 sm:p-6 border-b border-gray-50 dark:border-zinc-800 flex flex-row justify-between items-center gap-3 bg-gray-50/50 dark:bg-zinc-800/30">
+                            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2 min-w-0">
+                                <FaMoneyBillWave className="text-green-500 shrink-0" />
+                                <span className="truncate">Plan Management</span>
                             </h2>
                             <div className="flex items-center gap-2 flex-wrap">
                                 {isEditingPricing && (

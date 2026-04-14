@@ -194,6 +194,17 @@ function NewMember() {
     setIsCameraModalOpen(false);
   };
 
+  // After Retake, the <video> element is freshly mounted and its srcObject is
+  // null even though the stream is still alive in streamRef. Reattach so the
+  // live preview comes back instead of a frozen black frame.
+  useEffect(() => {
+    if (isCameraModalOpen && !tempCapturedImage && streamRef.current && modalVideoRef.current) {
+      if (modalVideoRef.current.srcObject !== streamRef.current) {
+        modalVideoRef.current.srcObject = streamRef.current;
+      }
+    }
+  }, [isCameraModalOpen, tempCapturedImage]);
+
   const captureFrame = () => {
     const video = modalVideoRef.current;
     const canvas = modalCanvasRef.current;

@@ -68,6 +68,36 @@ body {
   }
 }
 
+/* Safari (esp. iOS) renders form-field text in the *system* color when the
+   site hasn't set one explicitly — this produces white-on-white on pages
+   rendered in light mode while the user's OS is in dark mode. Force a sane
+   default so individual inputs don't need to repeat text-gray-900 everywhere.
+   Feature-level Tailwind classes (text-white, text-gray-200, etc.) still win
+   because they have higher specificity on the element itself. */
+input,
+textarea,
+select {
+  color: #111827; /* tailwind gray-900 */
+  -webkit-text-fill-color: #111827;
+}
+input::placeholder,
+textarea::placeholder {
+  color: #9ca3af; /* tailwind gray-400 */
+  -webkit-text-fill-color: #9ca3af;
+  opacity: 1;
+}
+.dark input,
+.dark textarea,
+.dark select {
+  color: #f4f4f5; /* tailwind zinc-100 */
+  -webkit-text-fill-color: #f4f4f5;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #71717a; /* tailwind zinc-500 */
+  -webkit-text-fill-color: #71717a;
+}
+
 /* Hide scrollbar utility — cross-browser */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;

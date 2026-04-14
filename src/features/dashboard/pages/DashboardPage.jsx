@@ -41,7 +41,7 @@ const Dashboard = () => {
     if (loading) {
         return (
             <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
-                <div className="space-y-6 pb-10">
+                <div className="space-y-6 lg:pb-10">
                     <div className="h-36 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-[#2a2a2a] dark:to-[#1c1c1c] animate-pulse rounded-2xl w-full" />
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[1, 2, 3, 4].map(i => (
@@ -66,7 +66,7 @@ const Dashboard = () => {
 
     return (
         <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
-            <div className="space-y-6 pb-10">
+            <div className="space-y-6 lg:pb-10">
 
                 {/* ── Daily Report ──────────────────────────────────────── */}
                 <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm">

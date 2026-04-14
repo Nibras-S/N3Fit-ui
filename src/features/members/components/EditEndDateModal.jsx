@@ -71,16 +71,16 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4">
             {/* Backdrop */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-sm"
                 onClick={handleClose}
             />
 
-            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800">
+            <div className="relative w-full max-w-md bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl shadow-xl border border-gray-100 dark:border-zinc-800 max-h-[92vh] sm:max-h-[90vh] flex flex-col animate-sheet-up sm:animate-modal-in">
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
+                <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800 shrink-0">
                     <div className="flex items-center gap-2">
                         <FaCalendarAlt className="text-zinc-900" />
                         <h2 className="font-bold text-gray-900 dark:text-white text-lg">
@@ -95,7 +95,7 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-5 space-y-5">
+                <form onSubmit={handleSubmit} className="p-5 space-y-5 flex-1 overflow-y-auto custom-scrollbar" style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1.25rem)' }}>
                     {/* Current info */}
                     <div className="bg-gray-50 dark:bg-zinc-800/50 rounded-xl p-4 space-y-2 text-sm">
                         <div className="flex justify-between">

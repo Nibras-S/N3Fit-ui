@@ -675,7 +675,7 @@ export function AppLayout({
         {/* Mobile Menu Overlay */}
         {mobileMenuOpen && (
           <div
-            className="lg:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm animate-fade-in"
+            className="lg:hidden fixed inset-0 z-50 bg-black/30 backdrop-blur-sm animate-fade-in"
             onClick={() => setMobileMenuOpen(false)}
           >
             <div
@@ -819,7 +819,7 @@ export function AppLayout({
 
         <div
           key={location.pathname}
-          className="flex-1 p-4 md:p-6 pb-28 lg:pb-6 animate-page-in"
+          className="flex-1 p-4 md:p-6 pb-24 lg:pb-6 animate-page-in"
         >
           {children}
         </div>
