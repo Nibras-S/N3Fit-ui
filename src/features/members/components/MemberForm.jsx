@@ -398,7 +398,7 @@ function NewMember() {
     return (
       <div
         className="lg:hidden fixed left-0 right-0 z-30 bg-white dark:bg-zinc-900 border-t border-gray-100 dark:border-zinc-800 px-4 pt-2 pb-1.5 flex items-center gap-3"
-        style={{ bottom: 'calc(68px + env(safe-area-inset-bottom))' }}
+        style={{ bottom: 'calc(54px + max(0.125rem, calc(env(safe-area-inset-bottom) - 1.5rem)))' }}
       >
         <div className="flex-1 flex justify-start">{left}</div>
         <div className="shrink-0">{renderStepDots()}</div>
