@@ -761,28 +761,60 @@ const Settings = () => {
 
                             <div className="space-y-3">
                                 {(settings.plans || []).map((plan, index) => (
-                                    <div key={index} className={`p-4 rounded-xl border flex items-center justify-between group transition-all ${plan.isDefault ? 'bg-gray-50 dark:bg-zinc-800/30 border-gray-100 dark:border-zinc-700' : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200 dark:border-zinc-700/30'}`}>
-                                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                                    <div key={index} className={`p-3 sm:p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 group transition-all ${plan.isDefault ? 'bg-gray-50 dark:bg-zinc-800/30 border-gray-100 dark:border-zinc-700' : 'bg-zinc-50/50 dark:bg-zinc-800/30 border-zinc-200 dark:border-zinc-700/30'}`}>
+                                        <div className="flex-1 w-full min-w-0">
                                             {isEditingPricing ? (
-                                                <>
-                                                    {plan.isDefault ? (
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-semibold text-gray-900 dark:text-white text-sm">{plan.name}</span>
-                                                            <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>
+                                                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center gap-3">
+                                                    {/* Header row: name + mobile-only inline actions */}
+                                                    <div className="flex items-center gap-2 sm:contents">
+                                                        {plan.isDefault ? (
+                                                            <div className="flex items-center gap-2 flex-1 sm:flex-none min-w-0">
+                                                                <span className="font-semibold text-gray-900 dark:text-white text-sm truncate">{plan.name}</span>
+                                                                <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded shrink-0">Default</span>
+                                                            </div>
+                                                        ) : (
+                                                            <input
+                                                                type="text"
+                                                                value={plan.name}
+                                                                onChange={(e) => {
+                                                                    const newPlans = [...settings.plans];
+                                                                    newPlans[index].name = e.target.value;
+                                                                    setSettings({ ...settings, plans: newPlans });
+                                                                }}
+                                                                className="flex-1 sm:flex-none min-w-0 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
+                                                                placeholder="Plan Name"
+                                                            />
+                                                        )}
+                                                        {/* Mobile-only inline actions */}
+                                                        <div className="flex items-center gap-2 sm:hidden shrink-0">
+                                                            <span className={`text-[10px] font-bold uppercase tracking-wider ${plan.isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                                                                {plan.isActive ? 'Active' : 'Inactive'}
+                                                            </span>
+                                                            <button
+                                                                onClick={() => {
+                                                                    const newPlans = [...settings.plans];
+                                                                    newPlans[index].isActive = !newPlans[index].isActive;
+                                                                    setSettings({ ...settings, plans: newPlans });
+                                                                }}
+                                                                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${plan.isActive ? 'bg-green-500' : 'bg-gray-300 dark:bg-zinc-700'}`}
+                                                            >
+                                                                <span className="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform" style={{ transform: plan.isActive ? 'translateX(18px)' : 'translateX(2px)' }} />
+                                                            </button>
+                                                            {!plan.isDefault && (
+                                                                <button
+                                                                    onClick={() => {
+                                                                        const newPlans = settings.plans.filter((_, i) => i !== index);
+                                                                        setSettings({ ...settings, plans: newPlans });
+                                                                    }}
+                                                                    className="text-zinc-400 hover:text-zinc-700 p-1"
+                                                                >
+                                                                    <span className="text-xl leading-none">&times;</span>
+                                                                </button>
+                                                            )}
                                                         </div>
-                                                    ) : (
-                                                        <input
-                                                            type="text"
-                                                            value={plan.name}
-                                                            onChange={(e) => {
-                                                                const newPlans = [...settings.plans];
-                                                                newPlans[index].name = e.target.value;
-                                                                setSettings({ ...settings, plans: newPlans });
-                                                            }}
-                                                            className="bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded px-2 py-1 text-sm font-medium text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
-                                                            placeholder="Plan Name"
-                                                        />
-                                                    )}
+                                                    </div>
+
+                                                    {/* Duration controls */}
                                                     {plan.isDefault ? (
                                                         <span className="text-xs text-gray-500">{plan.duration} {plan.durationType === 'days' ? (plan.duration > 1 ? 'Days' : 'Day') : plan.durationType === 'weeks' ? (plan.duration > 1 ? 'Weeks' : 'Week') : (plan.duration > 1 ? 'Months' : 'Month')}</span>
                                                     ) : (
@@ -812,6 +844,8 @@ const Settings = () => {
                                                             </select>
                                                         </div>
                                                     )}
+
+                                                    {/* Price input */}
                                                     <div className="relative">
                                                         <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">₹</span>
                                                         <input
@@ -825,21 +859,28 @@ const Settings = () => {
                                                             className="w-full pl-5 pr-2 py-1 bg-white dark:bg-zinc-900 border border-gray-200 dark:border-zinc-700 rounded text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500 outline-none"
                                                         />
                                                     </div>
-                                                </>
+                                                </div>
                                             ) : (
-                                                <>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-semibold text-gray-900 dark:text-white text-sm">{plan.name}</span>
-                                                        {plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded">Default</span>}
-                                                        {!plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 px-1.5 py-0.5 rounded">Custom</span>}
+                                                <div className="flex flex-col sm:grid sm:grid-cols-3 sm:gap-4 sm:items-center gap-1">
+                                                    <div className="flex items-center gap-2 sm:contents">
+                                                        <div className="flex items-center gap-2 flex-1 sm:flex-none min-w-0">
+                                                            <span className="font-semibold text-gray-900 dark:text-white text-sm truncate">{plan.name}</span>
+                                                            {plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-300 px-1.5 py-0.5 rounded shrink-0">Default</span>}
+                                                            {!plan.isDefault && <span className="text-[9px] font-bold uppercase tracking-wider bg-zinc-100 dark:bg-zinc-700/50 text-zinc-700 px-1.5 py-0.5 rounded shrink-0">Custom</span>}
+                                                        </div>
+                                                        {/* Mobile-only ACTIVE/INACTIVE indicator */}
+                                                        <span className={`sm:hidden text-[10px] font-bold uppercase tracking-wider shrink-0 ${plan.isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                                                            {plan.isActive ? 'Active' : 'Inactive'}
+                                                        </span>
                                                     </div>
                                                     <span className="text-xs text-gray-500">{plan.duration} {plan.durationType === 'days' ? (plan.duration > 1 ? 'Days' : 'Day') : plan.durationType === 'weeks' ? (plan.duration > 1 ? 'Weeks' : 'Week') : (plan.duration > 1 ? 'Months' : 'Month')}</span>
                                                     <span className="font-bold text-gray-900 dark:text-white text-sm">₹{plan.price.toLocaleString('en-IN')}</span>
-                                                </>
+                                                </div>
                                             )}
                                         </div>
 
-                                        <div className="flex items-center gap-4 ml-4">
+                                        {/* Desktop-only side action block */}
+                                        <div className="hidden sm:flex items-center gap-4 sm:ml-4">
                                             <div className="flex items-center gap-2">
                                                 <span className={`text-[10px] font-bold uppercase tracking-wider ${plan.isActive ? 'text-green-600' : 'text-gray-400'}`}>
                                                     {plan.isActive ? 'Active' : 'Inactive'}
