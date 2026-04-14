@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../auth/context/AuthContext';
 import { FaPrint, FaArrowLeft } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
@@ -25,6 +25,11 @@ const METHOD_COLOR = {
 const Invoice = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
+    const handleBack = () => {
+        if (location.key === 'default') navigate('/transactions');
+        else navigate(-1);
+    };
     const { api } = useAuth();
     const [transaction, setTransaction] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -89,13 +94,16 @@ const Invoice = () => {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 p-3 sm:p-6 md:p-8 print:bg-white print:p-0">
+        <div
+            className="min-h-screen bg-gray-50 px-3 pb-3 sm:px-6 sm:pb-6 md:px-8 md:pb-8 print:bg-white print:p-0"
+            style={{ paddingTop: 'calc(env(safe-area-inset-top) + 0.75rem)' }}
+        >
             <Toaster position="top-right" />
 
             {/* Toolbar */}
             <div className="max-w-2xl mx-auto mb-4 flex justify-between items-center print:hidden">
                 <button
-                    onClick={() => navigate(-1)}
+                    onClick={handleBack}
                     className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors text-sm"
                 >
                     <FaArrowLeft /> Back
