@@ -892,9 +892,6 @@ export function AppLayout({
           ))}
         </div>
       </nav>
-
-      {/* Spacer for mobile bottom nav */}
-      <div className="lg:hidden h-[72px] shrink-0" aria-hidden="true" />
     </div>
   );
 }
