@@ -666,12 +666,12 @@ const Settings = () => {
 
                 {(user?.role === 'gymadmin' || user?.role === 'staff') && activeTab === 'billing' && (
                     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors">
-                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
+                        <div className="p-4 sm:p-6 border-b border-gray-50 dark:border-zinc-800 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-gray-50/50 dark:bg-zinc-800/30">
                             <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
                                 <FaMoneyBillWave className="text-green-500" />
                                 Plan Management
                             </h2>
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                                 {isEditingPricing && (
                                     <button
                                         onClick={saveSettings}
@@ -705,9 +705,9 @@ const Settings = () => {
                             </div>
                         </div>
 
-                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800">
+                        <div className="p-4 sm:p-6 border-b border-gray-50 dark:border-zinc-800">
                             <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                <FaCheckCircle className="text-zinc-700" />
+                                <FaCheckCircle className="text-zinc-700 dark:text-zinc-300" />
                                 Admission Fee
                             </h3>
                             <div className="bg-gray-50 dark:bg-zinc-800/50 p-4 rounded-xl border border-gray-100 dark:border-zinc-700 transition-all hover:shadow-sm">
@@ -736,10 +736,10 @@ const Settings = () => {
 
 
 
-                        <div className="p-6">
-                            <div className="flex justify-between items-center mb-4">
+                        <div className="p-4 sm:p-6">
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-4">
                                 <h3 className="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
-                                    <FaCalendarAlt className="text-purple-500" />
+                                    <FaCalendarAlt className="text-zinc-700 dark:text-zinc-300" />
                                     Membership Plans
                                 </h3>
                                 {isEditingPricing && (
@@ -752,7 +752,7 @@ const Settings = () => {
                                                 plans: [...(prev.plans || []), newPlan]
                                             }));
                                         }}
-                                        className="text-xs bg-purple-600 text-white px-4 py-2 rounded-xl hover:bg-purple-700 flex items-center gap-1.5 font-semibold shadow-md shadow-purple-500/20 transition-all"
+                                        className="text-xs bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 px-4 py-2 rounded-xl hover:bg-zinc-800 dark:hover:bg-zinc-100 flex items-center gap-1.5 font-semibold shadow-md shadow-zinc-900/20 transition-all self-start sm:self-auto"
                                     >
                                         <FaCrown size={10} /> Add Custom Plan
                                     </button>
