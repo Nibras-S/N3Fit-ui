@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../../../shared/services/api';
+import { queryClient, PERSIST_KEY } from '../../../shared/lib/queryClient';
 
 const AuthContext = createContext(null);
 
@@ -193,6 +194,15 @@ export const AuthProvider = ({ children }) => {
         }
         setUser(null);
         writeAuthHint(null);
+        // Wipe TQ cache (in-memory + persisted) so the next user on this
+        // browser never sees the previous tenant's data hydrated from
+        // localStorage. Must stay in sync with PERSIST_KEY in queryClient.js.
+        try {
+            queryClient.clear();
+            if (typeof window !== 'undefined') {
+                window.localStorage.removeItem(PERSIST_KEY);
+            }
+        } catch (_) { /* storage disabled — nothing to clean */ }
     }, []);
 
     /**
