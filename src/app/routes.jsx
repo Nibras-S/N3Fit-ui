@@ -24,6 +24,7 @@ const MembersPage = lazy(() => import('../features/members/pages/MembersPage'));
 const MemberProfilePage = lazy(() => import('../features/members/pages/MemberProfilePage'));
 const RegisterMemberPage = lazy(() => import('../features/members/pages/RegisterMemberPage'));
 const InactiveSoonPage = lazy(() => import('../features/members/pages/InactiveSoonPage'));
+const BirthdaysPage = lazy(() => import('../features/members/pages/BirthdaysPage'));
 const MembershipCardPage = lazy(() => import('../features/members/pages/MembershipCardPage'));
 
 // Dashboard & Analytics
@@ -84,6 +85,7 @@ export default function AppRoutes() {
                     <Route path="/members/:id/card" element={<MembershipCardPage />} />
                     <Route path="/register" element={<RegisterMemberPage />} />
                     <Route path="/inactivesoon" element={<InactiveSoonPage />} />
+                    <Route path="/birthdays" element={<BirthdaysPage />} />
                     <Route path="/invoice/:id" element={<InvoicePage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     {/* Legacy redirects */}

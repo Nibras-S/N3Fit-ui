@@ -15,6 +15,7 @@ export const memberKeys = {
     detail: (id) => [...memberKeys.details(), id],
     detailTransactions: (id) => [...memberKeys.detail(id), 'transactions'],
     detailAudit: (id) => [...memberKeys.detail(id), 'audit'],
+    birthdays: () => [...memberKeys.all, 'birthdays'],
 };
 
 // ── Queries ────────────────────────────────────────────────────────────────
@@ -89,6 +90,18 @@ export function useMemberAudit(id) {
             return Array.isArray(res.data) ? res.data : [];
         },
         enabled: Boolean(id),
+    });
+}
+
+// All members with dob set, sorted by nearest upcoming birthday.
+// Nests under ['members'] so RealtimeSync's member:* invalidation covers it.
+export function useBirthdays() {
+    return useQuery({
+        queryKey: memberKeys.birthdays(),
+        queryFn: async () => {
+            const res = await api.get('/contacts/birthdays');
+            return Array.isArray(res.data) ? res.data : [];
+        },
     });
 }
 

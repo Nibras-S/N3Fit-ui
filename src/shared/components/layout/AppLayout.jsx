@@ -30,6 +30,7 @@ import {
   FaBars,
   FaExchangeAlt,
   FaInbox,
+  FaBirthdayCake,
 } from "react-icons/fa";
 import ConfirmModal from "../feedback/ConfirmModal";
 import InstallPWA from "../pwa/InstallPWA";
@@ -187,6 +188,7 @@ export function AppLayout({
       roles: ["gymadmin", "staff"],
     },
     { path: "/register", label: "New Member", icon: FaUserPlus, roles: ["gymadmin", "staff"] },
+    { path: "/birthdays", label: "Birthdays", icon: FaBirthdayCake, roles: ["gymadmin", "staff"] },
     { path: "/expenses", label: "Expenses", icon: FaWallet, feature: "expenses", roles: ["gymadmin", "staff"], permission: "expenses" },
     { path: "/transactions", label: "Transactions", icon: FaExchangeAlt, roles: ["gymadmin", "staff"], permission: "payments" },
     { path: "/reports", label: "Reports", icon: FaChartLine, roles: ["gymadmin", "staff", "superadmin"], permission: "reports" },
