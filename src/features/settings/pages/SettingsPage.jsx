@@ -11,6 +11,7 @@ import {
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import { FormSkeleton } from '../../../shared/components/ui/Skeleton';
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../shared/context/ThemeContext';
 import { useAuth } from '../../auth/context/AuthContext';
 
@@ -37,11 +38,13 @@ const Settings = () => {
     const [uploadingLogo, setUploadingLogo] = useState(false);
     const { theme, toggleTheme } = useTheme();
     const { user, logout, refreshUser } = useAuth();
+    const queryClient = useQueryClient();
     const fileInputRef = React.useRef(null);
 
     const [isEditingPricing, setIsEditingPricing] = useState(false);
     const [isEditingBranding, setIsEditingBranding] = useState(false);
     const [isEditingProfile, setIsEditingProfile] = useState(false);
+    const [isEditingMembers, setIsEditingMembers] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [activeTab, setActiveTab] = useState('main');
     const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -58,6 +61,7 @@ const Settings = () => {
         },
         defaultPaymentMethod: "Cash",
         admissionFee: 0,
+        archiveAfterDays: 90,
         plans: [] // New plans array
     });
 
@@ -119,6 +123,7 @@ const Settings = () => {
             const payload = {
                 ...settings,
                 admissionFee: settings.admissionFee === '' ? 0 : Number(settings.admissionFee),
+                archiveAfterDays: settings.archiveAfterDays === '' ? 90 : Number(settings.archiveAfterDays),
                 plans: settings.plans.map(p => ({
                     ...p,
                     duration: p.duration === '' ? 0 : Number(p.duration),
@@ -247,6 +252,7 @@ const Settings = () => {
                                 setIsEditingBranding(false);
                                 setIsEditingPricing(false);
                                 setIsEditingProfile(false);
+                                setIsEditingMembers(false);
                             }}
                             className="flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-zinc-900 transition-colors"
                         >
@@ -298,6 +304,18 @@ const Settings = () => {
                                 onClick={() => setActiveTab('billing')}
                             />
                             <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
+
+                            {user?.role === 'gymadmin' && (
+                                <>
+                                    <SettingItem
+                                        icon={<FaUsers />}
+                                        title="Member Settings"
+                                        subtitle="Archive rules and member defaults"
+                                        onClick={() => setActiveTab('members')}
+                                    />
+                                    <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
+                                </>
+                            )}
 
                             <SettingItem
                                 icon={<FaSun />}
@@ -917,6 +935,85 @@ const Settings = () => {
                                         No plans configured. Click "Edit" and then "Add Custom Plan" to create one.
                                     </div>
                                 )}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {user?.role === 'gymadmin' && activeTab === 'members' && (
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden transition-colors animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="p-6 border-b border-gray-50 dark:border-zinc-800 flex justify-between items-center bg-gray-50/50 dark:bg-zinc-800/30">
+                            <h2 className="font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                                <FaUsers className="text-zinc-700" />
+                                Member Settings
+                            </h2>
+                            {!isEditingMembers ? (
+                                <button
+                                    onClick={() => setIsEditingMembers(true)}
+                                    className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors bg-white dark:bg-zinc-700 px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-600"
+                                >
+                                    Edit
+                                </button>
+                            ) : (
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => { setIsEditingMembers(false); fetchAllData(); }}
+                                        className="text-xs font-semibold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white transition-colors px-3 py-1.5 rounded-lg border border-gray-200 dark:border-zinc-600"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                setSaving(true);
+                                                await api.put('/settings', {
+                                                    archiveAfterDays: Number(settings.archiveAfterDays) || 90,
+                                                });
+                                                toast.success('Member settings saved!');
+                                                setIsEditingMembers(false);
+                                                queryClient.invalidateQueries({ queryKey: ['members'] });
+                                            } catch (err) {
+                                                toast.error('Failed to save member settings');
+                                            } finally {
+                                                setSaving(false);
+                                            }
+                                        }}
+                                        disabled={saving}
+                                        className="text-xs font-semibold text-white bg-zinc-900 dark:bg-white dark:text-zinc-900 px-3 py-1.5 rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-200 transition-colors flex items-center gap-1.5"
+                                    >
+                                        {saving ? <ButtonSpinner /> : <FaSave size={10} />}
+                                        Save
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Archive After Days */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                                    Archive expired members after
+                                </label>
+                                {isEditingMembers ? (
+                                    <div className="flex items-center gap-3">
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            max="365"
+                                            value={settings.archiveAfterDays}
+                                            onChange={(e) => setSettings(prev => ({ ...prev, archiveAfterDays: e.target.value }))}
+                                            className="w-24 px-3 py-2 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-900 dark:focus:border-zinc-500 outline-none transition-all"
+                                        />
+                                        <span className="text-sm text-gray-500 dark:text-gray-400">days after expiry</span>
+                                    </div>
+                                ) : (
+                                    <div className="px-4 py-2.5 bg-gray-50 dark:bg-zinc-800/30 rounded-lg text-sm text-gray-900 dark:text-white font-medium">
+                                        {settings.archiveAfterDays} days
+                                    </div>
+                                )}
+                                <p className="mt-1.5 text-xs text-gray-400 dark:text-zinc-500">
+                                    Members whose membership expired more than {settings.archiveAfterDays} days ago will be moved to the Archived section. Range: 1–365 days.
+                                </p>
                             </div>
                         </div>
                     </div>
