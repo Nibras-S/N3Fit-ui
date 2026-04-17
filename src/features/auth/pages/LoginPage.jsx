@@ -65,13 +65,12 @@ function AdminAuth() {
       <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
       {/* Left Panel — Branding */}
-      <div className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-gradient-to-br from-slate-900 via-zinc-800 to-zinc-700">
-        {/* Animated Background Orbs */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-zinc-900 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-20 w-72 h-72 bg-zinc-900 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-          <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-zinc-600 rounded-full mix-blend-multiply filter blur-3xl animate-pulse" style={{ animationDelay: '4s' }}></div>
-        </div>
+      <div
+        className="hidden lg:flex lg:w-[45%] relative overflow-hidden bg-cover bg-center"
+        style={{ backgroundImage: "url('/assets/gymbg.jpg')" }}
+      >
+        {/* Dark Overlay for Readability */}
+        <div className="absolute inset-0 bg-zinc-900/70 z-0"></div>
 
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           {/* Logo */}

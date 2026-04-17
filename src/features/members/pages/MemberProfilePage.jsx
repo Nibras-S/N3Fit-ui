@@ -214,7 +214,7 @@ function MemberProfile() {
                                     <div>
                                         <span className="text-gray-500 dark:text-gray-400">Joined On:</span>
                                         <span className="ml-2 text-gray-900 dark:text-white font-medium">
-                                            {member.createdAt ? new Date(member.createdAt).toLocaleDateString() : '-'}
+                                            {(member.joinedDate || member.createdAt) ? new Date(member.joinedDate || member.createdAt).toLocaleDateString() : '-'}
                                         </span>
                                     </div>
                                     <div>

@@ -20,7 +20,7 @@ const AllMembers = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [genderFilter, setGenderFilter] = useState('all');
-    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'dews', direction: 'asc' });
 
     // Pagination State
     const [page, setPage] = useState(1);

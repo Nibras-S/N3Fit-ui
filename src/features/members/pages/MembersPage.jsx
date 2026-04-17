@@ -21,7 +21,7 @@ import {
     FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaSync,
     FaUserCheck, FaUserTimes, FaExclamationTriangle, FaWhatsapp,
     FaFileImport, FaUserPlus, FaRedo, FaTimesCircle, FaColumns,
-    FaFileExport, FaCheck, FaFilter, FaPlus
+    FaFileExport, FaCheck, FaFilter, FaPlus, FaArchive
 } from 'react-icons/fa';
 
 // Columns the user can toggle on/off via the column chooser. The Name column
@@ -34,21 +34,21 @@ const TOGGLEABLE_COLUMNS = [
     { key: 'status', label: 'Status' },
     { key: 'dews', label: 'Days Left' },
     { key: 'endDate', label: 'End Date' },
-    { key: 'createdAt', label: 'Joined On' },
+    { key: 'joinedDate', label: 'Joined On' },
     { key: 'msgCount', label: 'Messages Sent' },
 ];
 
-// Sensible defaults — what shows out of the box. Start Date is intentionally
-// excluded: after a renewal the backend overwrites `member.date` with the new
-// renewal start, so the column was misleading users into thinking it was the
-// original join date. Use the "Joined On" column (createdAt) for that.
+// Sensible defaults — what shows out of the box. "Joined On" uses the
+// dedicated `joinedDate` field (set once at creation, never overwritten
+// by renewals). Falls back to createdAt for members created before the field.
 const DEFAULT_VISIBLE_COLUMNS = ['phone', 'status', 'dews', 'endDate'];
 
 const COLUMN_PREF_KEY = 'n3fit:members:visibleColumns';
 
-const TAB_CONFIG = [
+const BASE_TABS = [
     { key: 'active', label: 'Active Members', icon: FaUserCheck, status: 'Active' },
     { key: 'inactive', label: 'Expired Members', icon: FaUserTimes, status: 'InActive' },
+    { key: 'archived', label: 'Archived', icon: FaArchive, status: 'InActive', onlyExpired: true },
     { key: 'all', label: 'All Members', icon: FaUsers, status: 'all' },
 ];
 
@@ -56,6 +56,11 @@ const MembersPage = () => {
     const { hasFeature } = useAuth();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
+
+    // Build tabs dynamically — "Archived" only shows when archiveExpired feature is on
+    const TAB_CONFIG = useMemo(() =>
+        BASE_TABS.filter(t => t.key !== 'archived' || hasFeature('archiveExpired')),
+    [hasFeature]);
 
     // ── Tab state from URL ──────────────────────────────────────
     const activeTab = searchParams.get('tab') || 'active';
@@ -77,7 +82,7 @@ const MembersPage = () => {
     // Default sort matches the per-tab reset below so first load and post-tab-
     // switch behave the same. Previously these two defaults disagreed and the
     // list silently re-sorted the moment you touched a tab.
-    const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+    const [sortConfig, setSortConfig] = useState({ key: 'dews', direction: 'asc' });
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
 
@@ -138,19 +143,11 @@ const MembersPage = () => {
         setSearchTerm('');
         setDebouncedSearch('');
         setGenderFilter('all');
-        setSortConfig({ key: 'createdAt', direction: 'desc' });
+        setSortConfig({ key: 'dews', direction: 'asc' });
         setPage(1);
     }, [activeTab]);
 
-    useEffect(() => {
-        setPage(1);
-    }, [genderFilter, sortConfig, limit]);
-
-    // ── Fetch members via TanStack Query ────────────────────────
-    // Filters are memoized so the query key stays stable between renders.
-    // Cache invalidation on member:* socket events is handled app-wide by
-    // RealtimeSync (app/RealtimeSync.jsx) — no per-page socket subscription
-    // needed here.
+    // ── Build query filters for TanStack Query ───────────────────
     const membersFilters = useMemo(() => {
         const tabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
         const params = {
@@ -163,8 +160,14 @@ const MembersPage = () => {
             sortOrder: sortConfig.direction,
         };
         if (tabCfg.key === 'all') params.includeExpired = true;
+        if (tabCfg.onlyExpired) params.onlyExpired = true;
+        // When archiveExpired is off, show all expired (including 90-day archived)
+        // in the "Expired Members" tab instead of hiding them
+        if (tabCfg.key === 'inactive' && !hasFeature('archiveExpired')) {
+            params.includeExpired = true;
+        }
         return params;
-    }, [page, limit, debouncedSearch, genderFilter, sortConfig, activeTab]);
+    }, [TAB_CONFIG, activeTab, page, limit, debouncedSearch, genderFilter, sortConfig, hasFeature]);
 
     const membersQuery = useMembers(membersFilters);
     const members = membersQuery.data?.items ?? [];
@@ -197,8 +200,15 @@ const MembersPage = () => {
     const pendingCount = pendingRemindersQuery.data ?? 0;
 
     // ── Global member counts (tab-independent, for stats row) ───
-    const activeTabStatus = (TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0]).status;
-    const statsQuery = useMembersStats(activeTabStatus);
+    const activeTabCfg = TAB_CONFIG.find(t => t.key === activeTab) || TAB_CONFIG[0];
+    const statsFilters = useMemo(() => {
+        const p = { status: activeTabCfg.status };
+        if (activeTabCfg.key === 'all') p.includeExpired = true;
+        if (activeTabCfg.onlyExpired) p.onlyExpired = true;
+        if (activeTabCfg.key === 'inactive' && !hasFeature('archiveExpired')) p.includeExpired = true;
+        return p;
+    }, [activeTabCfg, hasFeature]);
+    const statsQuery = useMembersStats(statsFilters);
     const allStats = statsQuery.data ?? { total: 0, male: 0, female: 0 };
 
     // ── Sort ────────────────────────────────────────────────────
@@ -333,7 +343,7 @@ const MembersPage = () => {
                 escape(m.dews),
                 escape(formatDate(m.date)),
                 escape(formatDate(m.endDate)),
-                escape(formatDate(m.createdAt)),
+                escape(formatDate(m.joinedDate || m.createdAt)),
                 escape(m.amount ?? ''),
                 escape(m.discount ?? ''),
                 escape(m.paymentMethod ?? ''),
@@ -389,7 +399,7 @@ const MembersPage = () => {
             render: (row) => <span className={row.dews <= 0 ? 'text-zinc-700 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>,
         },
         endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
-        createdAt: { key: 'createdAt', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.createdAt)}</span> },
+        joinedDate: { key: 'joinedDate', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.joinedDate || row.createdAt)}</span> },
         msgCount: {
             key: 'msgCount', label: 'Messages Sent', sortable: false,
             render: (row) => (

@@ -40,15 +40,13 @@ export function useMembers(filters) {
 }
 
 // Global per-tab member counts (total / male / female) that are NOT affected
-// by search or gender filters. Cached per tab status so tab flipping is free.
-export function useMembersStats(tabStatus) {
+// by search or gender filters. Accepts a filters object (status, includeExpired,
+// onlyExpired) so archived/expired tabs get correct counts.
+export function useMembersStats(filters) {
     return useQuery({
-        queryKey: memberKeys.stats(tabStatus),
+        queryKey: memberKeys.stats(filters),
         queryFn: async () => {
-            const params = { status: tabStatus, page: 1, limit: 1 };
-            // The list query on the All tab passes includeExpired=true; the
-            // stats badge must match or it undercounts expired members.
-            if (tabStatus === 'all') params.includeExpired = true;
+            const params = { ...filters, page: 1, limit: 1 };
             const res = await api.get('/contacts/', { params });
             const p = res.data?.pagination || {};
             return { total: p.total || 0, male: p.male || 0, female: p.female || 0 };
