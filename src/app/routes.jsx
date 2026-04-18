@@ -4,6 +4,15 @@ import ProtectedRoute from '../shared/components/guards/ProtectedRoute';
 import LoginGuard from '../features/auth/components/LoginGuard';
 import { PageSkeleton } from '../shared/components/ui/Skeleton';
 import ScrollToTop from '../shared/components/ScrollToTop';
+import { useAuth } from '../features/auth/context/AuthContext';
+
+/** Redirects to /dashboard if the gym doesn't have the required feature enabled. */
+const FeatureGate = ({ feature, children }) => {
+    const { hasFeature, user } = useAuth();
+    // Superadmin bypasses feature gates
+    if (user?.role === 'superadmin' || hasFeature(feature)) return children;
+    return <Navigate to="/dashboard" replace />;
+};
 
 /**
  * Fallback shown while a lazy page chunk loads. Kept deliberately bare —
@@ -73,7 +82,7 @@ export default function AppRoutes() {
 
                 {/* ── All Authenticated Users ─────────────────────────── */}
                 <Route element={<ProtectedRoute allowedRoles={['gymadmin', 'staff', 'superadmin']} />}>
-                    <Route path="/announcement" element={<AnnouncementPage />} />
+                    <Route path="/announcement" element={<FeatureGate feature="whatsappNotifications"><AnnouncementPage /></FeatureGate>} />
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/account" element={<ManageAccountPage />} />
                 </Route>

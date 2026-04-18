@@ -199,7 +199,7 @@ export function AppLayout({
       permission: "notifications",
       badge: unreadCount > 0 ? (unreadCount > 9 ? "9+" : unreadCount) : null
     },
-    { path: "/announcement", label: "Announcement", icon: FaBullhorn, roles: ["gymadmin", "superadmin"], feature: "announcements" },
+    { path: "/announcement", label: "Announcement", icon: FaBullhorn, roles: ["gymadmin", "superadmin"], feature: "whatsappNotifications" },
     { path: "/superadmin/settings", label: "Settings", icon: FaCog, roles: ["superadmin"] },
     { path: "/settings", label: "Settings", icon: FaCog, roles: ["gymadmin", "staff"] },
   ]
