@@ -9,6 +9,7 @@ import {
     FaChevronRight, FaSignOutAlt, FaShieldAlt, FaUsers, FaCheckCircle, FaTimes
 } from 'react-icons/fa';
 import AppLayout from '../../../shared/components/layout/AppLayout';
+import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import { FormSkeleton } from '../../../shared/components/ui/Skeleton';
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import { useQueryClient } from '@tanstack/react-query';
@@ -50,6 +51,7 @@ const Settings = () => {
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordData, setPasswordData] = useState({ newPassword: "", confirmPassword: "" });
     const [profileForm, setProfileForm] = useState({ name: "", email: "" });
+    const [showEmailWarning, setShowEmailWarning] = useState(false);
 
     const [settings, setSettings] = useState({
         subscriptionPrices: {
@@ -181,16 +183,35 @@ const Settings = () => {
         }
     };
 
+    const emailChanged = profileForm.email && user?.email && profileForm.email.toLowerCase() !== user.email.toLowerCase();
+
     const handleProfileSave = async (e) => {
         if (e) e.preventDefault();
+        // If email changed, show warning modal first
+        if (emailChanged) {
+            setShowEmailWarning(true);
+            return;
+        }
+        await doProfileSave();
+    };
+
+    const doProfileSave = async () => {
         setSaving(true);
         try {
             await api.put("/auth/profile", {
                 name: profileForm.name,
                 email: profileForm.email,
             });
-            toast.success("Profile updated!");
-            setIsEditingProfile(false);
+            if (emailChanged) {
+                toast.success("Email changed — logging out...");
+                setShowEmailWarning(false);
+                // Short delay so the user sees the toast before redirect
+                setTimeout(() => logout(), 1000);
+            } else {
+                toast.success("Profile updated!");
+                setIsEditingProfile(false);
+                refreshUser();
+            }
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to update profile");
         } finally {
@@ -1129,6 +1150,18 @@ const Settings = () => {
                         </div>
                     </div>
                 )}
+
+                {/* Email Change Warning Modal */}
+                <ConfirmModal
+                    isOpen={showEmailWarning}
+                    onClose={() => setShowEmailWarning(false)}
+                    onConfirm={doProfileSave}
+                    title="Change Login Email?"
+                    message={`This will update your login email to "${profileForm.email}" and log you out from all devices.`}
+                    confirmText="Change Email & Logout"
+                    type="warning"
+                    loading={saving}
+                />
             </div>
         </AppLayout >
     );
