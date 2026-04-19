@@ -151,9 +151,13 @@ const TransactionsPage = () => {
             key: 'memberName', label: 'Member', sortable: true,
             render: (row) => (
                 <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-400 flex items-center justify-center text-xs font-bold shrink-0">
-                        {row.memberName?.charAt(0)?.toUpperCase()}
-                    </div>
+                    {row.memberProfileImage ? (
+                        <img src={row.memberProfileImage} alt={row.memberName} className="w-8 h-8 rounded-full object-cover shrink-0" />
+                    ) : (
+                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center text-xs font-bold shrink-0">
+                            {row.memberName?.charAt(0)?.toUpperCase()}
+                        </div>
+                    )}
                     <span className="font-medium text-gray-800 dark:text-gray-200 text-sm">{row.memberName}</span>
                 </div>
             )
@@ -203,9 +207,13 @@ const TransactionsPage = () => {
         <>
             <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-400 flex items-center justify-center text-sm font-bold shrink-0">
-                        {row.memberName?.charAt(0)?.toUpperCase()}
-                    </div>
+                    {row.memberProfileImage ? (
+                        <img src={row.memberProfileImage} alt={row.memberName} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                    ) : (
+                        <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center text-sm font-bold shrink-0">
+                            {row.memberName?.charAt(0)?.toUpperCase()}
+                        </div>
+                    )}
                     <div>
                         <p className="font-semibold text-gray-900 dark:text-white text-sm">{row.memberName}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(row.transactionDate)} · {row.plan}</p>

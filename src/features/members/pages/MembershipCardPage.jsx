@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FaCheckCircle, FaClock, FaExclamationTriangle,
     FaDumbbell, FaUser, FaArrowRight, FaMoneyBillWave,
-    FaCalendarAlt, FaIdCard,
+    FaCalendarAlt, FaIdCard, FaWhatsapp,
 } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -272,10 +272,41 @@ export default function MembershipCardPage() {
                                 <FaIdCard size={11} /> View Profile
                             </button>
                             <button
-                                onClick={() => navigate('/members')}
-                                className="py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-gray-100 dark:hover:bg-zinc-600 text-gray-700 dark:text-gray-200 rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
+                                onClick={() => {
+                                    // Use backend's dews (computed at IST midnight) so the count
+                                    // matches exactly. Fallback to IST-midnight math if dews is missing.
+                                    const istNow = new Date();
+                                    const istMidnight = new Date(istNow.getTime() + 5.5 * 3600000);
+                                    istMidnight.setUTCHours(0, 0, 0, 0);
+                                    const todayIST = istMidnight.getTime() - 5.5 * 3600000;
+                                    const days = Number.isFinite(member.dews)
+                                        ? Math.max(0, member.dews)
+                                        : Math.max(0, Math.round((new Date(member.endDate).getTime() - todayIST) / 86400000));
+                                    const paidAmt = transaction?.paidAmount ?? 0;
+                                    const balance = Math.max(0, totalAmount - paidAmt);
+                                    const paymentStatus = transaction?.paymentStatus || 'Pending';
+                                    const lines = [
+                                        `Hello ${member.name},`,
+                                        '',
+                                        `Welcome to ${gymName}!`,
+                                        '',
+                                        `Plan: ${member.plan}`,
+                                        `Total Amount: Rs. ${fmt(totalAmount)}`,
+                                        `Amount Paid: Rs. ${fmt(paidAmt)}`,
+                                        ...(balance > 0 ? [`Balance Due: Rs. ${fmt(balance)}`] : []),
+                                        `Payment Status: ${paymentStatus}`,
+                                        `Membership Valid Till: ${toIST(member.endDate)}`,
+                                        `Days Remaining: ${days} days`,
+                                        '',
+                                        'Stay fit and strong!',
+                                    ];
+                                    const message = encodeURIComponent(lines.join('\n'));
+                                    const phone = String(member.phone || '').replace(/\D/g, '');
+                                    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                                }}
+                                className="py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
                             >
-                                Done <FaArrowRight size={10} />
+                                <FaWhatsapp size={14} /> Share on WhatsApp
                             </button>
                         </div>
 

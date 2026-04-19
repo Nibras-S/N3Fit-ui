@@ -389,7 +389,7 @@ function NewMember() {
           onClick={Submit}
           type="button"
           disabled={submitting}
-          className="px-6 py-3 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 transition-all text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-white text-black border border-white rounded-xl font-black uppercase tracking-widest hover:bg-gray-200 transition-all text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           Add Member
         </button>
@@ -545,7 +545,7 @@ function NewMember() {
                           key={g}
                           type="button"
                           onClick={() => setGender(g)}
-                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-zinc-800/50' :
+                          className={`py-2.5 rounded-xl border font-black text-[10px] uppercase transition-all ${gender === g ? 'border-zinc-900 bg-zinc-50 text-zinc-900 dark:bg-white dark:text-black dark:border-white' :
                             'border-gray-50 dark:border-zinc-800 text-gray-400 hover:bg-gray-50'
                             }`}
                         >
@@ -675,13 +675,13 @@ function NewMember() {
                           key={p.name}
                           type="button"
                           onClick={() => setPlan(p.name)}
-                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-zinc-800'}`}
+                          className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p.name ? 'border-zinc-900 bg-zinc-50 dark:bg-white dark:border-white' : 'border-gray-50 dark:border-zinc-800'}`}
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-2 h-2 rounded-full ${plan === p.name ? 'bg-zinc-900' : 'bg-gray-200'}`} />
-                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-zinc-900' : 'text-gray-400'}`}>{p.name}</span>
+                            <span className={`font-black uppercase tracking-wide text-xs ${plan === p.name ? 'text-zinc-900 dark:text-black' : 'text-gray-400'}`}>{p.name}</span>
                           </div>
-                          <span className="font-bold text-[11px] text-gray-400">₹{p.price.toLocaleString('en-IN')}</span>
+                          <span className={`font-bold text-[11px] ${plan === p.name ? 'text-zinc-900 dark:text-black' : 'text-gray-400'}`}>₹{p.price.toLocaleString('en-IN')}</span>
                         </button>
                       ))
                     ) : (
@@ -693,13 +693,13 @@ function NewMember() {
                             key={p}
                             type="button"
                             onClick={() => setPlan(p)}
-                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-zinc-900 bg-zinc-50 dark:bg-zinc-800/50' : 'border-gray-50 dark:border-zinc-800'}`}
+                            className={`w-full px-5 py-4 rounded-xl border transition-all flex items-center justify-between group ${plan === p ? 'border-zinc-900 bg-zinc-50 dark:bg-white dark:border-white' : 'border-gray-50 dark:border-zinc-800'}`}
                           >
                             <div className="flex items-center gap-3">
                               <div className={`w-2 h-2 rounded-full ${plan === p ? 'bg-zinc-900' : 'bg-gray-200'}`} />
-                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-zinc-900' : 'text-gray-400'}`}>{p}</span>
+                              <span className={`font-black uppercase tracking-wide text-xs ${plan === p ? 'text-zinc-900 dark:text-black' : 'text-gray-400'}`}>{p}</span>
                             </div>
-                            <span className="font-bold text-[11px] text-gray-400">₹{price || 0}</span>
+                            <span className={`font-bold text-[11px] ${plan === p ? 'text-zinc-900 dark:text-black' : 'text-gray-400'}`}>₹{price || 0}</span>
                           </button>
                         );
                       })
@@ -728,7 +728,7 @@ function NewMember() {
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-black text-base outline-none"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-black text-base text-gray-900 dark:text-white outline-none"
                       />
                     </div>
                     <div>
@@ -737,7 +737,7 @@ function NewMember() {
                         type="number"
                         value={admissionFee}
                         onChange={(e) => setAdmissionFee(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-black text-base outline-none"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-black text-base text-gray-900 dark:text-white outline-none"
                       />
                     </div>
                     <div>
@@ -746,7 +746,7 @@ function NewMember() {
                         type="number"
                         value={discount}
                         onChange={(e) => setDiscount(e.target.value)}
-                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-bold text-base text-zinc-700 outline-none"
+                        className="w-full px-3 py-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-100 dark:border-zinc-800 rounded-xl font-bold text-base text-zinc-700 dark:text-white outline-none"
                       />
                     </div>
                   </div>
@@ -763,11 +763,11 @@ function NewMember() {
                       </div>
                       <div className="flex justify-between text-[11px]">
                         <span className="text-gray-400 font-bold uppercase">Discount</span>
-                        <span className="text-zinc-700 font-bold">-₹{discount || 0}</span>
+                        <span className="text-zinc-700 dark:text-gray-300 font-bold">-₹{discount || 0}</span>
                       </div>
                       <div className="pt-2 border-t border-gray-100 dark:border-zinc-800 flex justify-between items-end">
-                        <span className="text-[10px] font-black uppercase text-zinc-900">Total</span>
-                        <span className="text-2xl font-black text-zinc-900">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
+                        <span className="text-[10px] font-black uppercase text-zinc-900 dark:text-white">Total</span>
+                        <span className="text-2xl font-black text-zinc-900 dark:text-white">₹{parseInt(amount) + parseInt(admissionFee || 0) - parseInt(discount || 0)}</span>
                       </div>
                     </div>
                   </div>
@@ -871,7 +871,7 @@ function NewMember() {
                       <button
                         onClick={Submit}
                         disabled={submitting}
-                        className="flex-[1.5] py-3.5 bg-zinc-900 text-white rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex-[1.5] py-3.5 bg-white text-black border border-white rounded-xl font-black uppercase tracking-widest hover:bg-gray-200 text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         Add Member
                       </button>

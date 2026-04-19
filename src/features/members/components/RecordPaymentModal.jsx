@@ -160,7 +160,7 @@ export default function RecordPaymentModal({
 
                             {/* Amount input */}
                             <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
-                                <span className="text-gray-400 font-bold text-sm">₹</span>
+                                <span className="text-gray-600 dark:text-gray-300 font-bold text-sm">₹</span>
                                 <input
                                     type="number"
                                     min="0"
@@ -168,12 +168,12 @@ export default function RecordPaymentModal({
                                     value={splits[0].amount}
                                     onChange={(e) => updateSplit(0, 'amount', e.target.value)}
                                     placeholder="0"
-                                    className="flex-1 bg-transparent outline-none font-black text-lg text-gray-900 dark:text-white"
+                                    className="flex-1 bg-transparent outline-none font-black text-lg text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => fillFull(0)}
-                                    className="text-[10px] font-black text-zinc-900 bg-zinc-50 dark:bg-zinc-800/50 px-2 py-1 rounded-md hover:bg-zinc-100 transition-colors"
+                                    className="text-[10px] font-black text-zinc-900 dark:text-white bg-zinc-50 dark:bg-zinc-700 px-2 py-1 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors"
                                 >
                                     Full
                                 </button>
@@ -329,7 +329,7 @@ export default function RecordPaymentModal({
                         disabled={submitting || isOver || splitTotal <= 0}
                         className={`flex-2 flex-grow py-3 rounded-xl font-black text-[11px] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                             isFull
-                                ? 'bg-zinc-900 hover:bg-zinc-800 text-white'
+                                ? 'bg-white text-black border border-white hover:bg-gray-100'
                                 : 'bg-amber-500 hover:bg-amber-600 text-white'
                         }`}
                     >

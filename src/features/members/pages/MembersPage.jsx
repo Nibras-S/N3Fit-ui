@@ -712,7 +712,7 @@ const MembersPage = () => {
             </div>
 
             {/* ── Toolbar & Table Card (Combined Full Size) ── */}
-            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col mb-4">
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-gray-200 dark:border-zinc-800 shadow-sm overflow-hidden flex flex-col mb-4 pb-24 lg:pb-0">
 
                 {/* Desktop Toolbar Header section */}
                 <div className="hidden lg:flex flex-wrap gap-3 px-6 py-4 border-b border-gray-200 dark:border-zinc-800">
@@ -1039,7 +1039,7 @@ const MembersPage = () => {
                                 type="button"
                                 onClick={() => submitRenewal(renewingMemberId)}
                                 disabled={!renewForm.plan || !renewForm.amount}
-                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-zinc-900 hover:bg-zinc-800 text-white transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-white text-black border border-white hover:bg-gray-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                                 Continue to Payment →
                             </button>

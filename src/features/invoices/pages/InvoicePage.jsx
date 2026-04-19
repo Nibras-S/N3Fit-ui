@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from '../../auth/context/AuthContext';
-import { FaPrint, FaArrowLeft } from "react-icons/fa";
+import { FaPrint, FaArrowLeft, FaWhatsapp } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
 import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
 
@@ -108,12 +108,48 @@ const Invoice = () => {
                 >
                     <FaArrowLeft /> Back
                 </button>
-                <button
-                    onClick={() => window.print()}
-                    className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm text-sm"
-                >
-                    <FaPrint /> <span className="hidden sm:inline">Print Invoice</span><span className="sm:hidden">Print</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => {
+                            const digits = String(phone || '').replace(/\D/g, '');
+                            if (!digits) {
+                                toast.error('Member phone not available');
+                                return;
+                            }
+                            const waPhone = digits.length === 10 ? `91${digits}` : digits;
+                            const lines = [
+                                `Hello ${memberName},`,
+                                '',
+                                `Invoice from ${gym?.name || 'Fit'}`,
+                                `Invoice No: #${_id.slice(-6).toUpperCase()}`,
+                                `Date: ${invoiceDate}`,
+                                '',
+                                `Plan: ${plan}`,
+                                `Subtotal: Rs. ${fmt(amount)}`,
+                                ...(discount > 0 ? [`Discount: Rs. ${fmt(discount)}`] : []),
+                                `Total: Rs. ${fmt(total)}`,
+                                `Paid: Rs. ${fmt(paidAmount)}`,
+                                ...(balanceDue > 0 ? [`Balance Due: Rs. ${fmt(balanceDue)}`] : []),
+                                `Payment Method: ${paymentMethod || '-'}`,
+                                `Status: ${paymentStatus}`,
+                                ...(remarks ? ['', `Note: ${remarks}`] : []),
+                                '',
+                                'Thank you for your business!',
+                            ];
+                            const message = encodeURIComponent(lines.join('\n'));
+                            window.open(`https://wa.me/${waPhone}?text=${message}`, '_blank');
+                        }}
+                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-sm text-sm"
+                    >
+                        <FaWhatsapp /> <span className="hidden sm:inline">Share on WhatsApp</span><span className="sm:hidden">Share</span>
+                    </button>
+                    <button
+                        onClick={() => window.print()}
+                        className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-colors shadow-sm text-sm"
+                    >
+                        <FaPrint /> <span className="hidden sm:inline">Print Invoice</span><span className="sm:hidden">Print</span>
+                    </button>
+                </div>
             </div>
 
             {/* Invoice Paper */}
