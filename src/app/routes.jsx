@@ -27,6 +27,8 @@ const LayoutSkeleton = () => (
 
 // ── Feature Pages (lazy-loaded for code splitting) ───────────────
 const LandingPage = lazy(() => import('../features/landing/pages/LandingPage'));
+const PrivacyPolicyPage = lazy(() => import('../features/landing/pages/PrivacyPolicyPage'));
+const TermsOfServicePage = lazy(() => import('../features/landing/pages/TermsOfServicePage'));
 
 // Members
 const MembersPage = lazy(() => import('../features/members/pages/MembersPage'));
@@ -77,6 +79,8 @@ export default function AppRoutes() {
             <Routes>
                 {/* ── Public ──────────────────────────────────────────── */}
                 <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                <Route path="/terms" element={<TermsOfServicePage />} />
                 <Route path="/login" element={<LoginGuard />} />
                 <Route path="/admin" element={<LoginGuard />} />
 

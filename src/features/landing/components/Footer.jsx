@@ -32,8 +32,8 @@ const socials = [
 ];
 
 const legalLinks = [
-  { label: 'Privacy Policy', href: '#' },
-  { label: 'Terms of Service', href: '#' },
+  { label: 'Privacy Policy', to: '/privacy' },
+  { label: 'Terms of Service', to: '/terms' },
 ];
 
 export default function Footer() {
@@ -137,12 +137,10 @@ export default function Footer() {
             {legalLinks.map((link, i) => (
               <a
                 key={i}
-                href={link.href}
+                href={link.to}
                 onClick={(e) => {
-                  if (link.href.startsWith('#')) {
-                    e.preventDefault();
-                    scrollTo(link.href);
-                  }
+                  e.preventDefault();
+                  navigate(link.to);
                 }}
                 className="landing-footer-link-dim"
               >
