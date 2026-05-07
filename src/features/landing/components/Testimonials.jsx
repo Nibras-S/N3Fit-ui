@@ -11,17 +11,17 @@ const testimonials = [
     color: 'var(--landing-primary)',
   },
   {
-    name: 'John D.',
-    role: 'Owner, German Fitness',
+    name: 'Sharika',
+    role: 'Owner, RedForce Fitness Pinnarayi',
     text: 'Billing used to be a nightmare. Now it\'s automated and seamless. Best investment we made for our gym this year.',
-    avatar: 'J',
+    avatar: 'S',
     color: '#7c3aed',
   },
   {
-    name: 'Mike R.',
-    role: 'Manager, Iron Gym',
+    name: 'Saleej',
+    role: 'Owner, Turbo Fitness',
     text: 'The membership tracking is flawless. We\'ve reduced dropouts by 20% in just 3 months using the renewal reminders.',
-    avatar: 'M',
+    avatar: 'S',
     color: '#059669',
   },
 ];

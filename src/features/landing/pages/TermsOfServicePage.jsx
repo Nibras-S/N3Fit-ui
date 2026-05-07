@@ -24,8 +24,8 @@ export default function TermsOfServicePage() {
       >
         <h2>1. Who these terms apply to</h2>
         <p>
-          “N3FitBook”, “we” or “us” refers to N3 Solution, the operator of the
-          N3FitBook platform. “You” means the gym, account owner, or
+          “N3FitBook”, “we” or “us” refers to N3 Global Tech (Kannur, Kerala,
+          India), the operator of the N3FitBook platform. “You” means the gym, account owner, or
           authorised user accessing the service.
         </p>
 
@@ -139,7 +139,7 @@ export default function TermsOfServicePage() {
         <h2>14. Contact</h2>
         <p>
           For any questions about these terms, write to{' '}
-          <a href="mailto:contact@n3solution.com">contact@n3solution.com</a>.
+          <a href="mailto:contact@n3global.tech">contact@n3global.tech</a>.
         </p>
       </LegalPageLayout>
 

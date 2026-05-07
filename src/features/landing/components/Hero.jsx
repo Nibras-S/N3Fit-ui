@@ -138,7 +138,7 @@ const fadeUp = {
 export default function Hero({ onOpenTrial }) {
 
   const stats = [
-    { value: 50, suffix: '+', label: 'Active Clubs' },
+    { value: 30, suffix: '+', label: 'Active Clubs' },
     { value: 500, suffix: '+', label: 'Members Managed' },
     { value: 99.9, suffix: '%', label: 'Uptime SLA' },
     { value: 4.9, suffix: '/5', label: 'User Rating' },

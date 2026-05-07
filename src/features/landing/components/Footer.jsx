@@ -11,23 +11,23 @@ const footerLinks = {
     { label: 'FAQ', href: '#faq' },
   ],
   Company: [
-    { label: 'About Us', href: '#' },
+    { label: 'About Us', href: 'https://www.n3global.tech', external: true },
     { label: 'Careers', href: '#' },
     { label: 'Blog', href: '#' },
-    { label: 'Contact', href: '#' },
+    { label: 'Contact', href: 'mailto:contact@n3global.tech' },
   ],
   Support: [
     { label: 'Help Center', href: '#' },
-    { label: 'contact@n3solution.com', href: 'mailto:contact@n3solution.com' },
-    { label: 'WhatsApp Chat', href: '#' },
+    { label: 'contact@n3global.tech', href: 'mailto:contact@n3global.tech' },
+    { label: 'WhatsApp Chat', href: 'https://wa.me/919645091256' },
     { label: 'Documentation', href: '#' },
   ],
 };
 
 const socials = [
-  { icon: FaInstagram, href: '#' },
+  { icon: FaInstagram, href: 'https://www.instagram.com/n3globaltech' },
   { icon: FaTwitter, href: '#' },
-  { icon: FaLinkedinIn, href: '#' },
+  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/n3-global-tech' },
   { icon: FaYoutube, href: '#' },
 ];
 
@@ -76,16 +76,20 @@ export default function Footer() {
               <span className="text-lg font-extrabold text-white">N3FitBook</span>
             </div>
             <p className="leading-relaxed max-w-sm mb-5 text-sm" style={{ color: 'rgba(255,255,255,0.5)' }}>
-              The all-in-one SaaS platform for modern gym management. Built for
-              owners who want to automate operations and grow revenue.
+              N3FitBook is a product by N3 Global Tech &mdash; Kannur, Kerala.
+              Built for gym owners who want to automate operations and grow
+              revenue.
             </p>
             <div className="flex gap-2.5">
               {socials.map((s, i) => {
                 const Icon = s.icon;
+                const isExternal = s.href.startsWith('http');
                 return (
                   <a
                     key={i}
                     href={s.href}
+                    target={isExternal ? '_blank' : undefined}
+                    rel={isExternal ? 'noopener noreferrer' : undefined}
                     className="landing-footer-social"
                   >
                     <Icon size={16} />
@@ -105,21 +109,26 @@ export default function Footer() {
                 {title}
               </h4>
               <div className="flex flex-col gap-2.5">
-                {links.map((link, i) => (
-                  <a
-                    key={i}
-                    href={link.href}
-                    onClick={(e) => {
-                      if (link.href.startsWith('#')) {
-                        e.preventDefault();
-                        scrollTo(link.href);
-                      }
-                    }}
-                    className="text-sm landing-footer-link"
-                  >
-                    {link.label}
-                  </a>
-                ))}
+                {links.map((link, i) => {
+                  const isExternal = link.href.startsWith('http');
+                  return (
+                    <a
+                      key={i}
+                      href={link.href}
+                      onClick={(e) => {
+                        if (link.href.startsWith('#')) {
+                          e.preventDefault();
+                          scrollTo(link.href);
+                        }
+                      }}
+                      target={isExternal ? '_blank' : undefined}
+                      rel={isExternal ? 'noopener noreferrer' : undefined}
+                      className="text-sm landing-footer-link"
+                    >
+                      {link.label}
+                    </a>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -131,7 +140,7 @@ export default function Footer() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}
         >
           <p style={{ color: 'rgba(255,255,255,0.3)' }}>
-            &copy; {new Date().getFullYear()} N3FitBook. All rights reserved.
+            &copy; {new Date().getFullYear()} N3FitBook by N3 Global Tech. All rights reserved.
           </p>
           <div className="flex gap-6">
             {legalLinks.map((link, i) => (

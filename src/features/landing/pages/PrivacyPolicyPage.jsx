@@ -75,7 +75,7 @@ export default function PrivacyPolicyPage() {
         <h2>5. Your rights</h2>
         <p>
           You can access, export or delete your data from inside the app, or
-          by writing to us at <a href="mailto:contact@n3solution.com">contact@n3solution.com</a>.
+          by writing to us at <a href="mailto:contact@n3global.tech">contact@n3global.tech</a>.
           Gym admins are the data controller for their members; members should
           contact their gym directly for changes to their own records.
         </p>
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
         <h2>10. Contact</h2>
         <p>
           Questions or concerns? Reach us at{' '}
-          <a href="mailto:contact@n3solution.com">contact@n3solution.com</a>.
+          <a href="mailto:contact@n3global.tech">contact@n3global.tech</a>.
         </p>
       </LegalPageLayout>
 
