@@ -12,15 +12,12 @@ const footerLinks = {
   ],
   Company: [
     { label: 'About Us', href: 'https://www.n3global.tech', external: true },
-    { label: 'Careers', href: '#' },
-    { label: 'Blog', href: '#' },
+    { label: 'Blog', href: 'https://www.n3global.tech/blog/custom-software-saas-kerala/' },
     { label: 'Contact', href: 'mailto:contact@n3global.tech' },
   ],
   Support: [
     { label: 'Help Center', href: '#' },
     { label: 'contact@n3global.tech', href: 'mailto:contact@n3global.tech' },
-    { label: 'WhatsApp Chat', href: 'https://wa.me/919645091256' },
-    { label: 'Documentation', href: '#' },
   ],
 };
 
