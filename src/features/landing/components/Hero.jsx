@@ -48,7 +48,7 @@ function DashboardMockup() {
             <rect x="3" y="11" width="18" height="11" rx="2" />
             <path d="M7 11V7a5 5 0 0110 0v4" />
           </svg>
-          n3fit.app/dashboard
+          n3fitbook.in/dashboard
         </div>
       </div>
 
@@ -138,8 +138,8 @@ const fadeUp = {
 export default function Hero({ onOpenTrial }) {
 
   const stats = [
-    { value: 500, suffix: '+', label: 'Active Clubs' },
-    { value: 50000, suffix: '+', label: 'Members Managed' },
+    { value: 50, suffix: '+', label: 'Active Clubs' },
+    { value: 500, suffix: '+', label: 'Members Managed' },
     { value: 99.9, suffix: '%', label: 'Uptime SLA' },
     { value: 4.9, suffix: '/5', label: 'User Rating' },
   ];
@@ -177,7 +177,6 @@ export default function Hero({ onOpenTrial }) {
               software for{' '}
               <span className="landing-heading-gradient">gym management.</span>
             </motion.h1>
-            <span className="landing-heading-accent" />
 
             <motion.p
               variants={fadeUp}

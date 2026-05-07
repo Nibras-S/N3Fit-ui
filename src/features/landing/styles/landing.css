@@ -3,7 +3,7 @@
    Color system via CSS custom properties for easy customization
    ═══════════════════════════════════════════════════════════════ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap');
 
 /* ─── Color System ─── */
 :root {
@@ -44,12 +44,20 @@
 
 /* ─── Base Wrapper ─── */
 .landing-page-wrapper {
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
     color: var(--landing-text);
     background: var(--landing-bg);
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
+}
+
+/* Force the display font onto every descendant so it overrides
+   inline Tailwind / framer-motion styles applied by individual sections. */
+.landing-page-wrapper,
+.landing-page-wrapper *:not(svg):not(path):not(circle):not(rect):not(line):not(polyline):not(polygon):not(g) {
+    font-family: 'Space Grotesk', system-ui, sans-serif !important;
 }
 
 /* ─── Section Container ─── */
@@ -103,9 +111,11 @@
     object-fit: contain;
 }
 
-.landing-nav-logo span {
+.landing-page-wrapper .landing-navbar .landing-nav-logo span,
+.landing-page-wrapper .landing-mobile-menu .landing-nav-logo span {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
     font-size: 1.25rem;
-    font-weight: 800;
+    font-weight: 600;
     color: var(--landing-text);
     letter-spacing: -0.02em;
 }
@@ -202,7 +212,7 @@
     background: var(--landing-primary);
     color: #ffffff;
     border: none;
-    border-radius: 10px;
+    border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -230,7 +240,7 @@
     background: var(--landing-bg);
     color: var(--landing-text);
     border: 1px solid var(--landing-border);
-    border-radius: 10px;
+    border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -274,7 +284,7 @@
     background: transparent;
     color: var(--landing-primary);
     border: 1.5px solid var(--landing-primary);
-    border-radius: 12px;
+    border-radius: 9999px;
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
@@ -292,7 +302,7 @@
 .landing-btn-lg {
     padding: 0.875rem 2rem;
     font-size: 1rem;
-    border-radius: 12px;
+    border-radius: 9999px;
 }
 
 /* Full-width button */
@@ -604,7 +614,7 @@
     background: #ffffff;
     color: var(--landing-primary);
     border: none;
-    border-radius: 12px;
+    border-radius: 9999px;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;
@@ -624,7 +634,7 @@
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 12px;
+    border-radius: 9999px;
     font-weight: 700;
     font-size: 1rem;
     cursor: pointer;

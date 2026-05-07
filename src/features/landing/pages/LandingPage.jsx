@@ -44,7 +44,7 @@ export default function LandingPage() {
         <Problem />
         <Features />
         <HowItWorks />
-        <Pricing />
+        <Pricing onOpenTrial={() => setTrialOpen(true)} />
         <Testimonials />
         <FAQ />
         <CallToAction onOpenTrial={() => setTrialOpen(true)} />

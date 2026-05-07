@@ -8,7 +8,7 @@ const plans = [
     price: '5,999',
     tagline: 'Perfect for small gyms',
     features: [
-      'Up to 100 Members',
+      'Up to 500 Members',
       'Basic Dashboard',
       'Attendance Tracking',
       'Payment Reminders',
@@ -39,7 +39,7 @@ const plans = [
     tagline: 'For multi-branch chains',
     features: [
       'Multi-Branch Support',
-      'White-label Dashboard',
+      'Biometrics',
       'Dedicated Account Manager',
       'Custom Reports & API',
       '24/7 Priority Support',
@@ -55,7 +55,7 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 };
 
-export default function Pricing() {
+export default function Pricing({ onOpenTrial }) {
   return (
     <section
       id="pricing"
@@ -179,6 +179,7 @@ export default function Pricing() {
               <button
                 className={plan.popular ? 'landing-btn-primary landing-btn-full' : 'landing-btn-outline'}
                 style={plan.popular ? { padding: '0.75rem 1.5rem', background: '#ffffff', color: 'var(--landing-primary)' } : {}}
+                onClick={onOpenTrial}
               >
                 {plan.cta}
               </button>
