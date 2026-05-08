@@ -53,9 +53,9 @@ export default function Footer() {
       }}
     >
       <div className="landing-container">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-10 mb-12">
           {/* Brand */}
-          <div className="lg:col-span-2">
+          <div className="col-span-2 md:col-span-2 lg:col-span-2">
             <div
               className="flex items-center gap-2 mb-4 cursor-pointer"
               onClick={() => navigate('/')}
