@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -7,12 +7,17 @@ import Features from '../components/Features';
 import HowItWorks from '../components/HowItWorks';
 import Pricing from '../components/Pricing';
 import Testimonials from '../components/Testimonials';
-import FAQ from '../components/FAQ';
-import About from '../components/About';
-import CallToAction from '../components/CallToAction';
-import Footer from '../components/Footer';
-import FreeTrialModal from '../components/FreeTrialModal';
 import { FiArrowUp } from 'react-icons/fi';
+
+// Below-the-fold sections — split out of the initial chunk so the hero
+// becomes interactive faster on first paint. They load in the background
+// once the main bundle has parsed; <Suspense fallback={null}> hides the
+// hand-off so users don't see a flash.
+const FAQ = lazy(() => import('../components/FAQ'));
+const About = lazy(() => import('../components/About'));
+const CallToAction = lazy(() => import('../components/CallToAction'));
+const Footer = lazy(() => import('../components/Footer'));
+const FreeTrialModal = lazy(() => import('../components/FreeTrialModal'));
 
 import '../styles/landing.css';
 
@@ -47,14 +52,17 @@ export default function LandingPage() {
         <HowItWorks />
         <Pricing onOpenTrial={() => setTrialOpen(true)} />
         <Testimonials />
-        <FAQ />
-        <About />
-        <CallToAction onOpenTrial={() => setTrialOpen(true)} />
+        <Suspense fallback={null}>
+          <FAQ />
+          <About />
+          <CallToAction onOpenTrial={() => setTrialOpen(true)} />
+        </Suspense>
       </main>
 
-      <FreeTrialModal isOpen={trialOpen} onClose={() => setTrialOpen(false)} />
-
-      <Footer />
+      <Suspense fallback={null}>
+        <FreeTrialModal isOpen={trialOpen} onClose={() => setTrialOpen(false)} />
+        <Footer />
+      </Suspense>
 
       {/* Scroll to top */}
       <motion.button

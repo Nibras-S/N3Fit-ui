@@ -15,6 +15,15 @@
   <link rel="preconnect" href="%REACT_APP_API_BASE_URL%" crossorigin />
   <link rel="dns-prefetch" href="%REACT_APP_API_BASE_URL%" />
 
+  <!-- Google Fonts: declared in <head> as <link> rather than CSS @import so the
+       browser can begin downloading the font CSS in parallel with the rest of
+       the document, instead of waiting for landing.css to fully load. Only the
+       weights we actually use are requested (Space Grotesk 400/600 for body
+       and headings; Inter 600 for the navbar wordmark). -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&family=Inter:wght@600&display=swap" />
+
   <link rel="icon" type="image/png" href="%PUBLIC_URL%/n3fitbook-192.png" />
   <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/n3fitbook.svg" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/n3fitbook-192.png" />

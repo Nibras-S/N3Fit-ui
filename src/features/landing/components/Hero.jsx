@@ -151,11 +151,11 @@ export default function Hero({ onOpenTrial }) {
     >
       {/* Decorative gradient blobs */}
       <div
-        className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full opacity-[0.15] blur-[120px] pointer-events-none"
+        className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full opacity-[0.15] blur-[64px] pointer-events-none"
         style={{ background: 'var(--landing-primary-200)' }}
       />
       <div
-        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full opacity-[0.1] blur-[100px] pointer-events-none"
+        className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] rounded-full opacity-[0.1] blur-[56px] pointer-events-none"
         style={{ background: 'var(--landing-primary-100)' }}
       />
 

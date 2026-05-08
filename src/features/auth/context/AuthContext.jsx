@@ -97,6 +97,15 @@ export const AuthProvider = ({ children }) => {
     // First paint does NOT wait on this: guards render using the session
     // hint, and this effect hydrates the real user data in the background.
     useEffect(() => {
+        // Public visitors (landing, /privacy, /terms) have no session hint
+        // because they were never logged in. Skip the /auth/me round-trip
+        // entirely — otherwise it hangs for the request timeout when the
+        // backend is slow or unreachable, blocking guards downstream.
+        if (!readAuthHint()) {
+            setLoading(false);
+            setInitialAuthChecked(true);
+            return;
+        }
         const loadUser = async () => {
             try {
                 const res = await api.get('/auth/me');
