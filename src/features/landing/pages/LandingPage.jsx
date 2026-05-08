@@ -9,6 +9,8 @@ import Pricing from '../components/Pricing';
 import Testimonials from '../components/Testimonials';
 import { FiArrowUp } from 'react-icons/fi';
 
+import '../styles/landing.css';
+
 // Below-the-fold sections — split out of the initial chunk so the hero
 // becomes interactive faster on first paint. They load in the background
 // once the main bundle has parsed; <Suspense fallback={null}> hides the
@@ -18,8 +20,6 @@ const About = lazy(() => import('../components/About'));
 const CallToAction = lazy(() => import('../components/CallToAction'));
 const Footer = lazy(() => import('../components/Footer'));
 const FreeTrialModal = lazy(() => import('../components/FreeTrialModal'));
-
-import '../styles/landing.css';
 
 export default function LandingPage() {
   const [trialOpen, setTrialOpen] = useState(false);

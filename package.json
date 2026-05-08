@@ -30,7 +30,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build && node scripts/sw-inject.js",
+    "build": "CI=false craco build && node scripts/sw-inject.js",
     "test": "craco test",
     "eject": "react-scripts eject",
     "generate-splash": "node scripts/generate-splash.js"
