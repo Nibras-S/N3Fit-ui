@@ -15,6 +15,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const matter = require('gray-matter');
 
 const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
@@ -33,18 +34,28 @@ const STATIC_ROUTES = [
 
 function listBlogPosts() {
     if (!fs.existsSync(BLOG_DIR)) return [];
+    const today = new Date().toISOString().slice(0, 10);
+
     return fs.readdirSync(BLOG_DIR)
         .filter(f => f.endsWith('.mdx') || f.endsWith('.md'))
         .map(f => {
-            const slug = f.replace(/\.(mdx|md)$/, '');
-            const stat = fs.statSync(path.join(BLOG_DIR, f));
+            const filePath = path.join(BLOG_DIR, f);
+            const { data } = matter(fs.readFileSync(filePath, 'utf8'));
+            // Respect the frontmatter slug if set; fall back to the filename.
+            const slug = data.slug || f.replace(/\.(mdx|md)$/, '');
+            const date = data.date ? new Date(data.date).toISOString().slice(0, 10) : null;
             return {
+                slug,
                 loc: `/blog/${slug}`,
-                lastmod: stat.mtime.toISOString().slice(0, 10),
+                lastmod: data.updated || date || fs.statSync(filePath).mtime.toISOString().slice(0, 10),
                 changefreq: 'monthly',
                 priority: 0.7,
+                draft: data.draft === true,
+                publishOn: date,
             };
-        });
+        })
+        .filter(p => !p.draft && (!p.publishOn || p.publishOn <= today))
+        .map(({ draft, publishOn, slug, ...entry }) => entry);
 }
 
 function urlEntry({ loc, lastmod, changefreq, priority }) {

@@ -30,6 +30,9 @@ const LandingPage = lazy(() => import('../features/landing/pages/LandingPage'));
 const PrivacyPolicyPage = lazy(() => import('../features/landing/pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('../features/landing/pages/TermsOfServicePage'));
 const NotFoundPage = lazy(() => import('../features/landing/pages/NotFoundPage'));
+const BlogIndexPage = lazy(() => import('../features/blog/pages/BlogIndexPage'));
+const BlogPostPage = lazy(() => import('../features/blog/pages/BlogPostPage'));
+const BlogTagPage = lazy(() => import('../features/blog/pages/BlogTagPage'));
 
 // Members
 const MembersPage = lazy(() => import('../features/members/pages/MembersPage'));
@@ -82,6 +85,9 @@ export default function AppRoutes() {
                 <Route path="/" element={isPWA ? <Navigate to="/login" replace /> : <LandingPage />} />
                 <Route path="/privacy" element={<PrivacyPolicyPage />} />
                 <Route path="/terms" element={<TermsOfServicePage />} />
+                <Route path="/blog" element={<BlogIndexPage />} />
+                <Route path="/blog/tag/:tag" element={<BlogTagPage />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
                 <Route path="/login" element={<LoginGuard />} />
                 <Route path="/admin" element={<LoginGuard />} />
 

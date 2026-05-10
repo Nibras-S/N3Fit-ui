@@ -12,7 +12,7 @@ const footerLinks = {
   ],
   Company: [
     { label: 'About Us', href: 'https://www.n3global.tech', external: true },
-    { label: 'Blog', href: 'https://www.n3global.tech/blog/custom-software-saas-kerala/' },
+    { label: 'Blog', href: '/blog' },
     // The mailto opens the user's email client. We also surface the address
     // via the title attribute so visitors on a desktop browser without an
     // email app configured can hover/long-press to read and copy it.
@@ -128,14 +128,22 @@ export default function Footer() {
               <div className="flex flex-col gap-2.5">
                 {links.map((link, i) => {
                   const isExternal = link.href.startsWith('http');
+                  const isHash = link.href.startsWith('#');
+                  const isInternalRoute = link.href.startsWith('/') && !link.href.startsWith('//');
                   return (
                     <a
                       key={i}
                       href={link.href}
                       onClick={(e) => {
-                        if (link.href.startsWith('#')) {
+                        if (isHash) {
                           e.preventDefault();
                           scrollTo(link.href);
+                        } else if (isInternalRoute) {
+                          // SPA navigation for internal routes (e.g. /blog).
+                          // Plain <a> would trigger a full reload and re-download
+                          // the bundle.
+                          e.preventDefault();
+                          navigate(link.href);
                         }
                       }}
                       target={isExternal ? '_blank' : undefined}

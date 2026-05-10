@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>N3FitBook Blog</title>
+    <link>https://www.n3fitbook.in/blog</link>
+    <atom:link href="https://www.n3fitbook.in/rss.xml" rel="self" type="application/rss+xml" />
+    <description>Gym management, member retention, and SaaS for Indian gyms.</description>
+    <language>en-in</language>
+    <lastBuildDate>Sat, 09 May 2026 18:30:00 GMT</lastBuildDate>
+    <item>
+      <title>Gym Member Retention: 7 Tactics That Actually Move the Needle</title>
+      <link>https://www.n3fitbook.in/blog/gym-member-retention-strategies</link>
+      <guid isPermaLink="true">https://www.n3fitbook.in/blog/gym-member-retention-strategies</guid>
+      <pubDate>Sat, 09 May 2026 18:30:00 GMT</pubDate>
+      <description>How to keep gym members renewing — not by lowering prices, but by fixing the small frictions that drive churn. With benchmarks for Indian gyms.</description>
+      <author>noreply@n3fitbook.in (N3FitBook Team)</author>
+      <category>retention</category>
+      <category>churn</category>
+      <category>member-experience</category>
+      <category>pillar</category>
+    </item>
+    <item>
+      <title>Gym Software Cost in India (2026): What ₹500, ₹1500, and ₹3000/Month Actually Buy You</title>
+      <link>https://www.n3fitbook.in/blog/gym-software-cost-india</link>
+      <guid isPermaLink="true">https://www.n3fitbook.in/blog/gym-software-cost-india</guid>
+      <pubDate>Sat, 09 May 2026 18:30:00 GMT</pubDate>
+      <description>Honest pricing breakdown for gym management software in India. What&apos;s included at each tier, what&apos;s missing, and when paying more makes sense.</description>
+      <author>noreply@n3fitbook.in (N3FitBook Team)</author>
+      <category>pricing</category>
+      <category>gym-software</category>
+      <category>india</category>
+      <category>comparison</category>
+    </item>
+    <item>
+      <title>Best Gym Management Software in India (2026 Buyer&apos;s Guide)</title>
+      <link>https://www.n3fitbook.in/blog/gym-management-software-india</link>
+      <guid isPermaLink="true">https://www.n3fitbook.in/blog/gym-management-software-india</guid>
+      <pubDate>Sat, 09 May 2026 18:30:00 GMT</pubDate>
+      <description>How to pick gym software that handles billing, attendance, and WhatsApp reminders without breaking the bank. Side-by-side comparison of features that actually matter for Indian gyms.</description>
+      <author>noreply@n3fitbook.in (N3FitBook Team)</author>
+      <category>gym-software</category>
+      <category>buyers-guide</category>
+      <category>india</category>
+      <category>pillar</category>
+    </item>
+    <item>
+      <title>Switching from Spreadsheets to Gym Software: A 30-Minute Migration Guide</title>
+      <link>https://www.n3fitbook.in/blog/switch-from-spreadsheets-to-gym-software</link>
+      <guid isPermaLink="true">https://www.n3fitbook.in/blog/switch-from-spreadsheets-to-gym-software</guid>
+      <pubDate>Sat, 09 May 2026 18:30:00 GMT</pubDate>
+      <description>If your gym still runs on Excel, here&apos;s exactly how to migrate to dedicated software in one evening — without losing a single member record.</description>
+      <author>noreply@n3fitbook.in (N3FitBook Team)</author>
+      <category>migration</category>
+      <category>spreadsheets</category>
+      <category>gym-software</category>
+      <category>how-to</category>
+    </item>
+    <item>
+      <title>WhatsApp Renewal Reminders for Gyms: How to Set Them Up (and Not Annoy Members)</title>
+      <link>https://www.n3fitbook.in/blog/whatsapp-renewal-reminders</link>
+      <guid isPermaLink="true">https://www.n3fitbook.in/blog/whatsapp-renewal-reminders</guid>
+      <pubDate>Sat, 09 May 2026 18:30:00 GMT</pubDate>
+      <description>Automate gym membership renewal reminders via WhatsApp — without spamming members. Templates, timing, and the IST-aware logic that catches every renewal window.</description>
+      <author>noreply@n3fitbook.in (N3FitBook Team)</author>
+      <category>whatsapp</category>
+      <category>renewals</category>
+      <category>automation</category>
+      <category>member-retention</category>
+    </item>
+  </channel>
+</rss>
