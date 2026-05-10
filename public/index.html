@@ -183,6 +183,28 @@
     -->
   <title>N3FitBook | Gym Management</title>
 
+  <!-- Mark public routes (landing, blog, legal, login) so the inline app-shell
+       skeleton below can suppress the dashboard sidebar/topbar mockup on those
+       paths. Without this, a hard refresh on the landing page briefly shows
+       dashboard chrome before React mounts the real landing layout. The
+       canonical public-route list lives in src/app/routes.jsx. -->
+  <script>
+    (function () {
+      var p = window.location.pathname;
+      if (
+        p === '/' ||
+        p === '/privacy' ||
+        p === '/terms' ||
+        p === '/login' ||
+        p === '/admin' ||
+        p === '/blog' ||
+        p.indexOf('/blog/') === 0
+      ) {
+        document.documentElement.setAttribute('data-public-route', '');
+      }
+    })();
+  </script>
+
   <!-- Inline app-shell skeleton. Paints before the React bundle parses, so the
        user sees structure within ~50 ms of HTML response instead of a blank
        screen. React mounts into #root and replaces it. Stays in sync with the
@@ -205,6 +227,11 @@
           linear-gradient(#111827,#111827) 72px top / calc(100% - 72px) 64px no-repeat;
       }
     }
+    /* Public routes don't have a sidebar/topbar layout, so the dashboard
+       mockup above is misleading on landing/blog/legal/login. Spinner
+       alone is enough until React mounts. The data attribute is set by
+       the inline script earlier in <head>. */
+    html[data-public-route] #root:empty::before{background:none}
     #root:empty::after{
       content:"";
       position:fixed;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;
