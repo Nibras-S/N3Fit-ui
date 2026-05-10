@@ -3,13 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
-    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle
+    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle, FaIdCard
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import EditEndDateModal from '../components/EditEndDateModal';
+import MembershipHistoryTab from '../components/MembershipHistoryTab';
 import { ProfileSkeleton } from '../../../shared/components/ui/Skeleton';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -145,6 +146,13 @@ function MemberProfile() {
                     >
                         Transaction History
                         {activeTab === 'history' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-white rounded-t-full"></div>}
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('memberships')}
+                        className={`pb-3 px-1 text-sm font-medium transition-colors relative flex items-center gap-1.5 ${activeTab === 'memberships' ? 'text-zinc-900 dark:text-zinc-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+                    >
+                        <FaIdCard className="text-xs" /> Memberships
+                        {activeTab === 'memberships' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 dark:bg-white rounded-t-full"></div>}
                     </button>
                     <button
                         onClick={() => setActiveTab('audit')}
@@ -337,6 +345,9 @@ function MemberProfile() {
                                 </div>
                             )}
                         </div>
+                    )}
+                    {activeTab === 'memberships' && (
+                        <MembershipHistoryTab memberId={id} />
                     )}
                     {activeTab === 'audit' && (
                         <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">

@@ -15,6 +15,7 @@ export const memberKeys = {
     detail: (id) => [...memberKeys.details(), id],
     detailTransactions: (id) => [...memberKeys.detail(id), 'transactions'],
     detailAudit: (id) => [...memberKeys.detail(id), 'audit'],
+    detailMemberships: (id) => [...memberKeys.detail(id), 'memberships'],
     birthdays: () => [...memberKeys.all, 'birthdays'],
 };
 
@@ -87,6 +88,21 @@ export function useMemberAudit(id) {
         queryKey: memberKeys.detailAudit(id),
         queryFn: async () => {
             const res = await api.get(`/contacts/${id}/audit`, { silent: true });
+            return Array.isArray(res.data) ? res.data : [];
+        },
+        enabled: Boolean(id),
+    });
+}
+
+// Membership history for a single member. Reads from the new /memberships
+// endpoint introduced in the membership refactor. Returns rows ordered by
+// startDate descending (most recent first). Nested under the member's detail
+// key so the membership:created socket event invalidates it via RealtimeSync.
+export function useMemberMemberships(id) {
+    return useQuery({
+        queryKey: memberKeys.detailMemberships(id),
+        queryFn: async () => {
+            const res = await api.get('/memberships', { params: { memberId: id } });
             return Array.isArray(res.data) ? res.data : [];
         },
         enabled: Boolean(id),

@@ -8,12 +8,11 @@ import {
     AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import api from '../../../shared/services/api';
-import toast from 'react-hot-toast';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
+import { useExpenseReport } from '../hooks/useReportsQueries';
 
 const COLORS = ['#3f3f46', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
 
@@ -43,40 +42,27 @@ const ExpenseDetailPage = () => {
         return { preset, ...computePresetRange(preset) };
     });
 
-    const [loading, setLoading] = useState(true);
-    const [data, setData] = useState({
+    const EMPTY = useMemo(() => ({
         kpi: { totalExpense: 0, expenseCount: 0, avgExpense: 0, largestCategory: '—', largestVendor: '—' },
         trend: [],
         byCategory: [],
         byMethod: [],
         byVendor: [],
         expenses: [],
-    });
+    }), []);
 
-    const fetchData = async () => {
-        try {
-            setLoading(true);
-            const params = new URLSearchParams();
-            if (filter.startDate) params.set('startDate', filter.startDate);
-            if (filter.endDate) params.set('endDate', filter.endDate);
-            const res = await api.get(`/reports/expense?${params.toString()}`);
-            setData(res.data);
-        } catch (err) {
-            toast.error('Failed to load expense report');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const query = useExpenseReport(filter);
+    const data = query.data || EMPTY;
+    const loading = query.isLoading || query.isFetching;
+    const fetchData = () => query.refetch();
 
     useEffect(() => {
-        fetchData();
         const next = new URLSearchParams();
         if (filter.preset) next.set('preset', filter.preset);
         if (filter.startDate) next.set('startDate', filter.startDate);
         if (filter.endDate) next.set('endDate', filter.endDate);
         setSearchParams(next, { replace: true });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter]);
+    }, [filter, setSearchParams]);
 
     const buildExpenseExport = () => ({
         filename: 'expenses',

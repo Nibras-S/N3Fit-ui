@@ -82,6 +82,28 @@ export function fromDateInputToISO(value) {
     return new Date(Date.UTC(y, m - 1, d) - IST_OFFSET_MS).toISOString();
 }
 
+/**
+ * Today's IST calendar date as a `YYYY-MM-DD` string suitable for
+ * `<input type="date">`. Replaces the footgun `new Date().toISOString().split('T')[0]`
+ * which returns the UTC date — wrong for any user not in UTC, e.g. a 1 AM IST
+ * user gets yesterday.
+ */
+export function getTodayDateInputIST(at = Date.now()) {
+    const ist = new Date(at + IST_OFFSET_MS);
+    const y = ist.getUTCFullYear();
+    const m = String(ist.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(ist.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+
+/** Format any Date-ish value as a `YYYY-MM-DD` IST calendar date. */
+export function toDateInputIST(input) {
+    if (!input) return '';
+    const d = input instanceof Date ? input : new Date(input);
+    if (isNaN(d.getTime())) return '';
+    return getTodayDateInputIST(d.getTime());
+}
+
 /** Common preset date ranges, all computed in IST. */
 export function getISTRange(preset) {
     const today = getISTMidnightUTC();

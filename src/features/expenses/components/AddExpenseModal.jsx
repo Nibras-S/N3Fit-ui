@@ -4,12 +4,13 @@ import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import { FileUpload } from '../../../shared/components/ui/file-upload/file-upload-base';
+import { getTodayDateInputIST, toDateInputIST } from '../../../shared/lib/timezone';
 
 const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
     const [formData, setFormData] = useState({
         category: '',
         amount: '',
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayDateInputIST(),
         paymentMethod: 'Cash',
         vendor: '',
         note: '',
@@ -71,7 +72,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
             setFormData({
                 category: expense.category,
                 amount: expense.amount,
-                date: new Date(expense.date).toISOString().split('T')[0],
+                date: toDateInputIST(expense.date),
                 paymentMethod: expense.paymentMethod,
                 vendor: expense.vendor || '',
                 note: expense.note || '',
@@ -94,7 +95,7 @@ const AddExpenseModal = ({ isOpen, onClose, onRefresh, expense = null }) => {
             setFormData({
                 category: '',
                 amount: '',
-                date: new Date().toISOString().split('T')[0],
+                date: getTodayDateInputIST(),
                 paymentMethod: 'Cash',
                 vendor: '',
                 note: '',

@@ -38,6 +38,7 @@ export default function RealtimeSync() {
         () => {
             queryClient.invalidateQueries({ queryKey: ['transactions'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['reports'] });
             // Member profile page caches transactions under the member detail
             // subtree; a recorded payment needs to flush that too.
             queryClient.invalidateQueries({ queryKey: ['members', 'detail'] });
@@ -49,6 +50,19 @@ export default function RealtimeSync() {
         () => {
             queryClient.invalidateQueries({ queryKey: ['expenses'] });
             queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['reports'] });
+        },
+    );
+
+    // Membership refactor (PR-2): the renewal/registration routes write a
+    // Membership row alongside Member + Transaction and emit this event.
+    // PR-3 will read from this collection; for now it just keeps the
+    // Membership History tab fresh on the member profile.
+    useGymSocket(
+        ['membership:created', 'membership:updated'],
+        () => {
+            queryClient.invalidateQueries({ queryKey: ['memberships'] });
+            queryClient.invalidateQueries({ queryKey: ['members', 'detail'] });
         },
     );
 
