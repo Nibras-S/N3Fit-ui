@@ -30,11 +30,13 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "CI=false craco build && node scripts/sw-inject.js",
+    "build": "CI=false craco build && node scripts/sw-inject.js && node scripts/generate-sitemap.js",
     "test": "craco test",
     "eject": "react-scripts eject",
     "generate-splash": "node scripts/generate-splash.js",
-    "generate-favicons": "node scripts/generate-favicons.js"
+    "generate-favicons": "node scripts/generate-favicons.js",
+    "generate-sitemap": "node scripts/generate-sitemap.js",
+    "generate-og-image": "node scripts/generate-og-image.js"
   },
   "eslintConfig": {
     "extends": [

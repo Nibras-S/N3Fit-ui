@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FreeTrialModal from '../components/FreeTrialModal';
 import LegalPageLayout from '../components/LegalPageLayout';
+import useDocumentMeta from '../../../shared/hooks/useDocumentMeta';
 import '../styles/landing.css';
 
 export default function TermsOfServicePage() {
   const [trialOpen, setTrialOpen] = useState(false);
 
-  useEffect(() => {
-    document.title = 'Terms of Service — N3FitBook';
-  }, []);
+  useDocumentMeta({
+    title: 'Terms of Service — N3FitBook',
+    description: 'Terms governing your access to and use of the N3FitBook gym management platform. Last updated May 2026.',
+    canonical: 'https://n3fitbook.in/terms',
+    ogType: 'article',
+  });
 
   return (
     <div className="landing-page-wrapper min-h-screen">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaInstagram, FaTwitter, FaLinkedinIn, FaYoutube } from 'react-icons/fa';
+import { FaInstagram } from 'react-icons/fa';
 import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 
 const footerLinks = {
@@ -15,17 +15,13 @@ const footerLinks = {
     { label: 'Blog', href: 'https://www.n3global.tech/blog/custom-software-saas-kerala/' },
     { label: 'Contact', href: 'mailto:contact@n3global.tech' },
   ],
-  Support: [
-    { label: 'Help Center', href: '#' },
-    { label: 'contact@n3global.tech', href: 'mailto:contact@n3global.tech' },
-  ],
 };
 
+// N3FitBook social presence. Add LinkedIn / Twitter / YouTube here when those
+// accounts exist. Empty placeholders are intentionally omitted — better to
+// show one real handle than four icons where three go nowhere.
 const socials = [
-  { icon: FaInstagram, href: 'https://www.instagram.com/n3globaltech' },
-  { icon: FaTwitter, href: '#' },
-  { icon: FaLinkedinIn, href: 'https://www.linkedin.com/company/n3-global-tech' },
-  { icon: FaYoutube, href: '#' },
+  { icon: FaInstagram, label: 'Instagram', href: 'https://www.instagram.com/n3fitbook' },
 ];
 
 const legalLinks = [
@@ -53,7 +49,7 @@ export default function Footer() {
       }}
     >
       <div className="landing-container">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-2 lg:col-span-2">
             <div
@@ -88,6 +84,8 @@ export default function Footer() {
                     target={isExternal ? '_blank' : undefined}
                     rel={isExternal ? 'noopener noreferrer' : undefined}
                     className="landing-footer-social"
+                    aria-label={`N3FitBook on ${s.label}`}
+                    title={`N3FitBook on ${s.label}`}
                   >
                     <Icon size={16} />
                   </a>

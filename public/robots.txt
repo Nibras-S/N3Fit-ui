@@ -1,3 +1,37 @@
 # https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
-Disallow:
+
+# Public marketing pages — explicitly allowed (default, but stated for clarity).
+Allow: /
+Allow: /privacy
+Allow: /terms
+Allow: /blog
+Allow: /blog/
+
+# Auth-gated app surfaces — blocked from crawl. These pages would 401/redirect
+# anyway, but excluding them keeps Google from wasting crawl budget and from
+# accidentally surfacing tenant URLs in search.
+Disallow: /login
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /members
+Disallow: /register
+Disallow: /inactivesoon
+Disallow: /birthdays
+Disallow: /transactions
+Disallow: /invoice
+Disallow: /expenses
+Disallow: /reports
+Disallow: /staff
+Disallow: /settings
+Disallow: /notifications
+Disallow: /announcement
+Disallow: /account
+Disallow: /superadmin
+
+# Static asset folders that don't need indexing on their own.
+Disallow: /static/
+Disallow: /splash/
+
+Sitemap: https://n3fitbook.in/sitemap.xml

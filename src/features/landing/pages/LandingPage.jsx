@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -8,6 +8,7 @@ import HowItWorks from '../components/HowItWorks';
 import Pricing from '../components/Pricing';
 import Testimonials from '../components/Testimonials';
 import { FiArrowUp } from 'react-icons/fi';
+import useDocumentMeta from '../../../shared/hooks/useDocumentMeta';
 
 import '../styles/landing.css';
 
@@ -31,9 +32,15 @@ export default function LandingPage() {
     restDelta: 0.001,
   });
 
-  useEffect(() => {
-    document.title = 'N3FitBook — All-in-One Fitness Management Platform';
-  }, []);
+  useDocumentMeta({
+    title: 'Gym Management Software India | N3FitBook',
+    description: "Complete gym management software for India. Track members, billing, attendance, expenses & WhatsApp reminders from one platform. Start your free trial today.",
+    canonical: 'https://n3fitbook.in/',
+    ogTitle: 'N3FitBook — All-in-One Gym Management Platform',
+    ogDescription: "Members, billing, attendance, expenses, WhatsApp reminders — every gym management tool in one platform. Built for Indian gyms.",
+    ogImage: 'https://n3fitbook.in/og-image.png',
+    ogType: 'website',
+  });
 
   return (
     <div className="landing-page-wrapper min-h-screen">

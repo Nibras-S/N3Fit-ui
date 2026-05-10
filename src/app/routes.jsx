@@ -29,6 +29,7 @@ const LayoutSkeleton = () => (
 const LandingPage = lazy(() => import('../features/landing/pages/LandingPage'));
 const PrivacyPolicyPage = lazy(() => import('../features/landing/pages/PrivacyPolicyPage'));
 const TermsOfServicePage = lazy(() => import('../features/landing/pages/TermsOfServicePage'));
+const NotFoundPage = lazy(() => import('../features/landing/pages/NotFoundPage'));
 
 // Members
 const MembersPage = lazy(() => import('../features/members/pages/MembersPage'));
@@ -144,7 +145,7 @@ export default function AppRoutes() {
                 </Route>
 
                 {/* ── Catch-all ───────────────────────────────────────── */}
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
             </Routes>
         </Suspense>
     );

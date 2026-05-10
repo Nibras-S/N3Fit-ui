@@ -1,16 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import FreeTrialModal from '../components/FreeTrialModal';
 import LegalPageLayout from '../components/LegalPageLayout';
+import useDocumentMeta from '../../../shared/hooks/useDocumentMeta';
 import '../styles/landing.css';
 
 export default function PrivacyPolicyPage() {
   const [trialOpen, setTrialOpen] = useState(false);
 
-  useEffect(() => {
-    document.title = 'Privacy Policy — N3FitBook';
-  }, []);
+  useDocumentMeta({
+    title: 'Privacy Policy — N3FitBook',
+    description: 'How N3FitBook collects, uses, and protects your data and your gym members’ data. Last updated May 2026.',
+    canonical: 'https://n3fitbook.in/privacy',
+    ogType: 'article',
+  });
 
   return (
     <div className="landing-page-wrapper min-h-screen">
