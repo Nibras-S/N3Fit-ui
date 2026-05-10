@@ -24,7 +24,12 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&family=Inter:wght@600&display=swap" />
 
-  <link rel="icon" type="image/png" href="%PUBLIC_URL%/n3fitbook-192.png" />
+  <!-- Favicons. /favicon.ico is the legacy convention crawlers (Google Search,
+       social previews) request first; without a real file there, the SPA fallback
+       returns index.html and Google falls back to the generic globe icon. -->
+  <link rel="icon" href="%PUBLIC_URL%/favicon.ico" sizes="any" />
+  <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/favicon-16x16.png" />
   <link rel="icon" type="image/svg+xml" href="%PUBLIC_URL%/n3fitbook.svg" />
   <link rel="apple-touch-icon" href="%PUBLIC_URL%/n3fitbook-192.png" />
   <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />

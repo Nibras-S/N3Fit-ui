@@ -33,7 +33,8 @@
     "build": "CI=false craco build && node scripts/sw-inject.js",
     "test": "craco test",
     "eject": "react-scripts eject",
-    "generate-splash": "node scripts/generate-splash.js"
+    "generate-splash": "node scripts/generate-splash.js",
+    "generate-favicons": "node scripts/generate-favicons.js"
   },
   "eslintConfig": {
     "extends": [
