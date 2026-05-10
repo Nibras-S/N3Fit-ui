@@ -48,7 +48,7 @@ export default function Navbar({ onOpenTrial }) {
       >
         <div className="landing-nav-inner">
           <div className="landing-nav-logo" onClick={() => navigate('/')}>
-            <img src={n3fitbookLogo} alt="N3FitBook" />
+            <img src={n3fitbookLogo} alt="N3FitBook" width={192} height={192} />
             <span>N3FitBook</span>
           </div>
 

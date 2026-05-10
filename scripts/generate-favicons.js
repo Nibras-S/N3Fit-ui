@@ -11,9 +11,13 @@
  * back to the generic globe icon in search results.
  *
  * Output:
- *   public/favicon.ico         — proper ICO container with 16x16 + 32x32 + 48x48 PNG entries
+ *   public/favicon.ico         — proper ICO container with 16/32/48/96 PNG entries
  *   public/favicon-32x32.png   — explicit hint for the most-common tab size
  *   public/favicon-16x16.png   — for legacy browsers / address-bar usage
+ *
+ * Why 96 alongside 48: Google's favicon-in-search picker prefers icons that
+ * are a multiple of 48 and >= 48px. Including 96 gives crisper rendering on
+ * high-DPI listings without bloating the ICO meaningfully.
  */
 
 const fs = require('fs');
@@ -23,7 +27,7 @@ const sharp = require('sharp');
 const ROOT = path.resolve(__dirname, '..');
 const SRC = path.join(ROOT, 'public', 'n3fitbook-192.png');
 const PUBLIC_DIR = path.join(ROOT, 'public');
-const ICO_SIZES = [16, 32, 48];
+const ICO_SIZES = [16, 32, 48, 96];
 const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 };
 
 async function renderPng(size) {

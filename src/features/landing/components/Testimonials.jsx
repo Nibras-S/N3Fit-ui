@@ -100,12 +100,12 @@ export default function Testimonials() {
                   {t.avatar}
                 </div>
                 <div>
-                  <h4
+                  <h3
                     className="font-semibold text-sm"
                     style={{ color: 'var(--landing-text)' }}
                   >
                     {t.name}
-                  </h4>
+                  </h3>
                   <p
                     className="text-xs"
                     style={{ color: 'var(--landing-text-muted)' }}

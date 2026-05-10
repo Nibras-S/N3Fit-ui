@@ -199,7 +199,7 @@ export default function FreeTrialModal({ isOpen, onClose }) {
                                             {loading ? 'Submitting…' : 'Start Free Trial →'}
                                         </button>
 
-                                        <p className="text-xs text-center text-gray-400">
+                                        <p className="text-xs text-center text-gray-600 dark:text-gray-400">
                                             By submitting you agree to our terms. No spam, ever.
                                         </p>
                                     </form>

@@ -80,6 +80,8 @@ export default function Footer() {
               <img
                 src={n3fitbookLogo}
                 alt="N3FitBook"
+                width={192}
+                height={192}
                 style={{
                   height: '36px',
                   width: 'auto',
@@ -119,12 +121,12 @@ export default function Footer() {
           {/* Link columns */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h4
+              <h3
                 className="font-semibold text-sm mb-4 uppercase tracking-wider"
                 style={{ color: 'rgba(255,255,255,0.9)' }}
               >
                 {title}
-              </h4>
+              </h3>
               <div className="flex flex-col gap-2.5">
                 {links.map((link, i) => {
                   const isExternal = link.href.startsWith('http');

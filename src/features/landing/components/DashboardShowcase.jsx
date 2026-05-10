@@ -55,7 +55,7 @@ const DashboardShowcase = () => {
                                     NOT GUESSES
                                 </span>
                             </h2>
-                            <p className="text-lg mb-10 leading-relaxed" style={{ color: '#666' }}>
+                            <p className="text-lg mb-10 leading-relaxed" style={{ color: '#a3a3a3' }}>
                                 Track every metric that matters — revenue, retention, staff efficiency — all from one beautiful dashboard updated in real-time.
                             </p>
                         </motion.div>
@@ -90,7 +90,7 @@ const DashboardShowcase = () => {
                                         <i className={stat.icon}></i>
                                     </div>
                                     <div className="flex-1">
-                                        <p className="text-sm font-medium" style={{ color: '#555' }}>{stat.label}</p>
+                                        <p className="text-sm font-medium" style={{ color: '#9ca3af' }}>{stat.label}</p>
                                         <p className="text-2xl font-extrabold" style={{ color: '#00d4ff', fontFamily: "'Outfit', sans-serif" }}>
                                             <AnimNum end={stat.value} suffix={stat.suffix} prefix={stat.prefix} />
                                         </p>
@@ -134,9 +134,13 @@ const DashboardShowcase = () => {
                             style={{ background: 'rgba(0,212,255,0.02)' }}
                         ></div>
                         <img
-                            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=2426"
+                            src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200"
                             alt="Analytics Dashboard"
-                            className="relative rounded-2xl shadow-2xl"
+                            width={1200}
+                            height={750}
+                            loading="lazy"
+                            decoding="async"
+                            className="relative rounded-2xl shadow-2xl w-full h-auto"
                             style={{ border: '1px solid rgba(255,255,255,0.08)' }}
                         />
                         {/* Floating alert */}
@@ -159,7 +163,7 @@ const DashboardShowcase = () => {
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold" style={{ color: '#fff' }}>5 Memberships Expiring</p>
-                                    <p className="text-[10px]" style={{ color: '#555' }}>Action Required Today</p>
+                                    <p className="text-[10px]" style={{ color: '#9ca3af' }}>Action Required Today</p>
                                 </div>
                             </div>
                         </motion.div>

@@ -38,7 +38,7 @@ function MemberListVisual() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium truncate" style={{ color: 'var(--landing-text)' }}>{m.name}</div>
-            <div className="text-xs" style={{ color: 'var(--landing-text-light)' }}>{m.plan} Plan</div>
+            <div className="text-xs" style={{ color: 'var(--landing-text-muted)' }}>{m.plan} Plan</div>
           </div>
           <span
             className="text-[10px] font-semibold uppercase px-2 py-0.5 rounded-full"
@@ -104,7 +104,7 @@ function BillingVisual() {
       >
         <div>
           <div className="text-xs font-medium" style={{ color: 'var(--landing-text)' }}>INV-2024-0042</div>
-          <div className="text-[10px]" style={{ color: 'var(--landing-text-light)' }}>Rahul K. &bull; Pro Plan</div>
+          <div className="text-[10px]" style={{ color: 'var(--landing-text-muted)' }}>Rahul K. &bull; Pro Plan</div>
         </div>
         <div className="text-sm font-bold" style={{ color: '#059669' }}>₹2,999</div>
       </div>
@@ -114,7 +114,7 @@ function BillingVisual() {
       >
         <div>
           <div className="text-xs font-medium" style={{ color: 'var(--landing-text)' }}>INV-2024-0043</div>
-          <div className="text-[10px]" style={{ color: 'var(--landing-text-light)' }}>Priya S. &bull; Basic Plan</div>
+          <div className="text-[10px]" style={{ color: 'var(--landing-text-muted)' }}>Priya S. &bull; Basic Plan</div>
         </div>
         <div className="text-sm font-bold" style={{ color: '#059669' }}>₹1,499</div>
       </div>
