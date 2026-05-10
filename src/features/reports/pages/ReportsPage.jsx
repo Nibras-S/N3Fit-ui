@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
+import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 
 const COLORS = ['#3f3f46', '#10b981', '#6366f1', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4'];
@@ -177,6 +178,7 @@ const ReportsPage = () => {
     return (
         <AppLayout title="Reports" description="Complete business overview with revenue tracking" icon={FaChartPie} showGenderSwitch={false}>
             <div className="max-w-7xl mx-auto space-y-6">
+                <ReportBaselineBanner />
                 <div className="flex justify-end items-center gap-3 w-full">
                     <button
                         onClick={fetchReports}

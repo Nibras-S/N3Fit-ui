@@ -66,5 +66,19 @@ export default function RealtimeSync() {
         },
     );
 
+    // Reset Reports feature: when an admin resets/clears the report baseline,
+    // every connected client should refetch their dashboards/reports/expenses
+    // so the new floor is reflected immediately. The settings banner reads
+    // ['settings'] and flushes too.
+    useGymSocket(
+        ['settings:baseline-changed'],
+        () => {
+            queryClient.invalidateQueries({ queryKey: ['settings'] });
+            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+            queryClient.invalidateQueries({ queryKey: ['reports'] });
+            queryClient.invalidateQueries({ queryKey: ['expenses'] });
+        },
+    );
+
     return null;
 }

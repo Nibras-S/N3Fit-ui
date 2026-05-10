@@ -10,6 +10,7 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 import { useDashboardStats } from '../hooks/useDashboardQueries';
+import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -67,6 +68,8 @@ const Dashboard = () => {
     return (
         <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
             <div className="space-y-6 lg:pb-10">
+
+                <ReportBaselineBanner />
 
                 {/* ── Daily Report ──────────────────────────────────────── */}
                 <div className="bg-zinc-100 dark:bg-zinc-900/40 border border-zinc-200 dark:border-zinc-800 p-6 rounded-2xl shadow-sm">

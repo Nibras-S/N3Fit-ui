@@ -13,6 +13,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 import ExportMenu from '../components/ExportMenu';
 import { useExpenseReport } from '../hooks/useReportsQueries';
+import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 
 const COLORS = ['#3f3f46', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#10b981', '#6366f1'];
 
@@ -107,6 +108,7 @@ const ExpenseDetailPage = () => {
     return (
         <AppLayout showGenderSwitch={false}>
             <div className="max-w-7xl mx-auto space-y-6">
+                <ReportBaselineBanner />
                 <button
                     onClick={() => navigate('/reports')}
                     className="flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors text-sm -mb-2"

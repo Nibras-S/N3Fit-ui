@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../../shared/services/api';
 import toast, { Toaster } from 'react-hot-toast';
 import {
     FaSave, FaCog, FaMoneyBillWave, FaSun, FaMoon,
     FaBuilding, FaCamera, FaEnvelope, FaPhone, FaMapMarkerAlt,
     FaBarcode, FaCrown, FaCalendarAlt, FaUser, FaEye, FaEyeSlash,
-    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaUsers, FaCheckCircle, FaTimes
+    FaChevronRight, FaSignOutAlt, FaShieldAlt, FaUsers, FaCheckCircle, FaTimes,
+    FaChartLine
 } from 'react-icons/fa';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
@@ -15,6 +16,7 @@ import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTheme } from '../../../shared/context/ThemeContext';
 import { useAuth } from '../../auth/context/AuthContext';
+import ReportBaselineCard from '../components/ReportBaselineCard';
 
 const SettingItem = ({ icon, title, subtitle, onClick }) => (
     <button
@@ -47,7 +49,24 @@ const Settings = () => {
     const [isEditingProfile, setIsEditingProfile] = useState(false);
     const [isEditingMembers, setIsEditingMembers] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [activeTab, setActiveTab] = useState('main');
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [activeTab, setActiveTab] = useState(() => {
+        const t = searchParams.get('tab');
+        // Whitelist of tab names so an arbitrary URL can't open a non-existent tab.
+        return ['profile', 'gym', 'billing', 'members', 'appearance', 'reports'].includes(t) ? t : 'main';
+    });
+
+    // Keep ?tab= in sync with the active tab so the banner's "Manage" deep link
+    // and the back/forward buttons behave naturally.
+    useEffect(() => {
+        const next = new URLSearchParams(searchParams);
+        if (activeTab === 'main') next.delete('tab');
+        else next.set('tab', activeTab);
+        if (next.toString() !== searchParams.toString()) {
+            setSearchParams(next, { replace: true });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab]);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
     const [passwordData, setPasswordData] = useState({ newPassword: "", confirmPassword: "" });
     const [profileForm, setProfileForm] = useState({ name: "", email: "" });
@@ -333,6 +352,14 @@ const Settings = () => {
                                         title="Member Settings"
                                         subtitle="Archive rules and member defaults"
                                         onClick={() => setActiveTab('members')}
+                                    />
+                                    <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
+
+                                    <SettingItem
+                                        icon={<FaChartLine />}
+                                        title="Reports"
+                                        subtitle="Reset reports baseline · audit history"
+                                        onClick={() => setActiveTab('reports')}
                                     />
                                     <div className="h-px bg-gray-50 dark:bg-zinc-800/50 mx-4"></div>
                                 </>
@@ -1037,6 +1064,12 @@ const Settings = () => {
                                 </p>
                             </div>
                         </div>
+                    </div>
+                )}
+
+                {user?.role === 'gymadmin' && activeTab === 'reports' && (
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <ReportBaselineCard />
                     </div>
                 )}
 
