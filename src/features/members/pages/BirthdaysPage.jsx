@@ -94,7 +94,7 @@ const BirthdaysPage = () => {
                 </div>
 
                 {/* Filter chips */}
-                <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
+                <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
                     {FILTER_OPTIONS.map(opt => {
                         const count = counts[opt.key];
                         const isActive = activeFilter === opt.key;

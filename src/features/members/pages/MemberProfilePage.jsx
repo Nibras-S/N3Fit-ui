@@ -131,8 +131,8 @@ function MemberProfile() {
             </div>
 
             {/* Tabs */}
-            <div className="border-b border-gray-200 dark:border-zinc-800 mb-6">
-                <div className="flex gap-6">
+            <div className="border-b border-gray-200 dark:border-zinc-800 mb-6 overflow-x-auto hide-scrollbar">
+                <div className="flex gap-6 min-w-max">
                     <button
                         onClick={() => setActiveTab('overview')}
                         className={`pb-3 px-1 text-sm font-medium transition-colors relative ${activeTab === 'overview' ? 'text-zinc-900 dark:text-zinc-500' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}

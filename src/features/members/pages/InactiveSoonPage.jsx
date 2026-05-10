@@ -152,7 +152,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
       </div>
 
       {/* Status filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
         {["All", "Pending", "Sent"].map((filter) => (
           <button
             key={filter}
@@ -170,7 +170,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
       </div>
 
       {/* Days filter chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+      <div className="flex gap-2 overflow-x-auto pb-1 hide-scrollbar">
         {["All", "4", "3", "2", "1", "0"].map((day) => (
           <button
             key={day}
