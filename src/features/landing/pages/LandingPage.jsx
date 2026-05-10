@@ -10,6 +10,9 @@ import Pricing from '../components/Pricing';
 import Testimonials from '../components/Testimonials';
 import { FiArrowUp } from 'react-icons/fi';
 import useDocumentMeta from '../../../shared/hooks/useDocumentMeta';
+import useStructuredData from '../../../shared/seo/useStructuredData';
+import { softwareApplicationSchema, faqPageSchema } from '../../../shared/seo/schemas';
+import { faqs } from '../data/faqs';
 
 import '../styles/landing.css';
 
@@ -60,6 +63,15 @@ export default function LandingPage() {
     ogImage: 'https://www.n3fitbook.in/og-image.png',
     ogType: 'website',
   });
+
+  // SoftwareApplication eligibility for the product rich result + FAQPage
+  // eligibility for the FAQ rich snippet. The FAQ schema reads from the
+  // same source as the visible FAQ component below (data/faqs.js), so the
+  // text Google sees in the schema always matches the on-page content.
+  useStructuredData([
+    softwareApplicationSchema(),
+    faqPageSchema(faqs),
+  ]);
 
   return (
     <div className="landing-page-wrapper min-h-screen">

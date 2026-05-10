@@ -4,6 +4,8 @@ import Footer from '../components/Footer';
 import FreeTrialModal from '../components/FreeTrialModal';
 import LegalPageLayout from '../components/LegalPageLayout';
 import useDocumentMeta from '../../../shared/hooks/useDocumentMeta';
+import useStructuredData from '../../../shared/seo/useStructuredData';
+import { breadcrumbSchema } from '../../../shared/seo/schemas';
 import '../styles/landing.css';
 
 export default function TermsOfServicePage() {
@@ -15,6 +17,13 @@ export default function TermsOfServicePage() {
     canonical: 'https://www.n3fitbook.in/terms',
     ogType: 'article',
   });
+
+  useStructuredData([
+    breadcrumbSchema([
+      { name: 'Home', url: 'https://www.n3fitbook.in/' },
+      { name: 'Terms of Service', url: 'https://www.n3fitbook.in/terms' },
+    ]),
+  ]);
 
   return (
     <div className="landing-page-wrapper min-h-screen">

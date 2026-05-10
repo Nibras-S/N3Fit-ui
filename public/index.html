@@ -69,6 +69,67 @@
   <!-- RSS feed for the in-app blog. Discoverable by feed readers and
        Google's structured-data crawler. -->
   <link rel="alternate" type="application/rss+xml" title="N3FitBook Blog" href="%PUBLIC_URL%/rss.xml" />
+
+  <!-- ── Site-wide JSON-LD ─────────────────────────────────────────────
+       Static here so crawlers always see them on initial HTML load,
+       independent of JS execution. Per-page schemas (SoftwareApplication,
+       FAQPage, BreadcrumbList, Article) are injected at runtime by the
+       useStructuredData hook from each page component.
+
+       IMPORTANT: keep these in sync with src/shared/seo/schemas.js
+       (organizationSchema and webSiteSchema). If a social handle, contact
+       email, or address ever changes, update both files in the same diff. -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://www.n3fitbook.in/#organization",
+    "name": "N3FitBook",
+    "legalName": "N3FitBook",
+    "url": "https://www.n3fitbook.in",
+    "logo": "https://www.n3fitbook.in/n3fitbook-512.png",
+    "image": "https://www.n3fitbook.in/og-image.png",
+    "description": "Complete gym management software for India — members, billing, attendance, expenses & WhatsApp reminders in one platform.",
+    "sameAs": [
+      "https://www.instagram.com/n3fitbook"
+    ],
+    "parentOrganization": {
+      "@type": "Organization",
+      "name": "N3 Global Tech",
+      "url": "https://www.n3global.tech",
+      "sameAs": [
+        "https://x.com/N3Globaltech",
+        "https://www.instagram.com/n3globaltech",
+        "https://www.linkedin.com/company/n3-global-tech"
+      ]
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "contact@n3global.tech",
+      "contactType": "customer support",
+      "areaServed": "IN",
+      "availableLanguage": ["English", "Hindi", "Malayalam"]
+    },
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Kannur",
+      "addressRegion": "Kerala",
+      "addressCountry": "IN"
+    }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://www.n3fitbook.in/#website",
+    "url": "https://www.n3fitbook.in",
+    "name": "N3FitBook",
+    "description": "Gym management software for India.",
+    "publisher": { "@id": "https://www.n3fitbook.in/#organization" },
+    "inLanguage": "en-IN"
+  }
+  </script>
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="N3FitBook" />
