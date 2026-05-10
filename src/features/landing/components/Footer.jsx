@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaInstagram } from 'react-icons/fa';
+import { FaInstagram, FaXTwitter } from 'react-icons/fa6';
 import n3fitbookLogo from '../../../assets/n3fitbook-192.webp';
 
 const footerLinks = {
@@ -13,15 +13,29 @@ const footerLinks = {
   Company: [
     { label: 'About Us', href: 'https://www.n3global.tech', external: true },
     { label: 'Blog', href: 'https://www.n3global.tech/blog/custom-software-saas-kerala/' },
-    { label: 'Contact', href: 'mailto:contact@n3global.tech' },
+    // The mailto opens the user's email client. We also surface the address
+    // via the title attribute so visitors on a desktop browser without an
+    // email app configured can hover/long-press to read and copy it.
+    { label: 'Contact', href: 'mailto:contact@n3global.tech', title: 'Email contact@n3global.tech' },
+  ],
+  Support: [
+    // Help Center previously pointed to "#" which scrolled to top and did
+    // nothing useful. Both items below resolve to real destinations: FAQ
+    // smooth-scrolls to the on-page FAQ section; Email Support opens the
+    // mail client with the address ready to copy via title attribute.
+    { label: 'FAQ', href: '#faq' },
+    { label: 'Email Support', href: 'mailto:contact@n3global.tech', title: 'Email contact@n3global.tech' },
   ],
 };
 
-// N3FitBook social presence. Add LinkedIn / Twitter / YouTube here when those
-// accounts exist. Empty placeholders are intentionally omitted — better to
-// show one real handle than four icons where three go nowhere.
+// Social presence. Instagram is the N3FitBook product handle; X is the parent
+// company N3 Global Tech (so the brand-attribution lines up with the "by N3
+// Global Tech" tagline visible just above these icons). Add more rows when
+// new accounts come online — the rendered <a> reads `s.brand` for the
+// aria-label so attribution stays accurate per row.
 const socials = [
-  { icon: FaInstagram, label: 'Instagram', href: 'https://www.instagram.com/n3fitbook' },
+  { icon: FaInstagram, brand: 'N3FitBook', platform: 'Instagram', href: 'https://www.instagram.com/n3fitbook' },
+  { icon: FaXTwitter,  brand: 'N3 Global Tech', platform: 'X', href: 'https://x.com/N3Globaltech' },
 ];
 
 const legalLinks = [
@@ -32,10 +46,17 @@ const legalLinks = [
 export default function Footer() {
   const navigate = useNavigate();
 
+  // Anchor-link scroll. The Footer renders on /, /privacy, /terms, and the
+  // 404 page — Privacy/Terms/404 don't have #features, #pricing, #faq etc.
+  // anywhere on them. When the target id isn't on the current page we
+  // navigate home with the hash so the homepage scrolls to it on mount.
   const scrollTo = (href) => {
-    if (href.startsWith('#') && href.length > 1) {
-      const el = document.querySelector(href);
-      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    if (!href.startsWith('#') || href.length <= 1) return;
+    const el = document.querySelector(href);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate(`/${href}`);
     }
   };
 
@@ -49,7 +70,7 @@ export default function Footer() {
       }}
     >
       <div className="landing-container">
-        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-10 mb-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-10 mb-12">
           {/* Brand */}
           <div className="col-span-2 md:col-span-2 lg:col-span-2">
             <div
@@ -77,6 +98,7 @@ export default function Footer() {
               {socials.map((s, i) => {
                 const Icon = s.icon;
                 const isExternal = s.href.startsWith('http');
+                const label = `${s.brand} on ${s.platform}`;
                 return (
                   <a
                     key={i}
@@ -84,8 +106,8 @@ export default function Footer() {
                     target={isExternal ? '_blank' : undefined}
                     rel={isExternal ? 'noopener noreferrer' : undefined}
                     className="landing-footer-social"
-                    aria-label={`N3FitBook on ${s.label}`}
-                    title={`N3FitBook on ${s.label}`}
+                    aria-label={label}
+                    title={label}
                   >
                     <Icon size={16} />
                   </a>
@@ -119,6 +141,7 @@ export default function Footer() {
                       target={isExternal ? '_blank' : undefined}
                       rel={isExternal ? 'noopener noreferrer' : undefined}
                       className="text-sm landing-footer-link"
+                      title={link.title}
                     >
                       {link.label}
                     </a>

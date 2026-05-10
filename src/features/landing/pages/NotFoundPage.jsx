@@ -21,7 +21,7 @@ export default function NotFoundPage() {
     useDocumentMeta({
         title: 'Page not found — N3FitBook',
         description: "We couldn't find the page you were looking for. Try the homepage or visit our gym management features.",
-        canonical: 'https://n3fitbook.in/',
+        canonical: 'https://www.n3fitbook.in/',
         robots: 'noindex, follow',
     });
 

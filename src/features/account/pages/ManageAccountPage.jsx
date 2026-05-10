@@ -35,11 +35,15 @@ const ManageAccountPage = () => {
     const [reportLoading, setReportLoading] = useState(false);
     const gymDropdownRef = useRef(null);
 
-    // Initialize selectedGyms when allGyms loads
+    // Initialize selectedGyms when allGyms loads.
+    // Intentionally omits `selectedGyms.length` from deps: this is a one-shot
+    // bootstrap. If the user later toggles every gym off, we don't want this
+    // effect to re-fire and silently reset their selection back to "all".
     useEffect(() => {
         if (allGyms.length > 1 && selectedGyms.length === 0) {
             setSelectedGyms(allGyms.map(g => g._id?.toString()));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [allGyms]);
 
     // Close gym dropdown on outside click
@@ -73,7 +77,7 @@ const ManageAccountPage = () => {
         if (allGyms.length > 1 && selectedGyms.length > 0) {
             fetchReport();
         }
-    }, [selectedGyms, reportDateRange, fetchReport]);
+    }, [selectedGyms, reportDateRange, fetchReport, allGyms.length]);
 
     const toggleGymSelection = (gymId) => {
         const id = gymId?.toString();

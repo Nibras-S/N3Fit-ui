@@ -12,7 +12,7 @@ export default function PrivacyPolicyPage() {
   useDocumentMeta({
     title: 'Privacy Policy — N3FitBook',
     description: 'How N3FitBook collects, uses, and protects your data and your gym members’ data. Last updated May 2026.',
-    canonical: 'https://n3fitbook.in/privacy',
+    canonical: 'https://www.n3fitbook.in/privacy',
     ogType: 'article',
   });
 

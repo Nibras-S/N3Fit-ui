@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import api from '../../../shared/services/api';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-import { FaMale, FaFemale, FaTimes, FaCamera, FaUpload, FaSyncAlt, FaCropAlt, FaTrash } from 'react-icons/fa';
+import { FaMale, FaFemale, FaTimes, FaCamera, FaUpload, FaSyncAlt, FaCropAlt } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { useNavigate } from 'react-router-dom';

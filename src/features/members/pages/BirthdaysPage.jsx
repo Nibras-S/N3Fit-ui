@@ -4,7 +4,7 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import { useBirthdays } from '../hooks/useMembersQueries';
 import { formatDate } from '../../../shared/lib/formatters';
 import { formatPhoneForDisplay } from '../../../shared/lib/phone';
-import { FaBirthdayCake, FaSearch, FaSync, FaUser } from 'react-icons/fa';
+import { FaBirthdayCake, FaSearch, FaSync } from 'react-icons/fa';
 import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
 
 const FILTER_OPTIONS = [

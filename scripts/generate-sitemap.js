@@ -20,7 +20,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const BUILD_DIR = path.join(ROOT, 'build');
 const BLOG_DIR = path.join(ROOT, 'content', 'blog');
-const SITE_URL = (process.env.REACT_APP_SITE_URL || 'https://n3fitbook.in').replace(/\/$/, '');
+const SITE_URL = (process.env.REACT_APP_SITE_URL || 'https://www.n3fitbook.in').replace(/\/$/, '');
 
 // Public marketing routes. `priority` is informational only — Google doesn't
 // strictly use it, but the file format requires a value in [0.0, 1.0].

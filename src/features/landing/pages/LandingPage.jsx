@@ -1,4 +1,5 @@
-import React, { useState, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
@@ -24,6 +25,24 @@ const FreeTrialModal = lazy(() => import('../components/FreeTrialModal'));
 
 export default function LandingPage() {
   const [trialOpen, setTrialOpen] = useState(false);
+  const { hash } = useLocation();
+
+  // Scroll to a hash target after the lazy below-the-fold sections have had
+  // a chance to mount. The footer links from /privacy and /terms navigate
+  // here as `/#faq`; without this the browser can't find #faq because the
+  // FAQ chunk hasn't rendered yet.
+  useEffect(() => {
+    if (!hash) return;
+    const tryScroll = (attempt = 0) => {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      } else if (attempt < 10) {
+        setTimeout(() => tryScroll(attempt + 1), 200);
+      }
+    };
+    tryScroll();
+  }, [hash]);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -35,10 +54,10 @@ export default function LandingPage() {
   useDocumentMeta({
     title: 'Gym Management Software India | N3FitBook',
     description: "Complete gym management software for India. Track members, billing, attendance, expenses & WhatsApp reminders from one platform. Start your free trial today.",
-    canonical: 'https://n3fitbook.in/',
+    canonical: 'https://www.n3fitbook.in/',
     ogTitle: 'N3FitBook — All-in-One Gym Management Platform',
     ogDescription: "Members, billing, attendance, expenses, WhatsApp reminders — every gym management tool in one platform. Built for Indian gyms.",
-    ogImage: 'https://n3fitbook.in/og-image.png',
+    ogImage: 'https://www.n3fitbook.in/og-image.png',
     ogType: 'website',
   });
 

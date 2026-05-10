@@ -37,9 +37,6 @@ export function computePresetRange(preset) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
-    const endOfDay   = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
-
     switch (preset) {
         case 'today': {
             return { startDate: toIso(today), endDate: toIso(today) };

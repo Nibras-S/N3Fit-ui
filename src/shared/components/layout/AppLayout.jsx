@@ -84,7 +84,7 @@ export function AppLayout({
   };
 
   const { isDirty, setDirty } = useFormState();
-  const { user, logout, hasFeature, switchGym, api } = useAuth();
+  const { user, logout, hasFeature, api } = useAuth();
   const {
     unreadCount,
     activeWarning,

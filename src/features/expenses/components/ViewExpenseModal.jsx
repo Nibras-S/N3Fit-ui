@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTimes, FaRupeeSign, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaStickyNote, FaDownload, FaEye, FaFilePdf, FaImage, FaTimesCircle, FaCheckCircle } from 'react-icons/fa';
+import { FaTimes, FaCalendarAlt, FaTag, FaCreditCard, FaUser, FaDownload, FaEye, FaFilePdf, FaTimesCircle, FaCheckCircle } from 'react-icons/fa';
 
 const ViewExpenseModal = ({ isOpen, onClose, expense }) => {
     if (!isOpen || !expense) return null;

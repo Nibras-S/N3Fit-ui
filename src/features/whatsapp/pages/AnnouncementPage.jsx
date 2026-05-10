@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-    FaBullhorn, FaImage, FaUsers, FaArrowRight,
-    FaCheckCircle, FaExclamationCircle, FaSpinner,
-    FaSearch, FaCheck, FaTrash, FaPlus, FaTimes, FaWhatsapp, FaBell, FaExclamationTriangle
+    FaBullhorn, FaImage, FaUsers,
+    FaCheckCircle,
+    FaSearch, FaTimes, FaWhatsapp, FaBell, FaExclamationTriangle
 } from 'react-icons/fa';
 import toast, { Toaster } from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 
 const Announcement = () => {
@@ -17,7 +16,9 @@ const Announcement = () => {
     const [contacts, setContacts] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedMembers, setSelectedMembers] = useState([]);
-    const [mode, setMode] = useState(user?.role === 'superadmin' ? 'internal' : 'whatsapp'); // whatsapp, internal
+    // Mode is derived once from the user's role at mount; no setter is needed.
+    // If we ever want a UI toggle between modes, restore useState here.
+    const mode = user?.role === 'superadmin' ? 'internal' : 'whatsapp';
     const [gyms, setGyms] = useState([]);
     const [selectedGyms, setSelectedGyms] = useState([]);
     const [fetchingGyms, setFetchingGyms] = useState(false);
@@ -31,17 +32,10 @@ const Announcement = () => {
         type: 'notification' // notification, warning
     });
 
-    const [progress, setProgress] = useState(null);
-
-    useEffect(() => {
-        if (user?.role === 'superadmin') {
-            fetchGyms();
-        } else {
-            fetchContacts();
-        }
-    }, [user]);
-
-    const fetchGyms = async () => {
+    // Wrapped in useCallback so the effect deps below stay stable across
+    // renders. Only `api` is a true dep — useState setters are guaranteed
+    // stable by React.
+    const fetchGyms = useCallback(async () => {
         setFetchingGyms(true);
         try {
             const res = await api.get('/superadmin/gyms');
@@ -53,9 +47,9 @@ const Announcement = () => {
         } finally {
             setFetchingGyms(false);
         }
-    };
+    }, [api]);
 
-    const fetchContacts = async () => {
+    const fetchContacts = useCallback(async () => {
         try {
             const res = await api.get('/contacts/');
             // response.data IS already the unwrapped payload — don't re-unwrap in feature code
@@ -66,7 +60,15 @@ const Announcement = () => {
         } finally {
             setFetchingContacts(false);
         }
-    };
+    }, [api]);
+
+    useEffect(() => {
+        if (user?.role === 'superadmin') {
+            fetchGyms();
+        } else {
+            fetchContacts();
+        }
+    }, [user, fetchGyms, fetchContacts]);
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];

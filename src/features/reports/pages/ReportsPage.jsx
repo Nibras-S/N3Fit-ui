@@ -12,7 +12,6 @@ import {
     AreaChart, Area
 } from 'recharts';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 import DateRangeFilter, { computePresetRange } from '../components/DateRangeFilter';
 

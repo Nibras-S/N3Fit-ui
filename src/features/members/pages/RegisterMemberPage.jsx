@@ -1,7 +1,6 @@
 import React from "react";
 import { FaUserPlus } from "react-icons/fa";
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
 import NewMember from '../components/MemberForm';
 
 function PageNewMember() {

@@ -1,11 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { FaBell, FaCheckDouble, FaExclamationTriangle, FaTrash, FaSpinner } from 'react-icons/fa';
-import { useAuth } from '../../auth/context/AuthContext';
+import React from 'react';
+import { FaBell, FaCheckDouble, FaExclamationTriangle } from 'react-icons/fa';
 import { useNotifications } from '../context/NotificationContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import PageHeader from '../../../shared/components/layout/PageHeader';
-import toast, { Toaster } from 'react-hot-toast';
-import { TableSkeleton } from '../../../shared/components/ui/Skeleton';
+import { Toaster } from 'react-hot-toast';
 
 const Notifications = () => {
     const {

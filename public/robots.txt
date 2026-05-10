@@ -30,8 +30,10 @@ Disallow: /announcement
 Disallow: /account
 Disallow: /superadmin
 
-# Static asset folders that don't need indexing on their own.
-Disallow: /static/
-Disallow: /splash/
+# IMPORTANT: do NOT block /static/, /splash/, or any folder containing JS/CSS.
+# Googlebot needs to fetch the React bundle from /static/* to render the page;
+# without it the indexed snapshot is an empty <div id="root"> shell. The auth
+# routes above are already non-indexable (they 401/redirect), so leaving asset
+# folders open does not introduce any tenant-data exposure.
 
-Sitemap: https://n3fitbook.in/sitemap.xml
+Sitemap: https://www.n3fitbook.in/sitemap.xml

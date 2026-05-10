@@ -4,24 +4,24 @@ import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import toast, { Toaster } from "react-hot-toast";
 import {
-    FaTrashRestore, FaTrash, FaBuilding, FaSearch,
+    FaTrashRestore, FaTrash, FaSearch,
     FaExclamationCircle, FaShieldAlt, FaCogs
 } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 
 const SuperAdminSettings = () => {
     const { api } = useAuth();
     const [deletedGyms, setDeletedGyms] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState("");
 
     // Restore Modal State
     const [isRestoreModalOpen, setIsRestoreModalOpen] = useState(false);
     const [gymToRestore, setGymToRestore] = useState(null);
 
+    // No `loading` state here — the JSX never rendered a skeleton, so the
+    // previous useState was dead code. If a loading indicator is added later,
+    // re-introduce the state and a consumer in the same change.
     const fetchDeletedGyms = useCallback(async () => {
-        setLoading(true);
         try {
             const res = await api.get('/superadmin/gyms/deleted');
             // response.data IS already the unwrapped payload — don't re-unwrap in feature code
@@ -29,8 +29,6 @@ const SuperAdminSettings = () => {
             setDeletedGyms(data);
         } catch (err) {
             toast.error("Failed to load deleted gyms");
-        } finally {
-            setLoading(false);
         }
     }, [api]);
 

@@ -12,7 +12,7 @@ export default function TermsOfServicePage() {
   useDocumentMeta({
     title: 'Terms of Service — N3FitBook',
     description: 'Terms governing your access to and use of the N3FitBook gym management platform. Last updated May 2026.',
-    canonical: 'https://n3fitbook.in/terms',
+    canonical: 'https://www.n3fitbook.in/terms',
     ogType: 'article',
   });
 

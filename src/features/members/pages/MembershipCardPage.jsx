@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FaCheckCircle, FaClock, FaExclamationTriangle,
-    FaDumbbell, FaUser, FaArrowRight, FaMoneyBillWave,
+    FaDumbbell, FaMoneyBillWave,
     FaCalendarAlt, FaIdCard, FaWhatsapp,
 } from 'react-icons/fa';
 import api from '../../../shared/services/api';
@@ -117,7 +117,6 @@ export default function MembershipCardPage() {
 
     const status = transaction?.paymentStatus || 'Pending';
     const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.Pending;
-    const StatusIcon = cfg.icon;
     const profileImg = member.profileImage
         ? (member.profileImage.startsWith('http') ? member.profileImage : `${backendUrl}${member.profileImage}`)
         : null;

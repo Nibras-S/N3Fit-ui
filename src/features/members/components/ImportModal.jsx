@@ -56,7 +56,6 @@ const CSVImportModal = ({ isOpen, onClose, onRefresh }) => {
     const [mapping, setMapping] = useState({});
     const [importing, setImporting] = useState(false);
     const [dateFormat, setDateFormat] = useState('DD-MM-YYYY');
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     const parseCSVLine = (line) => {
         const result = [];

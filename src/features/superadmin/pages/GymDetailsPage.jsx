@@ -9,13 +9,13 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import {
     FaArrowLeft, FaSave, FaBuilding, FaEnvelope, FaPhone,
-    FaMapMarkerAlt, FaCalendarAlt, FaCrown, FaCheckCircle,
-    FaTimesCircle, FaUsers, FaUserShield, FaExclamationTriangle,
-    FaEdit, FaTrash, FaLock, FaGlobe, FaToggleOn, FaToggleOff, FaCogs,
+    FaMapMarkerAlt, FaCrown,
+    FaUsers, FaUserShield, FaExclamationTriangle,
+    FaEdit, FaTrash, FaLock, FaToggleOn, FaToggleOff, FaCogs,
     FaLink, FaUserPlus
 } from "react-icons/fa";
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const GymDetails = () => {
     const { id } = useParams();

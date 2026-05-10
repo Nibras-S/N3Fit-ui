@@ -16,8 +16,8 @@ import { useEffect } from 'react';
  *   useDocumentMeta({
  *     title: 'Gym Management Software | N3FitBook',
  *     description: 'Stop losing revenue to fragmented gym tools…',
- *     canonical: 'https://n3fitbook.in/',
- *     ogImage: 'https://n3fitbook.in/og-image.png',
+ *     canonical: 'https://www.n3fitbook.in/',
+ *     ogImage: 'https://www.n3fitbook.in/og-image.png',
  *     ogType: 'website',           // 'website' | 'article' | 'product'
  *     twitterCard: 'summary_large_image',
  *   });

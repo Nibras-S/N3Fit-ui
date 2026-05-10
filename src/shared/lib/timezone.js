@@ -110,7 +110,6 @@ export function getISTRange(preset) {
     const ist = new Date(today.getTime() + IST_OFFSET_MS);
     const y = ist.getUTCFullYear();
     const m = ist.getUTCMonth();
-    const d = ist.getUTCDate();
 
     const startOfDay = today;
     const endOfDay = new Date(today.getTime() + ONE_DAY_MS - 1);
