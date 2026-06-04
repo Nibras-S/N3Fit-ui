@@ -75,7 +75,7 @@ function MemberProfile() {
 
     if (!member) return <AppLayout><div>Member not found</div></AppLayout>;
 
-    const statusText = member.dews > 0 ? "Active" : "Expired";
+    const statusText = member.dews >= 0 ? "Active" : "Expired";
 
     return (
         <AppLayout>
@@ -111,7 +111,7 @@ function MemberProfile() {
                         <div className="min-w-0">
                             <h1 className="text-lg sm:text-3xl font-bold text-gray-900 dark:text-white truncate">{member.name}</h1>
                             <div className="flex items-center gap-3 text-gray-500 dark:text-gray-400 mt-1 flex-wrap">
-                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews > 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500'}`}>
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${member.dews >= 0 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-zinc-100 text-zinc-700 dark:bg-zinc-700/50 dark:text-zinc-500'}`}>
                                     {statusText}
                                 </span>
                                 <span className="flex items-center gap-1 text-xs sm:text-sm"><FaPhone className="text-xs" /> {member.phone}</span>
@@ -187,8 +187,8 @@ function MemberProfile() {
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-xl">
                                     <p className="text-xs text-gray-500 dark:text-gray-400 uppercase mb-1">Status</p>
-                                    <p className={`font-bold ${member.dews > 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-900 dark:text-zinc-500'}`}>
-                                        {member.dews > 0 ? `${member.dews} Days Left` : `${Math.abs(member.dews)} Days Overdue`}
+                                    <p className={`font-bold ${member.dews >= 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-900 dark:text-zinc-500'}`}>
+                                        {member.dews >= 0 ? `${member.dews} Days Left` : `${Math.abs(member.dews)} Days Overdue`}
                                     </p>
                                 </div>
                                 <div className="p-4 bg-gray-50 dark:bg-zinc-800/50 rounded-xl">

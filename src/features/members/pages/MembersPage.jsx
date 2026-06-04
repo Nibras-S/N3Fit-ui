@@ -277,18 +277,18 @@ const MembersPage = () => {
     // ── WhatsApp ────────────────────────────────────────────────
     // Build a status-aware message so the gym owner can fire off a manual
     // ping without retyping. Three buckets:
-    //   - expired   (dews <= 0): renewal nudge with days overdue
-    //   - expiring  (dews 1..7): friendly heads-up
+    //   - expired   (dews < 0): renewal nudge with days overdue
+    //   - expiring  (dews 0..7): friendly heads-up (0 = expires today, still active)
     //   - active    (otherwise): generic check-in
     const buildWhatsAppMessage = (member) => {
         const name = member.name || 'there';
         const dews = typeof member.dews === 'number' ? member.dews : null;
-        if (dews !== null && dews <= 0) {
+        if (dews !== null && dews < 0) {
             const overdue = Math.abs(dews);
-            return `Hi ${name}, your gym membership expired ${overdue === 0 ? 'today' : `${overdue} day${overdue === 1 ? '' : 's'} ago`}. Please renew to continue your fitness journey with us! 💪`;
+            return `Hi ${name}, your gym membership expired ${overdue} day${overdue === 1 ? '' : 's'} ago. Please renew to continue your fitness journey with us! 💪`;
         }
         if (dews !== null && dews <= 7) {
-            return `Hi ${name}, just a heads-up — your gym membership expires in ${dews} day${dews === 1 ? '' : 's'}. Renew early to avoid any break in your routine. 💪`;
+            return `Hi ${name}, just a heads-up — your gym membership expires ${dews === 0 ? 'today' : `in ${dews} day${dews === 1 ? '' : 's'}`}. Renew early to avoid any break in your routine. 💪`;
         }
         return `Hi ${name}, hope you're enjoying your workouts! Let us know if you need anything from the gym team. 💪`;
     };
@@ -331,7 +331,7 @@ const MembersPage = () => {
         const lines = [headers.join(',')];
 
         for (const m of rows) {
-            const status = m.dews > 0 ? 'Active' : 'Expired';
+            const status = m.dews >= 0 ? 'Active' : 'Expired';
             lines.push([
                 escape(m.name),
                 escape(m.phone),
@@ -387,14 +387,14 @@ const MembersPage = () => {
         status: {
             key: 'status', label: 'Status',
             render: (row) => (
-                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews > 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
-                    {row.dews > 0 ? 'Active' : 'Expired'}
+                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
+                    {row.dews >= 0 ? 'Active' : 'Expired'}
                 </span>
             ),
         },
         dews: {
             key: 'dews', label: 'Days Left', sortable: true,
-            render: (row) => <span className={row.dews <= 0 ? 'text-zinc-700 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews <= 0 ? `${row.dews} (Expired)` : row.dews}</span>,
+            render: (row) => <span className={row.dews < 0 ? 'text-zinc-700 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews < 0 ? `${row.dews} (Expired)` : row.dews}</span>,
         },
         endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
         joinedDate: { key: 'joinedDate', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.joinedDate || row.createdAt)}</span> },
@@ -463,8 +463,8 @@ const MembersPage = () => {
     // up to the row's onClick (which navigates to the member detail page).
     const whatsAppTitle = (row) => {
         if (typeof row.dews !== 'number') return 'Send WhatsApp';
-        if (row.dews <= 0) return 'WhatsApp: expired reminder';
-        if (row.dews <= 7) return 'WhatsApp: expiring soon';
+        if (row.dews < 0) return 'WhatsApp: expired reminder';
+        if (row.dews <= 7) return 'WhatsApp: expiring soon'; // includes 0 = expires today
         return 'WhatsApp: send message';
     };
 

@@ -196,11 +196,11 @@ const BirthdaysPage = () => {
                                                     {formatDate(member.dob)}
                                                 </span>
                                                 <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
-                                                    member.dews > 0
+                                                    member.dews >= 0
                                                         ? 'bg-emerald-50 dark:bg-emerald-900/10 text-emerald-600 dark:text-emerald-400'
                                                         : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-500'
                                                 }`}>
-                                                    {member.dews > 0 ? 'Active' : 'Expired'}
+                                                    {member.dews >= 0 ? 'Active' : 'Expired'}
                                                 </span>
                                             </div>
                                         </div>

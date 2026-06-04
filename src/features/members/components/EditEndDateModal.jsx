@@ -141,7 +141,7 @@ const EditEndDateModal = ({ isOpen, onClose, member, onSuccess }) => {
                             </div>
                             <div className="flex justify-between">
                                 <span className="text-gray-600 dark:text-gray-300">New Days Remaining</span>
-                                <span className={`font-bold ${preview.dews > 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-700'}`}>
+                                <span className={`font-bold ${preview.dews >= 0 ? 'text-green-600 dark:text-green-400' : 'text-zinc-700'}`}>
                                     {preview.dews} days
                                 </span>
                             </div>
