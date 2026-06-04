@@ -11,7 +11,7 @@
       ]
     },
     {
-      "source": "/(favicon\\.ico|favicon-(\\d+)x(\\d+)\\.png|n3fitbook-(\\d+)\\.(png|webp)|n3fitbook\\.svg|og-image\\.png|manifest\\.json|robots\\.txt|sitemap\\.xml|rss\\.xml)",
+      "source": "/:file(favicon\\.ico|favicon-\\d+x\\d+\\.png|n3fitbook-\\d+\\.png|n3fitbook-\\d+\\.webp|n3fitbook\\.svg|og-image\\.png|manifest\\.json|robots\\.txt|sitemap\\.xml|rss\\.xml)",
       "headers": [
         {
           "key": "Cache-Control",
