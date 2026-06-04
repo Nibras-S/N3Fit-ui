@@ -40,6 +40,33 @@ body {
 @tailwind components;
 @tailwind utilities;
 
+/* ── Lock the page against sideways panning on touch ───────────────────────
+   The mobile shell (AppLayout) lets the document itself scroll vertically.
+   With no horizontal containment at the root, ANY descendant that is wider
+   than the viewport makes the whole document horizontally scrollable — and a
+   vertical swipe then drags the entire shell sideways (the "header + content
+   shift left with a black gutter" bug on the Member Profile and other pages).
+
+   `overflow-x: clip` clamps that sideways overflow at the root WITHOUT turning
+   <html>/<body> into a scroll container. This matters: `overflow-x: hidden`
+   would force the computed overflow-y to `auto`, establishing a scroll
+   container that breaks the sticky mobile top bar and fixed bottom nav. `clip`
+   has no such side effect, so vertical scroll + sticky/fixed keep working.
+
+   `overscroll-behavior-x: none` kills the iOS horizontal rubber-band so even
+   momentum can't pan the page.
+
+   Tables and the profile tab strip stay horizontally scrollable because each
+   has its OWN `overflow-x-auto` wrapper — an ancestor's clip never disables a
+   descendant scroll container's own axis. */
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
 /* iOS Safari auto-zooms into any focused <input>/<textarea>/<select> whose
    computed font-size is < 16px, regardless of the viewport meta. Force the
    typable form controls to 16px on touch-sized viewports so the PWA keeps
