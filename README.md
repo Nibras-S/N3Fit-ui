@@ -1,4 +1,4 @@
-# N3 FitBook – Frontend
+# N3 FitBook – Frontends
 React.js application for the N3 Gym Management platform. Built with Tailwind CSS and Context APIs.s
 
 ## Setup
