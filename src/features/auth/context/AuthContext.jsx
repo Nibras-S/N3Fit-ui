@@ -4,17 +4,25 @@ import { queryClient, PERSIST_KEY } from '../../../shared/lib/queryClient';
 
 const AuthContext = createContext(null);
 
-// Non-sensitive hint stored in sessionStorage so the guards can render
-// optimistically on reload instead of blocking on /auth/me. The httpOnly
-// JWT cookie is still the only source of truth for authentication — this
-// hint only controls which placeholder UI is shown while /auth/me is in
-// flight. If the background verification fails, the hint is cleared and
-// the guards redirect to /login.
+// Non-sensitive hint stored in localStorage so the guards can render
+// optimistically on reload AND so a returning user with a still-valid JWT
+// cookie is recognised after the browser window is closed and reopened.
+//
+// It MUST be localStorage, not localStorage: localStorage is wiped the
+// moment the window/tab closes, which made the mount effect below skip
+// /auth/me and force a needless re-login on every reopen — even though the
+// httpOnly JWT cookie is persistent (maxAge 7 days) and still valid.
+//
+// The httpOnly JWT cookie remains the ONLY source of truth for
+// authentication. This hint only carries {_id, role, name} to choose the
+// placeholder UI while /auth/me is in flight; if that background
+// verification fails (401), the hint is cleared and the guards redirect to
+// /login.
 const AUTH_HINT_KEY = 'n3fit:auth-hint';
 
 function readAuthHint() {
     try {
-        const raw = sessionStorage.getItem(AUTH_HINT_KEY);
+        const raw = localStorage.getItem(AUTH_HINT_KEY);
         if (!raw) return null;
         const hint = JSON.parse(raw);
         if (!hint || typeof hint !== 'object') return null;
@@ -27,7 +35,7 @@ function readAuthHint() {
 function writeAuthHint(userData) {
     try {
         if (!userData) {
-            sessionStorage.removeItem(AUTH_HINT_KEY);
+            localStorage.removeItem(AUTH_HINT_KEY);
             return;
         }
         // Only a minimal shape — enough for the guards to decide layout +
@@ -37,7 +45,7 @@ function writeAuthHint(userData) {
             role: userData.role,
             name: userData.name,
         };
-        sessionStorage.setItem(AUTH_HINT_KEY, JSON.stringify(hint));
+        localStorage.setItem(AUTH_HINT_KEY, JSON.stringify(hint));
     } catch (_) {
         /* storage disabled — fall back to blocking path */
     }
