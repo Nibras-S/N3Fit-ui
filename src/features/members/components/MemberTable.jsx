@@ -4,7 +4,7 @@ import api from '../../../shared/services/api';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
 import { FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaTimes, FaSync } from 'react-icons/fa';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import DataTable from '../../../shared/components/data/DataTable';
 import PageHeader from '../../../shared/components/layout/PageHeader';
 import EditMemberModal from './EditMemberModal';
@@ -216,7 +216,6 @@ const AllMembers = () => {
 
     return (
         <div>
-            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
 
             {/* Page Header */}
             <PageHeader

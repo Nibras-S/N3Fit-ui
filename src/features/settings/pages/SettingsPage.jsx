@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../../../shared/services/api';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import {
     FaSave, FaCog, FaMoneyBillWave, FaSun, FaMoon,
     FaBuilding, FaCamera, FaEnvelope, FaPhone, FaMapMarkerAlt,
@@ -281,7 +281,6 @@ const Settings = () => {
     return (
         <AppLayout title="Settings" description="Manage your account and preferences" icon={FaCog} showGenderSwitch={false}>
             <div className={`mx-auto px-2 py-6 sm:py-10`}>
-                <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
                 {/* Back button for sub-pages */}
                 {activeTab !== 'main' && (

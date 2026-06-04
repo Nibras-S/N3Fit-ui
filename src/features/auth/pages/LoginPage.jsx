@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash, FaBuilding } from "react-icons/fa";
 import { HiShieldCheck, HiUserGroup } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
 
 function AdminAuth() {
@@ -62,7 +62,6 @@ function AdminAuth() {
 
   return (
     <div className="min-h-screen flex items-stretch">
-      <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
       {/* Left Panel — Branding */}
       <div

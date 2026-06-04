@@ -2,7 +2,6 @@ import React from 'react';
 import { FaBell, FaCheckDouble, FaExclamationTriangle } from 'react-icons/fa';
 import { useNotifications } from '../context/NotificationContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
-import { Toaster } from 'react-hot-toast';
 
 const Notifications = () => {
     const {
@@ -15,7 +14,6 @@ const Notifications = () => {
     return (
         <AppLayout title="Notifications" description="Manage your messages and alerts" icon={FaBell} showGenderSwitch={false}>
             <div className="mx-auto pb-10">
-                <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
                 <div className="flex justify-end items-center mb-6">
                     {notifications.some(n => !n.isRead) && (

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import PageHeader from '../../../shared/components/layout/PageHeader';
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import {
     FaTrashRestore, FaTrash, FaSearch,
     FaExclamationCircle, FaShieldAlt, FaCogs
@@ -54,7 +54,6 @@ const SuperAdminSettings = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="max-w-6xl mx-auto pb-20">
                 <PageHeader
                     title="Platform Settings"

@@ -5,7 +5,7 @@ import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
     FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle, FaIdCard
 } from 'react-icons/fa';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
@@ -79,7 +79,6 @@ function MemberProfile() {
 
     return (
         <AppLayout>
-            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
             {/* Header */}
             <div className="mb-6">

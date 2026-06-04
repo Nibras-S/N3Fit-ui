@@ -1,5 +1,5 @@
 import toast from "react-hot-toast";
-import React from "react";
+import React, { useRef } from "react";
 
 /**
  * Toast Utility  (src/shared/lib/toast.js)
@@ -23,26 +23,94 @@ import React from "react";
  *   showToast.success("Done!", { duration: 5000 });
  */
 
-import { Toaster } from "react-hot-toast";
+import { Toaster, ToastBar, resolveValue } from "react-hot-toast";
+
+/* ─── Swipe-to-dismiss wrapper ─── */
+// Drag a toast horizontally and release past the threshold to dismiss it.
+// Pure progressive enhancement — the × button always works regardless.
+function SwipeableToast({ id, children }) {
+    const ref = useRef(null);
+    const startX = useRef(null);
+
+    const move = (clientX) => {
+        if (startX.current == null || !ref.current) return;
+        ref.current.style.transform = `translateX(${clientX - startX.current}px)`;
+    };
+    const end = (clientX) => {
+        if (startX.current == null || !ref.current) return;
+        const dx = clientX - startX.current;
+        startX.current = null;
+        ref.current.style.transition = "transform 0.2s ease, opacity 0.2s ease";
+        if (Math.abs(dx) > 60) {
+            ref.current.style.transform = `translateX(${dx > 0 ? 500 : -500}px)`;
+            ref.current.style.opacity = "0";
+            toast.dismiss(id);
+        } else {
+            ref.current.style.transform = "translateX(0)";
+        }
+    };
+
+    return (
+        <div
+            ref={ref}
+            style={{ touchAction: "pan-y" }}
+            onPointerDown={(e) => {
+                e.currentTarget.setPointerCapture?.(e.pointerId);
+                startX.current = e.clientX;
+                if (ref.current) ref.current.style.transition = "none";
+            }}
+            onPointerMove={(e) => move(e.clientX)}
+            onPointerUp={(e) => end(e.clientX)}
+            onPointerCancel={() => { startX.current = null; }}
+        >
+            {children}
+        </div>
+    );
+}
 
 /* ─── Toast Provider ─── */
+// Single, app-wide toaster. Every toast is dismissible: a × close button (added
+// to default toasts here; showToast.* cards already carry their own ×) plus
+// swipe-to-dismiss. Mounted once in app/providers.jsx — pages must NOT render
+// their own <Toaster> (it would duplicate every toast).
 export function ToastProvider() {
     return (
         <Toaster
             position="top-right"
             reverseOrder={false}
             gutter={8}
-            containerStyle={{ top: 24, right: 24 }}
-            toastOptions={{
-                duration: 4000,
-                style: {
-                    padding: 0,
-                    background: "transparent",
-                    boxShadow: "none",
-                    maxWidth: 380,
-                },
-            }}
-        />
+            containerStyle={{ top: "calc(env(safe-area-inset-top) + 24px)", right: 24 }}
+            toastOptions={{ duration: 4000 }}
+        >
+            {(t) => (
+                <SwipeableToast id={t.id}>
+                    {t.type === "custom" ? (
+                        // showToast.* renders its own styled card (already has a × button)
+                        resolveValue(t.message, t)
+                    ) : (
+                        <ToastBar toast={t} style={{ ...t.style, maxWidth: 380 }}>
+                            {({ icon, message }) => (
+                                <div className="flex items-center gap-2 w-full">
+                                    {icon}
+                                    <div className="flex-1 min-w-0">{message}</div>
+                                    {t.type !== "loading" && (
+                                        <button
+                                            onClick={() => toast.dismiss(t.id)}
+                                            aria-label="Dismiss notification"
+                                            className="shrink-0 ml-1 -mr-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            )}
+                        </ToastBar>
+                    )}
+                </SwipeableToast>
+            )}
+        </Toaster>
     );
 }
 

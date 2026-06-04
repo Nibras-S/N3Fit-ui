@@ -4,6 +4,7 @@ import { NotificationProvider } from '../features/notifications/context/Notifica
 import ErrorBoundary from '../shared/components/feedback/ErrorBoundary';
 import { FormStateProvider } from '../shared/context/FormStateContext';
 import { queryClient, persister } from '../shared/lib/queryClient';
+import { ToastProvider } from '../shared/lib/toast';
 import RealtimeSync from './RealtimeSync';
 
 /**
@@ -37,6 +38,8 @@ export default function Providers({ children }) {
                         <FormStateProvider>
                             <RealtimeSync />
                             {children}
+                            {/* Single app-wide dismissible toaster (× button + swipe). */}
+                            <ToastProvider />
                         </FormStateProvider>
                     </NotificationProvider>
                 </AuthProvider>

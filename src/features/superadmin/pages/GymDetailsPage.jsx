@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import { PageSkeleton } from '../../../shared/components/ui/Skeleton';
@@ -184,7 +184,6 @@ const GymDetails = () => {
 
     return (
         <AppLayout showGenderSwitch={false}>
-            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
             <div className="max-w-4xl mx-auto pb-20">
                 {/* Navigation & Header */}
                 <button

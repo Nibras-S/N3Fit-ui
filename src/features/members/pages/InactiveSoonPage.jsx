@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from '../../../shared/services/api';
 import { openWhatsApp } from '../../../shared/lib/phone';
 import { FaPhone, FaClock, FaUser, FaWhatsapp, FaCheck, FaSync, FaSearch, FaUserSlash, FaSlidersH, FaTimes } from "react-icons/fa";
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 
 // Skeleton Components
@@ -189,20 +189,6 @@ Send payment screenshot to confirm. Stay fit! 💪`;
   return (
     <AppLayout showGenderSwitch={false}>
       <div className="space-y-6">
-        {/* Responsive Toast */}
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            style: {
-              background: '#1e293b',
-              color: '#fff',
-              borderRadius: '10px',
-            },
-          }}
-          containerStyle={{
-            top: 'calc(env(safe-area-inset-top) + 24px)',
-          }}
-        />
 
         {/* Inline header — title + actions on a single row even on mobile */}
         <div className="flex items-center justify-between gap-3">

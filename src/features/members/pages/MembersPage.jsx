@@ -15,7 +15,7 @@ import EditMemberModal from '../components/EditMemberModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -649,7 +649,6 @@ const MembersPage = () => {
 
     return (
         <AppLayout title="Members" description="Manage your gym members, renewals, and contact details" icon={FaUsers} showGenderSwitch={false}>
-            <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} toastOptions={{ style: { background: '#1e293b', color: '#fff', borderRadius: '10px' } }} />
             {/* ── Desktop Tab Bar ─────────────────────────────── */}
             <div className="hidden lg:block mb-6">
                 <div className="flex items-end justify-between border-b border-gray-200 dark:border-zinc-800">

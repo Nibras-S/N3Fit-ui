@@ -4,7 +4,7 @@ import {
     FaCheckCircle,
     FaSearch, FaTimes, FaWhatsapp, FaBell, FaExclamationTriangle
 } from 'react-icons/fa';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import { ButtonSpinner } from '../../../shared/components/ui/Skeleton';
@@ -215,7 +215,6 @@ const Announcement = () => {
             showGenderSwitch={false}
         >
             <div className="mx-auto pb-10">
-                <Toaster position="top-right" containerStyle={{ top: 'calc(env(safe-area-inset-top) + 24px)' }} />
 
                 {/* Auto-reminder status info card (gym users only) */}
                 {user?.role !== 'superadmin' && (

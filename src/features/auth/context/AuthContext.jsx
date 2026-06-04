@@ -65,11 +65,22 @@ function prefetchPostLoginRoutes(role) {
         try {
             if (role === 'superadmin') {
                 import('../../superadmin/pages/SuperAdminDashboard');
-            } else if (role === 'staff') {
-                import('../../members/pages/MembersPage');
+                import('../../superadmin/pages/GymDetailsPage');
             } else {
-                import('../../dashboard/pages/DashboardPage');
+                // Prefetch the high-traffic nav targets so switching tabs does
+                // NOT flash the full-screen Suspense skeleton (the lazy chunk is
+                // already parsed by the time the route mounts). New Member
+                // (/register) is included specifically because it's a common
+                // jump that previously always cold-loaded.
                 import('../../members/pages/MembersPage');
+                import('../../members/pages/RegisterMemberPage');
+                import('../../members/pages/BirthdaysPage');
+                import('../../settings/pages/SettingsPage');
+                if (role !== 'staff') {
+                    import('../../dashboard/pages/DashboardPage');
+                    import('../../expenses/pages/ExpensesPage');
+                    import('../../transactions/pages/TransactionsPage');
+                }
             }
         } catch (_) {
             /* webpack errors on dynamic import fall through silently */
