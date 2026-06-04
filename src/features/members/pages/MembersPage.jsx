@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../../shared/services/api';
+import { openWhatsApp } from '../../../shared/lib/phone';
 import {
     useMembers,
     useMembersStats,
@@ -294,10 +295,7 @@ const MembersPage = () => {
 
     const handleWhatsApp = (member) => {
         if (!member.phone) return;
-        const digits = member.phone.replace(/[^\d]/g, '');
-        const phone = digits.length === 10 ? `91${digits}` : digits;
-        const message = buildWhatsAppMessage(member);
-        window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        openWhatsApp(member.phone, buildWhatsAppMessage(member));
     };
 
     // ── Export selected to CSV ──────────────────────────────────

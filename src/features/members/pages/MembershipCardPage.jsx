@@ -6,6 +6,7 @@ import {
     FaCalendarAlt, FaIdCard, FaWhatsapp,
 } from 'react-icons/fa';
 import api from '../../../shared/services/api';
+import { openWhatsApp } from '../../../shared/lib/phone';
 import { useAuth } from '../../auth/context/AuthContext';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import AppLayout from '../../../shared/components/layout/AppLayout';
@@ -299,9 +300,7 @@ export default function MembershipCardPage() {
                                         '',
                                         'Stay fit and strong!',
                                     ];
-                                    const message = encodeURIComponent(lines.join('\n'));
-                                    const phone = String(member.phone || '').replace(/\D/g, '');
-                                    window.open(`https://wa.me/${phone}?text=${message}`, '_blank');
+                                    openWhatsApp(member.phone, lines.join('\n'));
                                 }}
                                 className="py-3 bg-green-500 hover:bg-green-600 text-white rounded-xl font-black text-[11px] uppercase tracking-wide transition-all flex items-center justify-center gap-1.5"
                             >

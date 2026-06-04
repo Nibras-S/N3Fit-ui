@@ -4,6 +4,7 @@ import { useAuth } from '../../auth/context/AuthContext';
 import { FaPrint, FaArrowLeft, FaWhatsapp } from "react-icons/fa";
 import toast, { Toaster } from "react-hot-toast";
 import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
+import { openWhatsApp } from '../../../shared/lib/phone';
 
 const fmt = (n) => Number(n || 0).toLocaleString('en-IN');
 
@@ -136,8 +137,7 @@ const Invoice = () => {
                                 '',
                                 'Thank you for your business!',
                             ];
-                            const message = encodeURIComponent(lines.join('\n'));
-                            window.open(`https://wa.me/${waPhone}?text=${message}`, '_blank');
+                            openWhatsApp(waPhone, lines.join('\n'));
                         }}
                         className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-sm text-sm"
                     >

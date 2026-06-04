@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from '../../../shared/services/api';
+import { openWhatsApp } from '../../../shared/lib/phone';
 import { FaPhone, FaClock, FaUser, FaWhatsapp, FaCheck, FaSync, FaSearch, FaUserSlash, FaSlidersH, FaTimes } from "react-icons/fa";
 import toast, { Toaster } from 'react-hot-toast';
 import AppLayout from '../../../shared/components/layout/AppLayout';
@@ -108,9 +109,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
       await api.post(`/reminders/send/${_id}`);
 
       // Open WhatsApp with pre-filled message
-      const digits = phone.replace(/[^\d]/g, '');
-      const phoneNumber = digits.length === 10 ? `91${digits}` : digits;
-      window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, "_blank");
+      openWhatsApp(phone, message);
 
       toast.success('Opening WhatsApp...');
       fetchData();
