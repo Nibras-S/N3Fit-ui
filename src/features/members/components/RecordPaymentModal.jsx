@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { FaTimes, FaPlus, FaTrash, FaCreditCard } from 'react-icons/fa';
+import { FaTimes, FaPlus, FaTrash, FaCreditCard, FaExclamationTriangle } from 'react-icons/fa';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
 
@@ -25,12 +25,27 @@ export default function RecordPaymentModal({
     memberName,
     onClose,
     onPaid,
+    // When true, pressing Cancel / ✕ first asks for confirmation — used by the
+    // renewal flow, where backing out before recording payment means the
+    // membership is NOT renewed. Left false for plain payment collection, where
+    // cancelling is harmless.
+    confirmCancel = false,
+    cancelWarningTitle = 'Cancel renewal?',
+    cancelWarningText = "No payment has been recorded yet, so this membership won't be renewed if you cancel.",
 }) {
     const balanceDue = Math.max(0, totalAmount - paidSoFar);
 
     const [splits, setSplits] = useState([{ paymentMethod: 'Cash', amount: '' }]);
     const [notes, setNotes] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [showCancelWarn, setShowCancelWarn] = useState(false);
+
+    // Cancel / ✕ both route through here so a renewal can confirm before the
+    // staged-but-unpaid renewal is discarded.
+    const requestClose = () => {
+        if (confirmCancel && !submitting) setShowCancelWarn(true);
+        else onClose();
+    };
 
     // ── Derived ──────────────────────────────────────────────────────────────
 
@@ -106,6 +121,7 @@ export default function RecordPaymentModal({
     const isSingleSplit = splits.length === 1;
 
     return (
+        <>
         <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
             <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
 
@@ -125,7 +141,7 @@ export default function RecordPaymentModal({
                             </p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
+                    <button onClick={requestClose} className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors">
                         <FaTimes className="text-gray-500" size={14} />
                     </button>
                 </div>
@@ -318,7 +334,7 @@ export default function RecordPaymentModal({
                 <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-zinc-800 shrink-0">
                     <button
                         type="button"
-                        onClick={onClose}
+                        onClick={requestClose}
                         className="flex-1 py-3 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-100 transition-colors"
                     >
                         Cancel
@@ -329,7 +345,7 @@ export default function RecordPaymentModal({
                         disabled={submitting || isOver || splitTotal <= 0}
                         className={`flex-2 flex-grow py-3 rounded-xl font-black text-[11px] uppercase transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
                             isFull
-                                ? 'bg-white text-black border border-white hover:bg-gray-100'
+                                ? 'bg-black text-white border border-black hover:bg-zinc-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-100'
                                 : 'bg-amber-500 hover:bg-amber-600 text-white'
                         }`}
                     >
@@ -338,5 +354,42 @@ export default function RecordPaymentModal({
                 </div>
             </div>
         </div>
+
+        {/* Cancel-confirmation — only armed for the renewal flow via confirmCancel.
+            "Continue" returns to the payment form; "Cancel" discards the renewal. */}
+        {showCancelWarn && (
+            <div className="fixed inset-0 z-[210] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-zinc-800 w-full max-w-xs overflow-hidden">
+                    <div className="p-5">
+                        <div className="flex items-center gap-3 mb-3">
+                            <div className="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-amber-600 dark:text-amber-400 shrink-0">
+                                <FaExclamationTriangle size={15} />
+                            </div>
+                            <h4 className="font-black text-gray-900 dark:text-white text-sm">{cancelWarningTitle}</h4>
+                        </div>
+                        <p className="text-[13px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                            {cancelWarningText}
+                        </p>
+                    </div>
+                    <div className="flex gap-2 p-4 pt-0">
+                        <button
+                            type="button"
+                            onClick={() => setShowCancelWarn(false)}
+                            className="flex-1 py-2.5 rounded-xl font-black text-[11px] uppercase bg-zinc-900 dark:bg-white text-white dark:text-black hover:opacity-90 transition-opacity"
+                        >
+                            Continue
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            className="flex-1 py-2.5 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+        </>
     );
 }

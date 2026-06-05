@@ -142,7 +142,7 @@ const AllMembers = () => {
         { key: 'phone', label: 'Phone', sortable: true, render: (row) => <span className="text-gray-500">{row.phone}</span> },
         {
             key: 'status', label: 'Status',
-            render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-zinc-100 text-zinc-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
+            render: (row) => <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>{row.dews >= 0 ? 'Active' : 'Expired'}</span>
         },
         {
             key: 'dews', label: 'Days Left', sortable: true,

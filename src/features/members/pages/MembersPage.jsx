@@ -257,7 +257,14 @@ const MembersPage = () => {
             // Backend returns { member, transaction } for renewal
             const txn = res.data?.transaction || res.data;
             setRenewingMemberId(null);
-            setRenewalTxn(txn); // open Step 2: RecordPaymentModal
+            if (hasFeature('simplePayments')) {
+                // simplePayments gym — backend already renewed and recorded the
+                // payment as Paid. Skip the breakdown modal entirely.
+                fetchMembers();
+                toast.success('Membership renewed!');
+            } else {
+                setRenewalTxn(txn); // open Step 2: RecordPaymentModal
+            }
         } catch (error) {
             toast.error(
                 error.response?.data?.message ||
@@ -387,14 +394,14 @@ const MembersPage = () => {
         status: {
             key: 'status', label: 'Status',
             render: (row) => (
-                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-zinc-100 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500'}`}>
+                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold ${row.dews >= 0 ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/25 text-red-700 dark:text-red-400'}`}>
                     {row.dews >= 0 ? 'Active' : 'Expired'}
                 </span>
             ),
         },
         dews: {
             key: 'dews', label: 'Days Left', sortable: true,
-            render: (row) => <span className={row.dews < 0 ? 'text-zinc-700 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews < 0 ? `${row.dews} (Expired)` : row.dews}</span>,
+            render: (row) => <span className={row.dews < 0 ? 'text-zinc-700 dark:text-gray-300 font-medium' : 'text-gray-700 dark:text-gray-300'}>{row.dews < 0 ? `${row.dews} (Expired)` : row.dews}</span>,
         },
         endDate: { key: 'endDate', label: 'End Date', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.endDate)}</span> },
         joinedDate: { key: 'joinedDate', label: 'Joined On', sortable: true, render: (row) => <span className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(row.joinedDate || row.createdAt)}</span> },
@@ -472,7 +479,11 @@ const MembersPage = () => {
         <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
             <button
                 onClick={() => handleRenew(row._id)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 rounded-lg transition-colors"
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-white rounded-lg transition-colors ${
+                    row.dews < 0
+                        ? 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700'
+                        : 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700'
+                }`}
                 title="Renew Membership"
             >
                 <FaRedo size={11} /> Renew
@@ -556,7 +567,11 @@ const MembersPage = () => {
                 )}
 
                 <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-zinc-800" onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleRenew(row._id)} className="flex-1 py-1.5 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
+                    <button onClick={() => handleRenew(row._id)} className={`flex-1 py-1.5 text-white font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0 ${
+                        row.dews < 0
+                            ? 'bg-red-600 hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700'
+                            : 'bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700'
+                    }`}>
                         <FaRedo size={11} /> Renew
                     </button>
                     <button onClick={() => handleEditClick(row._id)} className="flex-1 py-1.5 bg-zinc-50 hover:bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-zinc-500 font-semibold rounded-full text-sm flex items-center justify-center gap-2 transition-colors shrink-0">
@@ -1036,9 +1051,9 @@ const MembersPage = () => {
                                 type="button"
                                 onClick={() => submitRenewal(renewingMemberId)}
                                 disabled={!renewForm.plan || !renewForm.amount}
-                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-white text-black border border-white hover:bg-gray-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-black text-white border border-black hover:bg-zinc-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                             >
-                                Continue to Payment →
+                                {hasFeature('simplePayments') ? 'Renew' : 'Continue to Payment →'}
                             </button>
                         </div>
                     </div>
@@ -1052,6 +1067,7 @@ const MembersPage = () => {
                     totalAmount={renewalTxn.amount}
                     paidSoFar={0}
                     memberName={renewalTxn.memberName}
+                    confirmCancel
                     onClose={() => { setRenewalTxn(null); fetchMembers(); }}
                     onPaid={handleRenewalPaid}
                 />

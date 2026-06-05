@@ -327,9 +327,11 @@ function NewMember() {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       const { member, transaction } = res.data;
-      toast.success('Member enrolled! Record payment below.');
-      // Navigate to the membership card — the transaction is Pending until
-      // staff records the payment via the Mark-as-Paid flow.
+      // simplePayments gyms enroll as Paid (no breakdown step), so the card
+      // lands already paid — adjust the toast accordingly.
+      toast.success(hasFeature('simplePayments') ? 'Member enrolled!' : 'Member enrolled! Record payment below.');
+      // Navigate to the membership card. Normally the transaction is Pending
+      // until staff record payment; for simplePayments it's already Paid.
       const txnParam = transaction?._id ? `?txn=${transaction._id}` : '';
       navigate(`/members/${member._id}/card${txnParam}`);
     } catch (err) {
@@ -389,7 +391,7 @@ function NewMember() {
           onClick={Submit}
           type="button"
           disabled={submitting}
-          className="px-6 py-3 bg-white text-black border border-white rounded-xl font-black uppercase tracking-widest hover:bg-gray-200 transition-all text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-black text-white border border-black rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-200 transition-all text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
         >
           Add Member
         </button>
@@ -870,7 +872,7 @@ function NewMember() {
                       <button
                         onClick={Submit}
                         disabled={submitting}
-                        className="flex-[1.5] py-3.5 bg-white text-black border border-white rounded-xl font-black uppercase tracking-widest hover:bg-gray-200 text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="flex-[1.5] py-3.5 bg-black text-white border border-black rounded-xl font-black uppercase tracking-widest hover:bg-zinc-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-200 text-[11px] disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         Add Member
                       </button>

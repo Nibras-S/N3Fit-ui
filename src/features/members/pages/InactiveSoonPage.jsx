@@ -332,7 +332,7 @@ Send payment screenshot to confirm. Stay fit! 💪`;
 
                 <button
                   onClick={() => handleWhatsAppSend(user)}
-                  className="w-full py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors"
+                  className="w-full py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-medium flex items-center justify-center gap-2 transition-colors"
                 >
                   <FaWhatsapp />
                   Send Reminder

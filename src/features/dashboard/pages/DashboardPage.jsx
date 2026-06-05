@@ -13,7 +13,7 @@ import { useDashboardStats } from '../hooks/useDashboardQueries';
 import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 
 const Dashboard = () => {
-    const { user } = useAuth();
+    const { user, hasFeature } = useAuth();
     const navigate = useNavigate();
     const [todayModalOpen, setTodayModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
@@ -62,6 +62,10 @@ const Dashboard = () => {
     const dailyByMethod = stats?.income?.dailyByMethod || [];
     const dailyByStatus = stats?.income?.dailyByStatus || [];
     const pendingPayments = stats?.pendingPayments || [];
+
+    // simplePayments gyms don't track payment methods/dues — hide every money
+    // figure on the dashboard (revenue, collected, pending, breakdown, amounts).
+    const hidePayments = hasFeature('simplePayments');
     const expiringSoon = stats?.expiringSoon || [];
     const recentTransactions = stats?.recentTransactions || [];
 
@@ -92,6 +96,7 @@ const Dashboard = () => {
                             <p className="text-[10px] text-gray-400 dark:text-gray-500 font-medium">new members</p>
                         </div>
 
+                        {!hidePayments && (<>
                         {/* Revenue Booked */}
                         <div className="bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
                             <div className="flex items-center gap-2 mb-1">
@@ -128,6 +133,7 @@ const Dashboard = () => {
                                 {dailyByStatus.find(s => s._id === 'Pending')?.count || 0} dues today
                             </p>
                         </div>
+                        </>)}
                     </div>
                 </div>
 
@@ -177,6 +183,7 @@ const Dashboard = () => {
                                             <p className="text-xs text-gray-400 dark:text-gray-400">{txn.plan} · {formatDate(txn.transactionDate)}</p>
                                         </div>
                                     </div>
+                                    {!hidePayments && (
                                     <div className="flex items-center gap-3 shrink-0">
                                         <span className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${
                                             txn.paymentStatus === 'Paid'
@@ -189,6 +196,7 @@ const Dashboard = () => {
                                         </span>
                                         <span className="text-sm font-bold text-gray-800 dark:text-white">{formatCurrency(txn.amount)}</span>
                                     </div>
+                                    )}
                                 </div>
                             ))}
                         </div>
@@ -196,9 +204,10 @@ const Dashboard = () => {
                 </div>
 
                 {/* ── Pending Payments + Expiring Soon ─────────────────── */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className={`grid grid-cols-1 gap-6 ${hidePayments ? '' : 'lg:grid-cols-2'}`}>
 
                     {/* Pending Payments */}
+                    {!hidePayments && (
                     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 dark:border-zinc-800">
                             <div className="flex items-center gap-2">
@@ -241,6 +250,7 @@ const Dashboard = () => {
                             </div>
                         )}
                     </div>
+                    )}
 
                     {/* Expiring Soon */}
                     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm overflow-hidden">
@@ -310,11 +320,11 @@ const Dashboard = () => {
 
             </div>
 
-            {/* ── Today's Breakdown Modal ───────────────────────────────── */}
+            {/* ── Today's Breakdown Modal (hidden entirely for simplePayments) ── */}
             {/* Mobile: bottom sheet (anchored to bottom, slides up, drag-handle).
                 Desktop (sm+): centered modal. Same DOM, responsive classes flip
                 anchor / radius / animation at the breakpoint. */}
-            {todayModalOpen && (
+            {todayModalOpen && !hidePayments && (
                 <div
                     className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
                     onClick={() => setTodayModalOpen(false)}
@@ -432,6 +442,7 @@ const Dashboard = () => {
                     totalAmount={paymentTxn.amount}
                     paidSoFar={paymentTxn.paidAmount || 0}
                     memberName={paymentTxn.memberName}
+                    confirmCancel={!!(paymentTxn.pendingRenewal && !paymentTxn.pendingRenewal.applied)}
                     onClose={() => setPaymentTxn(null)}
                     onPaid={() => { setPaymentTxn(null); }}
                 />

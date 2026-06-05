@@ -456,6 +456,7 @@ function MemberProfile() {
                     totalAmount={paymentTxn.amount}
                     paidSoFar={paymentTxn.paidAmount || 0}
                     memberName={member.name}
+                    confirmCancel={!!(paymentTxn.pendingRenewal && !paymentTxn.pendingRenewal.applied)}
                     onClose={() => setPaymentTxn(null)}
                     onPaid={() => { setPaymentTxn(null); handleUpdateSuccess(); }}
                 />

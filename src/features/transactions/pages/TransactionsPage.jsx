@@ -402,6 +402,7 @@ const TransactionsPage = () => {
                     totalAmount={payModal.amount}
                     paidSoFar={payModal.paidAmount || 0}
                     memberName={payModal.memberName}
+                    confirmCancel={!!(payModal.pendingRenewal && !payModal.pendingRenewal.applied)}
                     onClose={closePayModal}
                     onPaid={handlePaid}
                 />

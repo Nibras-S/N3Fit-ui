@@ -110,6 +110,7 @@ export const AuthProvider = ({ children }) => {
         archiveExpired: true,
         whatsappNotifications: false,
         memberImport: false,
+        simplePayments: false,
     });
 
     // Verify session on mount — cookie is sent automatically by the browser.

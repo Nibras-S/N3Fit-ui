@@ -393,8 +393,8 @@ export function AppLayout({
                       title={isCollapsed ? label : undefined}
                       className={`w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 justify-between"
                         } ${isItemActive
-                          ? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
-                          : "text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white hover:text-black dark:hover:text-black group"
+                          ? "bg-gray-100 text-black shadow-sm dark:bg-white dark:text-black"
+                          : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white hover:text-black dark:hover:text-black group"
                         }`}
                     >
                       <div className={`flex items-center ${isCollapsed ? "" : "gap-3"}`}>
@@ -418,8 +418,8 @@ export function AppLayout({
                                 key={sub.path}
                                 onClick={() => safeNavigate(sub.path)}
                                 className={`w-full text-left px-3 py-2.5 flex items-center gap-3 transition-all duration-150 text-sm font-medium rounded-xl ${isActive(sub.path)
-                                  ? "bg-white text-black dark:bg-white dark:text-black"
-                                  : "text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white hover:text-black dark:hover:text-black group"
+                                  ? "bg-gray-100 text-black dark:bg-white dark:text-black"
+                                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white hover:text-black dark:hover:text-black group"
                                   }`}
                               >
                                 {sub.label}
@@ -440,8 +440,8 @@ export function AppLayout({
                   title={isCollapsed ? label : undefined}
                   className={`relative w-full text-left flex items-center transition-all duration-150 text-sm font-medium rounded-xl ${isCollapsed ? "px-0 py-3 justify-center" : "px-3 py-2.5 gap-3"
                     } ${isActive(path)
-                      ? "bg-white text-black shadow-sm dark:bg-white dark:text-black"
-                      : "text-gray-500 dark:text-gray-400 hover:bg-white dark:hover:bg-white hover:text-black dark:hover:text-black group"
+                      ? "bg-gray-100 text-black shadow-sm dark:bg-white dark:text-black"
+                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-white hover:text-black dark:hover:text-black group"
                     }`}
                 >
                   <Icon className={`text-[18px] shrink-0 ${isActive(path) ? "text-black dark:text-black" : "text-gray-400 dark:text-gray-500 group-hover:text-black"}`} />
@@ -681,7 +681,7 @@ export function AppLayout({
                               }}
                               className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-all text-sm ${isItemActive
                                 ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-white font-bold"
-                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                                : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800/50"
                                 }`}
                             >
                               <div className="flex items-center gap-3">
@@ -700,8 +700,8 @@ export function AppLayout({
                                       setMobileMenuOpen(false);
                                     }}
                                     className={`w-full text-left px-3 py-2 rounded-lg flex items-center gap-3 text-xs ${isActive(sub.path)
-                                      ? "text-zinc-900 dark:text-white font-bold"
-                                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                                      ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-white font-bold"
+                                      : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800/50"
                                       }`}
                                   >
                                     {sub.label}
@@ -722,7 +722,7 @@ export function AppLayout({
                           }}
                           className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center gap-3 text-sm ${isActive(path)
                             ? "bg-zinc-100 dark:bg-zinc-800/50 text-zinc-900 dark:text-white font-bold"
-                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-zinc-800/50"
+                            : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800/50"
                             }`}
                         >
                           <Icon />

@@ -69,6 +69,16 @@ Order matters — NotificationProvider needs AuthProvider (it subscribes to sock
 
 **UI state** (form drafts, modals, tab selection, theme) still uses plain `useState` or Context. No Redux, no Zustand. If UI state is getting complex, lift it or break it into multiple contexts before reaching for a store library.
 
+## Feature flags (per-gym)
+
+`gym.features` (booleans) ride along on `/auth/me` and are read through `useAuth().hasFeature(name)` ([features/auth/context/AuthContext.jsx](src/features/auth/context/AuthContext.jsx)). **Semantics: `hasFeature(x)` returns `true` unless the flag is explicitly `false`** — so a new flag MUST be added to the `gymFeatures` default state (as `false`) or it reads as "on" before `/auth/me` lands. Adding a flag on the client = that default + an entry in the superadmin toggle grid ([features/superadmin/pages/GymDetailsPage.jsx](src/features/superadmin/pages/GymDetailsPage.jsx)). Gate UI with `hasFeature('x') && …` / `!hasFeature('x') && …` — flags are UI gates, not security (the backend re-checks anything that matters).
+
+- **`simplePayments`** — gyms that don't track payment methods. When on: the renewal flow skips `RecordPaymentModal` (the "Continue to Payment" button becomes "Renew"; the backend renews + records Paid in one call), new-member enrollment lands on an already-Paid card, and the dashboard hides every money figure (gated in [features/dashboard/pages/DashboardPage.jsx](src/features/dashboard/pages/DashboardPage.jsx)).
+
+## Renewal payment modal
+
+[features/members/components/RecordPaymentModal.jsx](src/features/members/components/RecordPaymentModal.jsx) is the shared payment-recording modal. Pass `confirmCancel` when the txn is an un-applied renewal (`txn.pendingRenewal && !txn.pendingRenewal.applied`) — it then warns before discarding, because the backend defers the membership extension until payment is recorded. Every call site that can pay a renewal txn passes this (members list, membership card, profile, dashboard, transactions). Cancelling a renewal payment leaves a Pending txn the staff can complete later — that's intended, not a leak.
+
 ## Socket.io
 
 All socket subscriptions go through [src/shared/hooks/useGymSocket.js](src/shared/hooks/useGymSocket.js). It joins the gym room on mount and subscribes to events by name. Don't instantiate `io()` directly in a feature — you'll fork connection management and miss the global reconnect logic.

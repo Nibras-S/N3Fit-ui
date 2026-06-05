@@ -440,6 +440,7 @@ const GymDetails = () => {
                                     { key: 'memberImport', label: 'CSV Member Import', icon: '📤', desc: 'Allow bulk importing members via CSV wizard' },
                                     { key: 'memberExport', label: 'CSV Member Export', icon: '📥', desc: 'Allow exporting selected members to a CSV file' },
                                     { key: 'autoWhatsappReminders', label: 'Auto WhatsApp Reminders', icon: '🔔', desc: 'Auto-send at 3 days before, on expiry day, and 3 days after' },
+                                    { key: 'simplePayments', label: 'Simple Payments', icon: '⚡', desc: 'Skip the payment-method breakdown — renew/enroll records as paid instantly' },
                                 ].map((feature) => (
                                     <button
                                         key={feature.key}

@@ -326,6 +326,7 @@ export default function MembershipCardPage() {
                     totalAmount={totalAmount}
                     paidSoFar={paidSoFar}
                     memberName={member.name}
+                    confirmCancel={!!(transaction.pendingRenewal && !transaction.pendingRenewal.applied)}
                     onClose={() => setShowPayModal(false)}
                     onPaid={handlePaid}
                 />
