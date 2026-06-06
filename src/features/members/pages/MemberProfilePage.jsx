@@ -7,6 +7,7 @@ import {
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
+import RenewMembershipModal from '../components/RenewMembershipModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
 import EditEndDateModal from '../components/EditEndDateModal';
@@ -29,6 +30,7 @@ function MemberProfile() {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
     const [isExtendOpen, setIsExtendOpen] = useState(false);
+    const [renewOpen, setRenewOpen] = useState(false);
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
     // Three parallel queries — TanStack Query runs them in parallel and
@@ -421,7 +423,7 @@ function MemberProfile() {
                         <h4 className="font-bold text-gray-800 dark:text-white mb-4">Quick Actions</h4>
                         <div className="space-y-2">
                             <button
-                                onClick={() => setIsEditing(true)}
+                                onClick={() => setRenewOpen(true)}
                                 className="w-full py-2.5 px-4 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-xl hover:bg-green-100 dark:hover:bg-green-900/30 transition-colors text-sm font-medium flex items-center gap-2"
                             >
                                 <FaCheckCircle /> Renew Membership
@@ -448,6 +450,15 @@ function MemberProfile() {
                     </div>
                 </div>
             </div>
+
+            {/* Renew membership flow (plan → amount → payment) */}
+            {renewOpen && member && (
+                <RenewMembershipModal
+                    member={member}
+                    onClose={() => setRenewOpen(false)}
+                    onRenewed={handleUpdateSuccess}
+                />
+            )}
 
             {/* Record Payment Modal */}
             {paymentTxn && (

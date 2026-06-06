@@ -10,9 +10,8 @@ import {
 } from '../hooks/useMembersQueries';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import DataTable from '../../../shared/components/data/DataTable';
-import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import EditMemberModal from '../components/EditMemberModal';
-import RecordPaymentModal from '../components/RecordPaymentModal';
+import RenewMembershipModal from '../components/RenewMembershipModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
 import toast from 'react-hot-toast';
@@ -124,9 +123,6 @@ const MembersPage = () => {
 
     // ── Inline Renewal State ────────────────────────────────────
     const [renewingMemberId, setRenewingMemberId] = useState(null);
-    const [renewForm, setRenewForm] = useState({ plan: '', date: '', amount: '' });
-    const [renewalTxn, setRenewalTxn] = useState(null); // transaction awaiting payment recording
-    const [settings, setSettings] = useState(null);
 
     const backendUrl = process.env.REACT_APP_BACKEND_URL;
 
@@ -176,17 +172,6 @@ const MembersPage = () => {
     const loading = membersQuery.isFetching;
     const fetchMembers = membersQuery.refetch;
 
-    // ── Fetch settings for plans ────────────────────────────────
-    useEffect(() => {
-        api.get(`/settings`)
-            .then(res => {
-                // response.data IS already the unwrapped payload — don't re-unwrap in feature code
-                const settingsData = res.data;
-                setSettings(settingsData);
-            })
-            .catch(err => console.error('Failed to load settings', err));
-    }, [backendUrl]);
-
     // ── Expiring soon count (for warning FAB) ───────────────────
     // Also refetched by RealtimeSync on member:* events because reminders
     // and members share a lifecycle.
@@ -235,50 +220,7 @@ const MembersPage = () => {
 
     // ── Renew ───────────────────────────────────────────────────
     const handleRenew = (memberId) => {
-        if (renewingMemberId === memberId) {
-            setRenewingMemberId(null);
-        } else {
-            setRenewForm({ plan: '', date: '', amount: '' });
-            setRenewingMemberId(memberId);
-        }
-    };
-
-    // Step 1: select plan+date+amount → backend creates Pending transaction
-    const submitRenewal = async (memberId) => {
-        if (!renewForm.plan || !renewForm.amount) {
-            toast.error('Please select a plan and enter an amount');
-            return;
-        }
-        const payload = { _isRenewal: true, plan: renewForm.plan, amount: Number(renewForm.amount) };
-        if (renewForm.date) payload.date = renewForm.date;
-
-        try {
-            const res = await api.put(`/contacts/${memberId}`, payload);
-            // Backend returns { member, transaction } for renewal
-            const txn = res.data?.transaction || res.data;
-            setRenewingMemberId(null);
-            if (hasFeature('simplePayments')) {
-                // simplePayments gym — backend already renewed and recorded the
-                // payment as Paid. Skip the breakdown modal entirely.
-                fetchMembers();
-                toast.success('Membership renewed!');
-            } else {
-                setRenewalTxn(txn); // open Step 2: RecordPaymentModal
-            }
-        } catch (error) {
-            toast.error(
-                error.response?.data?.message ||
-                error.response?.data?.error?.message ||
-                'Failed to renew membership'
-            );
-        }
-    };
-
-    // Step 2 completion: payment recorded → refresh list
-    const handleRenewalPaid = () => {
-        setRenewalTxn(null);
-        fetchMembers();
-        toast.success('Membership renewed and payment recorded!');
+        setRenewingMemberId((cur) => (cur === memberId ? null : memberId));
     };
 
     // ── WhatsApp ────────────────────────────────────────────────
@@ -957,119 +899,12 @@ const MembersPage = () => {
                 </button>
             </div>
 
-            {/* ── STEP 1: Plan + Date + Amount ── */}
+            {/* Renew membership flow (plan → amount → payment) */}
             {renewingMemberId && renewingMember && (
-                <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
-                    <div className="bg-white dark:bg-zinc-900 rounded-t-3xl sm:rounded-2xl w-full sm:max-w-md shadow-2xl overflow-hidden">
-                        {/* Header */}
-                        <div className="flex items-center justify-between p-5 border-b border-gray-100 dark:border-zinc-800">
-                            <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                                    <FaRedo className="text-zinc-900 dark:text-white" size={14} />
-                                </div>
-                                <div>
-                                    <h3 className="font-black text-gray-900 dark:text-white text-base">Renew Membership</h3>
-                                    <p className="text-[11px] text-gray-500 dark:text-gray-400">{renewingMember.name}</p>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => setRenewingMemberId(null)}
-                                className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 rounded-full transition-colors text-gray-400"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-5 space-y-4">
-                            {/* Plan selector */}
-                            <div>
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Plan</label>
-                                <div className="grid grid-cols-2 gap-2">
-                                    {settings?.plans?.filter(p => p.isActive)?.map((p, i) => (
-                                        <button
-                                            key={i}
-                                            type="button"
-                                            onClick={() => setRenewForm(f => ({ ...f, plan: p.name, amount: p.price }))}
-                                            className={`flex flex-col items-start px-4 py-3 rounded-xl border text-left transition-all ${
-                                                renewForm.plan === p.name
-                                                    ? 'bg-zinc-900 border-zinc-900 text-white'
-                                                    : 'bg-gray-50 dark:bg-zinc-800 border-gray-100 dark:border-zinc-700 text-gray-700 dark:text-gray-300 hover:border-zinc-400'
-                                            }`}
-                                        >
-                                            <span className="text-xs font-black">{p.name}</span>
-                                            <span className={`text-[11px] font-semibold mt-0.5 ${renewForm.plan === p.name ? 'text-zinc-300' : 'text-gray-400'}`}>
-                                                ₹{Number(p.price).toLocaleString('en-IN')}
-                                            </span>
-                                        </button>
-                                    ))}
-                                </div>
-                                {!settings?.plans?.length && (
-                                    <p className="text-xs text-gray-400 text-center py-3">No plans configured. Go to Settings to add plans.</p>
-                                )}
-                            </div>
-
-                            {/* Amount override */}
-                            <div>
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">Amount (₹)</label>
-                                <div className="flex items-center gap-2 bg-gray-50 dark:bg-zinc-950/50 border border-gray-200 dark:border-zinc-800 rounded-xl px-4 py-3 focus-within:border-zinc-900 transition-colors">
-                                    <span className="text-gray-400 font-bold text-sm">₹</span>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        step="1"
-                                        value={renewForm.amount}
-                                        onChange={(e) => setRenewForm(f => ({ ...f, amount: e.target.value }))}
-                                        placeholder="0"
-                                        className="flex-1 bg-transparent outline-none font-black text-lg text-gray-900 dark:text-white"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Start date (optional) */}
-                            <div>
-                                <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
-                                    Start Date <span className="text-gray-300 normal-case font-normal">(optional — defaults to current end date)</span>
-                                </label>
-                                <DatePicker
-                                    value={renewForm.date}
-                                    onChange={(e) => setRenewForm(f => ({ ...f, date: e.target.value }))}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="flex gap-3 p-5 border-t border-gray-100 dark:border-zinc-800">
-                            <button
-                                type="button"
-                                onClick={() => setRenewingMemberId(null)}
-                                className="flex-1 py-3 rounded-xl font-black text-[11px] uppercase bg-gray-50 dark:bg-zinc-800 text-gray-600 dark:text-gray-200 hover:bg-gray-100 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => submitRenewal(renewingMemberId)}
-                                disabled={!renewForm.plan || !renewForm.amount}
-                                className="flex-[2] py-3 rounded-xl font-black text-[11px] uppercase bg-black text-white border border-black hover:bg-zinc-800 dark:bg-white dark:text-black dark:border-white dark:hover:bg-gray-100 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                            >
-                                {hasFeature('simplePayments') ? 'Renew' : 'Continue to Payment →'}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* ── STEP 2: Record Payment (RecordPaymentModal) ── */}
-            {renewalTxn && (
-                <RecordPaymentModal
-                    transactionId={renewalTxn._id}
-                    totalAmount={renewalTxn.amount}
-                    paidSoFar={0}
-                    memberName={renewalTxn.memberName}
-                    confirmCancel
-                    onClose={() => { setRenewalTxn(null); fetchMembers(); }}
-                    onPaid={handleRenewalPaid}
+                <RenewMembershipModal
+                    member={renewingMember}
+                    onClose={() => setRenewingMemberId(null)}
+                    onRenewed={fetchMembers}
                 />
             )}
 
