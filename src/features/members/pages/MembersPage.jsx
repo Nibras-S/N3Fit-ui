@@ -1029,7 +1029,7 @@ const MembersPage = () => {
                             {/* Start date (optional) */}
                             <div>
                                 <label className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
-                                    Start Date <span className="text-gray-300 normal-case font-normal">(optional — defaults to today)</span>
+                                    Start Date <span className="text-gray-300 normal-case font-normal">(optional — defaults to current end date)</span>
                                 </label>
                                 <DatePicker
                                     value={renewForm.date}
