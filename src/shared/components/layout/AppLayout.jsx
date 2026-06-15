@@ -9,6 +9,7 @@ import { useAuth } from "../../../features/auth/context/AuthContext";
 import { useNotifications } from "../../../features/notifications/context/NotificationContext";
 import { useOnlineStatus } from "../../hooks/useOnlineStatus";
 import { getRouteTitle } from "../../lib/routeTitles";
+import { getImageUrl } from "../../lib/imageUrl";
 import {
   FaUserPlus,
   FaUsers,
@@ -260,8 +261,6 @@ export function AppLayout({
   const userRole = user?.role === "gymadmin" ? "Admin" : user?.role === "staff" ? "Staff" : user?.role === "superadmin" ? "Super Admin" : "Admin";
   const gymName = user?.gym?.name || "Fit";
   const gymLogo = user?.gym?.logo;
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
   const bottomNavItems = (user?.role === 'superadmin'
     ? [
       { path: "/superadmin", label: "Dashboard", icon: FaBuilding },
@@ -282,12 +281,6 @@ export function AppLayout({
     }
     return true;
   });
-
-  const getImageUrl = (path) => {
-    if (!path) return null;
-    if (path.startsWith('http')) return path;
-    return `${backendUrl}${path}`;
-  };
 
   const canManageAccount = user?.role !== 'staff';
 

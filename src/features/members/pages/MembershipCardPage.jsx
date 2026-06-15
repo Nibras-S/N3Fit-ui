@@ -3,8 +3,10 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FaCheckCircle, FaClock, FaExclamationTriangle,
     FaDumbbell, FaMoneyBillWave,
-    FaCalendarAlt, FaIdCard, FaWhatsapp,
+    FaCalendarAlt, FaIdCard, FaWhatsapp, FaSearchPlus,
 } from 'react-icons/fa';
+import ImageViewer from '../../../shared/components/ui/ImageViewer';
+import { getImageUrl } from '../../../shared/lib/imageUrl';
 import api from '../../../shared/services/api';
 import { openWhatsApp } from '../../../shared/lib/phone';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -53,8 +55,6 @@ export default function MembershipCardPage() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const { user } = useAuth();
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
-
     // transactionId can be passed as a URL param to pre-select the right txn
     const txnIdFromUrl = searchParams.get('txn');
 
@@ -62,6 +62,7 @@ export default function MembershipCardPage() {
     const [transaction, setTransaction] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showPayModal, setShowPayModal] = useState(false);
+    const [isImageOpen, setIsImageOpen] = useState(false);
 
     useEffect(() => {
         const load = async () => {
@@ -118,9 +119,7 @@ export default function MembershipCardPage() {
 
     const status = transaction?.paymentStatus || 'Pending';
     const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.Pending;
-    const profileImg = member.profileImage
-        ? (member.profileImage.startsWith('http') ? member.profileImage : `${backendUrl}${member.profileImage}`)
-        : null;
+    const profileImg = getImageUrl(member.profileImage);
 
     const totalAmount = transaction?.amount || 0;
     const paidSoFar = transaction?.paidAmount || 0;
@@ -128,9 +127,7 @@ export default function MembershipCardPage() {
     const isPendingOrPartial = status === 'Pending' || status === 'Partial';
 
     const gymName = user?.gym?.name || 'N3FitBook';
-    const gymLogo = user?.gym?.logo
-        ? (user.gym.logo.startsWith('http') ? user.gym.logo : `${backendUrl}${user.gym.logo}`)
-        : null;
+    const gymLogo = getImageUrl(user?.gym?.logo);
 
     return (
         <AppLayout showBackToList={false}>
@@ -170,7 +167,17 @@ export default function MembershipCardPage() {
                             {/* Member identity */}
                             <div className="flex items-center gap-4">
                                 {profileImg ? (
-                                    <img src={profileImg} alt={member.name} className="w-16 h-16 rounded-2xl object-cover border-2 border-white dark:border-zinc-800 shadow-md" />
+                                    <button
+                                        type="button"
+                                        onClick={() => setIsImageOpen(true)}
+                                        aria-label={`View ${member.name}'s profile photo`}
+                                        className="group relative w-16 h-16 rounded-2xl overflow-hidden border-2 border-white dark:border-zinc-800 shadow-md shrink-0 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-white focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900"
+                                    >
+                                        <img src={profileImg} alt={member.name} className="w-full h-full object-cover" />
+                                        <span className="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/35">
+                                            <FaSearchPlus className="text-white text-sm" />
+                                        </span>
+                                    </button>
                                 ) : (
                                     <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner ${
                                         member.gender === 'Female' ? 'bg-pink-100 text-pink-600' : 'bg-zinc-100 text-zinc-900'
@@ -329,6 +336,16 @@ export default function MembershipCardPage() {
                     confirmCancel={!!(transaction.pendingRenewal && !transaction.pendingRenewal.applied)}
                     onClose={() => setShowPayModal(false)}
                     onPaid={handlePaid}
+                />
+            )}
+
+            {/* Full-screen profile photo preview */}
+            {profileImg && (
+                <ImageViewer
+                    isOpen={isImageOpen}
+                    onClose={() => setIsImageOpen(false)}
+                    src={profileImg}
+                    alt={member.name}
                 />
             )}
         </AppLayout>

@@ -10,6 +10,7 @@ import PageHeader from '../../../shared/components/layout/PageHeader';
 import EditMemberModal from './EditMemberModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from './ImportModal';
+import { getImageUrl } from '../../../shared/lib/imageUrl';
 import { FaFileImport } from 'react-icons/fa';
 import { useAuth } from '../../auth/context/AuthContext';
 
@@ -32,7 +33,7 @@ const AllMembers = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [isImportModalOpen, setIsImportModalOpen] = useState(false);
     const [editData, setEditData] = useState(null);
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
 
     // Search Debounce
     useEffect(() => {
@@ -76,7 +77,7 @@ const AllMembers = () => {
     useEffect(() => {
         fetchMembers();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [backendUrl, page, limit, debouncedSearch, genderFilter, sortConfig]);
+    }, [page, limit, debouncedSearch, genderFilter, sortConfig]);
 
     const stats = useMemo(() => ({
         total: totalRecords,
@@ -124,7 +125,7 @@ const AllMembers = () => {
                     {row.profileImage ? (
                         <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
                             <img
-                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                src={getImageUrl(row.profileImage)}
                                 alt={row.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { e.target.style.display = 'none'; }}
@@ -183,7 +184,7 @@ const AllMembers = () => {
                     {row.profileImage ? (
                         <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm">
                             <img
-                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
+                                src={getImageUrl(row.profileImage)}
                                 alt={row.name}
                                 className="w-full h-full object-cover"
                                 onError={(e) => { e.target.style.display = 'none'; }}

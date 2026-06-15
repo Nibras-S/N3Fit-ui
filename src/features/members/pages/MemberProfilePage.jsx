@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import AppLayout from '../../../shared/components/layout/AppLayout';
 import {
     FaUser, FaPhone, FaCalendarAlt, FaHistory, FaEdit,
-    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle, FaIdCard
+    FaCheckCircle, FaExclamationCircle, FaArrowLeft, FaMoneyBillWave, FaPlusCircle, FaIdCard, FaSearchPlus
 } from 'react-icons/fa';
 import toast from 'react-hot-toast';
 import EditMemberModal from '../components/EditMemberModal';
@@ -13,6 +13,8 @@ import RecordPaymentModal from '../components/RecordPaymentModal';
 import EditEndDateModal from '../components/EditEndDateModal';
 import MembershipHistoryTab from '../components/MembershipHistoryTab';
 import { ProfileSkeleton } from '../../../shared/components/ui/Skeleton';
+import ImageViewer from '../../../shared/components/ui/ImageViewer';
+import { getImageUrl } from '../../../shared/lib/imageUrl';
 import { useQueryClient } from '@tanstack/react-query';
 import {
     useMember,
@@ -31,7 +33,7 @@ function MemberProfile() {
     const [paymentTxn, setPaymentTxn] = useState(null);
     const [isExtendOpen, setIsExtendOpen] = useState(false);
     const [renewOpen, setRenewOpen] = useState(false);
-    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const [isImageOpen, setIsImageOpen] = useState(false);
 
     // Three parallel queries — TanStack Query runs them in parallel and
     // each caches independently, so revisiting this page or opening a
@@ -97,13 +99,21 @@ function MemberProfile() {
                     {/* Avatar + info */}
                     <div className="flex items-center gap-4 min-w-0">
                         {member.profileImage ? (
-                            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white dark:border-zinc-800 shadow-md shrink-0">
+                            <button
+                                type="button"
+                                onClick={() => setIsImageOpen(true)}
+                                aria-label={`View ${member.name}'s profile photo`}
+                                className="group relative w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-white dark:border-zinc-800 shadow-md shrink-0 cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 dark:focus-visible:ring-white focus-visible:ring-offset-2 dark:focus-visible:ring-offset-zinc-900 transition"
+                            >
                                 <img
-                                    src={member.profileImage.startsWith('http') ? member.profileImage : `${backendUrl}${member.profileImage}`}
+                                    src={getImageUrl(member.profileImage)}
                                     alt={member.name}
                                     className="w-full h-full object-cover"
                                 />
-                            </div>
+                                <span className="absolute inset-0 hidden group-hover:flex items-center justify-center bg-black/35">
+                                    <FaSearchPlus className="text-white text-sm" />
+                                </span>
+                            </button>
                         ) : (
                             <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-xl sm:text-2xl font-bold shrink-0 ${member.gender === 'Male' ? 'bg-zinc-100 text-zinc-900 dark:bg-zinc-700/50 dark:text-zinc-500' : 'bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400'}`}>
                                 {member.name?.charAt(0)}
@@ -498,6 +508,16 @@ function MemberProfile() {
                 message={`Are you sure you want to delete ${member.name}? This action cannot be undone.`}
                 type="danger"
             />
+
+            {/* Full-screen profile photo preview (pinch / double-tap to zoom) */}
+            {member.profileImage && (
+                <ImageViewer
+                    isOpen={isImageOpen}
+                    onClose={() => setIsImageOpen(false)}
+                    src={getImageUrl(member.profileImage)}
+                    alt={member.name}
+                />
+            )}
         </AppLayout>
     );
 }
