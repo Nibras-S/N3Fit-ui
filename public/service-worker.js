@@ -23,6 +23,23 @@ const HASHED_PRECACHE = self.__PRECACHE_MANIFEST__ || [];
 
 const PRECACHE_URLS = [...STATIC_PRECACHE, ...HASHED_PRECACHE];
 
+// Cache Storage only supports HTTP(S) requests. Browser extensions can issue
+// chrome-extension:// requests from a controlled page, so keep all cache
+// writes same-origin and absorb quota/storage failures instead of creating an
+// unhandled promise rejection in the service worker.
+async function cacheResponseSafely(request, response) {
+    try {
+        const url = new URL(request.url);
+        const isHttp = url.protocol === 'http:' || url.protocol === 'https:';
+        if (!isHttp || url.origin !== self.location.origin) return;
+
+        const cache = await caches.open(CACHE_NAME);
+        await cache.put(request, response);
+    } catch (error) {
+        console.warn('[SW] Cache write skipped:', error.message);
+    }
+}
+
 // Install — cache app shell
 self.addEventListener('install', (event) => {
     event.waitUntil(
@@ -48,6 +65,11 @@ self.addEventListener('fetch', (event) => {
 
     const url = new URL(request.url);
 
+    // Do not intercept or cache browser-extension and cross-origin requests.
+    // In particular, Cache.put() rejects chrome-extension:// requests.
+    const isHttp = url.protocol === 'http:' || url.protocol === 'https:';
+    if (!isHttp || url.origin !== self.location.origin) return;
+
     // Never handle API requests
     if (url.pathname.startsWith('/api/')) return;
 
@@ -68,9 +90,9 @@ self.addEventListener('fetch', (event) => {
                     const contentType = response.headers.get('content-type') || '';
                     if (contentType.includes('text/html')) return response;
                     const clone = response.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                    cacheResponseSafely(request, clone);
                     return response;
-                });
+                }).catch(() => Response.error());
             })
         );
         return;
@@ -83,11 +105,17 @@ self.addEventListener('fetch', (event) => {
                 .then((response) => {
                     if (response && response.status === 200) {
                         const clone = response.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                        cacheResponseSafely(request, clone);
                     }
                     return response;
                 })
-                .catch(() => caches.match(request).then((cached) => cached || caches.match('/index.html')))
+                .catch(async () => {
+                    const cached = await caches.match(request) || await caches.match('/index.html');
+                    return cached || new Response('Service temporarily unavailable', {
+                        status: 503,
+                        headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+                    });
+                })
         );
         return;
     }
@@ -109,9 +137,9 @@ self.addEventListener('fetch', (event) => {
                     return response;
                 }
                 const clone = response.clone();
-                caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+                cacheResponseSafely(request, clone);
                 return response;
-            }).catch(() => cached);
+            }).catch(() => Response.error());
         })
     );
 });
