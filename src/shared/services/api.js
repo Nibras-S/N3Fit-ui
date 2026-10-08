@@ -100,6 +100,12 @@ api.interceptors.response.use(
 
             if (status === 401) {
                 const path = window.location.pathname;
+                try {
+                    window.localStorage.removeItem('n3fit:auth-hint');
+                    window.localStorage.removeItem('n3fb-tq-cache');
+                } catch (_) {
+                    /* storage disabled; redirect still clears in-memory state */
+                }
                 if (path !== '/login' && path !== '/' && path !== '/admin') {
                     window.location.href = '/login';
                 }

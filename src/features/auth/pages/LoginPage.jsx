@@ -203,7 +203,7 @@ function AdminAuth() {
                       type="text"
                       value={gymCode}
                       onChange={(e) => setGymCode(e.target.value.toUpperCase())}
-                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm uppercase tracking-wider"
+                      className="login-auth-input w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm uppercase tracking-wider"
                       placeholder="e.g. GS-1"
                       required
                       autoComplete="off"
@@ -227,7 +227,7 @@ function AdminAuth() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm"
+                  className="login-auth-input w-full pl-11 pr-4 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm"
                   placeholder={activeTab === "staff" ? "staff@fitclub.com" : "admin@fitclub.com"}
                   required
                   autoComplete="email"
@@ -246,7 +246,7 @@ function AdminAuth() {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-11 pr-12 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm"
+                  className="login-auth-input w-full pl-11 pr-12 py-3.5 rounded-xl bg-gray-50 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 text-gray-900 dark:text-white placeholder-gray-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900/20 transition-all text-sm"
                   placeholder="Enter your password"
                   required
                   autoComplete="current-password"

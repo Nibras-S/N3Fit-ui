@@ -72,7 +72,9 @@ export const NotificationProvider = ({ children }) => {
     useEffect(() => {
         // Disconnect the singleton from any previous session before re-connecting.
         if (socketRef.current) {
-            socketRef.current.removeAllListeners();
+            socketRef.current.off('connect');
+            socketRef.current.off('new_notification');
+            socketRef.current.off('notification_read');
             socketRef.current.disconnect();
             socketRef.current = null;
         }
@@ -141,7 +143,9 @@ export const NotificationProvider = ({ children }) => {
             cancelled = true;
             cancel(handle);
             if (socketRef.current) {
-                socketRef.current.removeAllListeners();
+                socketRef.current.off('connect');
+                socketRef.current.off('new_notification');
+                socketRef.current.off('notification_read');
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }

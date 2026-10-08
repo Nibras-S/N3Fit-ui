@@ -123,6 +123,31 @@ textarea::placeholder {
   -webkit-text-fill-color: #71717a;
 }
 
+/* Chrome/Safari paint saved login credentials with their own pale autofill
+   background. In dark mode that background clashes with our white input text,
+   making the value look blank. Keep autofilled login fields aligned with the
+   normal bg-gray-50 / dark:bg-zinc-900 states. This is intentionally scoped
+   to the login form so other feature-specific input backgrounds are untouched. */
+.login-auth-input:-webkit-autofill,
+.login-auth-input:-webkit-autofill:hover,
+.login-auth-input:-webkit-autofill:focus,
+.login-auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827;
+  -webkit-box-shadow: 0 0 0 1000px #f9fafb inset !important;
+  box-shadow: 0 0 0 1000px #f9fafb inset !important;
+}
+
+.dark .login-auth-input:-webkit-autofill,
+.dark .login-auth-input:-webkit-autofill:hover,
+.dark .login-auth-input:-webkit-autofill:focus,
+.dark .login-auth-input:-webkit-autofill:active {
+  -webkit-text-fill-color: #f4f4f5 !important;
+  caret-color: #f4f4f5;
+  -webkit-box-shadow: 0 0 0 1000px #18181b inset !important;
+  box-shadow: 0 0 0 1000px #18181b inset !important;
+}
+
 /* Hide scrollbar utility — cross-browser */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;

@@ -421,16 +421,15 @@ const StaffManagement = () => {
                                                     <FaArchive size={9} /> Archived
                                                 </span>
                                             ) : (
-                                                <button
-                                                    onClick={() => toggleActive(member)}
-                                                    className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium cursor-pointer transition-colors ${member.isActive
+                                                <span
+                                                    className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${member.isActive
                                                         ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/30"
                                                         : "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800/40"
                                                         }`}
                                                 >
                                                     <span className={`w-1.5 h-1.5 rounded-full ${member.isActive ? "bg-green-500" : "bg-zinc-900"}`}></span>
                                                     {member.isActive ? "Active" : "Inactive"}
-                                                </button>
+                                                </span>
                                             )}
                                         </td>
                                         <td className="px-5 py-4">
@@ -460,48 +459,67 @@ const StaffManagement = () => {
                                                         <button
                                                             onClick={() => handleRestore(member._id)}
                                                             disabled={restoringId === member._id}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50"
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50"
                                                             title="Restore"
+                                                            aria-label={`Restore ${member.name}`}
                                                         >
                                                             {restoringId === member._id ? (
                                                                 <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaUndo size={13} />
                                                             )}
+                                                            <span>Restore</span>
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(member._id)}
                                                             disabled={deletingId === member._id}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors disabled:opacity-50"
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
                                                             title="Delete permanently"
+                                                            aria-label={`Permanently delete ${member.name}`}
                                                         >
                                                             {deletingId === member._id ? (
                                                                 <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaTrash size={13} />
                                                             )}
+                                                            <span>Delete</span>
                                                         </button>
                                                     </>
                                                 ) : (
                                                     <>
                                                         <button
                                                             onClick={() => openEditModal(member)}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors"
                                                             title="Edit"
+                                                            aria-label={`Edit ${member.name}`}
                                                         >
                                                             <FaEdit size={14} />
+                                                            <span>Edit</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={() => toggleActive(member)}
+                                                            className={`inline-flex items-center px-2.5 py-2 rounded-lg text-xs font-medium transition-colors ${member.isActive
+                                                                ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'
+                                                                : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                                                                }`}
+                                                            title={member.isActive ? 'Deactivate login access' : 'Activate login access'}
+                                                            aria-label={`${member.isActive ? 'Deactivate' : 'Activate'} ${member.name}`}
+                                                        >
+                                                            {member.isActive ? 'Deactivate' : 'Activate'}
                                                         </button>
                                                         <button
                                                             onClick={() => handleDelete(member._id)}
                                                             disabled={deletingId === member._id}
-                                                            className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50"
+                                                            className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50"
                                                             title="Archive"
+                                                            aria-label={`Archive ${member.name}`}
                                                         >
                                                             {deletingId === member._id ? (
                                                                 <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span>
                                                             ) : (
                                                                 <FaArchive size={13} />
                                                             )}
+                                                            <span>Archive</span>
                                                         </button>
                                                     </>
                                                 )}
@@ -579,15 +597,14 @@ const StaffManagement = () => {
                                                 Archived
                                             </span>
                                         ) : (
-                                            <button
-                                                onClick={() => toggleActive(member)}
+                                            <span
                                                 className={`text-xs px-3 py-1.5 rounded-full font-medium ${member.isActive
                                                     ? "bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
                                                     : "bg-zinc-50 dark:bg-zinc-800/50 text-zinc-700 dark:text-zinc-500"
                                                     }`}
                                             >
                                                 {member.isActive ? "Active" : "Inactive"}
-                                            </button>
+                                            </span>
                                         )}
                                     </div>
                                     <div className="flex items-center justify-between">
@@ -596,26 +613,38 @@ const StaffManagement = () => {
                                                 <span key={p} className="text-xs px-2 py-1 rounded-md bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-300 capitalize">{p}</span>
                                             ))}
                                         </div>
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center justify-end gap-1 flex-wrap">
                                             {view === 'archived' ? (
                                                 <>
                                                     <button onClick={() => handleRestore(member._id)} disabled={restoringId === member._id}
-                                                        className="p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50">
+                                                        aria-label={`Restore ${member.name}`}
+                                                        className="inline-flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors disabled:opacity-50">
                                                         {restoringId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaUndo size={13} />}
+                                                        <span>Restore</span>
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
-                                                        className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors disabled:opacity-50">
+                                                        aria-label={`Permanently delete ${member.name}`}
+                                                        className="inline-flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50">
                                                         {deletingId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaTrash size={13} />}
+                                                        <span>Delete</span>
                                                     </button>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <button onClick={() => openEditModal(member)} className="p-2 rounded-lg text-gray-400 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
+                                                    <button onClick={() => openEditModal(member)} aria-label={`Edit ${member.name}`} className="inline-flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
                                                         <FaEdit size={14} />
+                                                        <span>Edit</span>
+                                                    </button>
+                                                    <button onClick={() => toggleActive(member)}
+                                                        aria-label={`${member.isActive ? 'Deactivate' : 'Activate'} ${member.name}`}
+                                                        className={`inline-flex items-center px-2 py-2 rounded-lg text-xs font-medium transition-colors ${member.isActive ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'}`}>
+                                                        {member.isActive ? 'Deactivate' : 'Activate'}
                                                     </button>
                                                     <button onClick={() => handleDelete(member._id)} disabled={deletingId === member._id}
-                                                        className="p-2 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50">
+                                                        aria-label={`Archive ${member.name}`}
+                                                        className="inline-flex items-center gap-1 px-2 py-2 rounded-lg text-xs font-medium text-gray-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/20 transition-colors disabled:opacity-50">
                                                         {deletingId === member._id ? <span className="w-3.5 h-3.5 block bg-current rounded-full opacity-60 animate-pulse"></span> : <FaArchive size={13} />}
+                                                        <span>Archive</span>
                                                     </button>
                                                 </>
                                             )}
@@ -867,8 +896,8 @@ const StaffManagement = () => {
                 onConfirm={confirmDelete}
                 title={view === 'archived' ? 'Permanently Delete Staff' : 'Archive Staff Member'}
                 message={view === 'archived'
-                    ? 'This will permanently delete the staff record. Historical references (expenses, transactions) may show "Unknown user". This cannot be undone.'
-                    : "This staff member will be moved to the archive. They'll be hidden from rosters and dropdowns, but you can restore them anytime from the Archived tab."}
+                    ? 'This permanently deletes the staff record. Historical references may show "Unknown user". Archive is safer when the person has resigned. This cannot be undone.'
+                    : "This immediately blocks the staff member's login and current access, then moves them to Archived. Their historical records are preserved, and an admin can restore them later."}
                 confirmText={view === 'archived' ? 'Delete Permanently' : 'Move to Archive'}
                 cancelText="Cancel"
                 type="danger"
