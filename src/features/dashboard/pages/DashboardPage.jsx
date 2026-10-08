@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 import { useDashboardStats } from '../hooks/useDashboardQueries';
 import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
+import { Avatar } from '../../../shared/components/ui/Avatar';
 
 const Dashboard = () => {
     const { user, hasFeature } = useAuth();
@@ -167,17 +168,8 @@ const Dashboard = () => {
                                     onClick={() => navigate(`/invoice/${txn._id}`)}
                                 >
                                     <div className="flex items-center gap-3 min-w-0">
-                                        {txn.memberProfileImage ? (
-                                            <img
-                                                src={txn.memberProfileImage}
-                                                alt={txn.memberName}
-                                                className="w-8 h-8 rounded-full object-cover shrink-0"
-                                            />
-                                        ) : (
-                                            <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center text-xs font-bold shrink-0">
-                                                {txn.memberName?.charAt(0)?.toUpperCase() || '?'}
-                                            </div>
-                                        )}
+                                        <Avatar src={txn.memberProfileImage} name={txn.memberName}
+                                            size="sm" variant="neutral" />
                                         <div className="min-w-0">
                                             <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">{txn.memberName}</p>
                                             <p className="text-xs text-gray-400 dark:text-gray-400">{txn.plan} · {formatDate(txn.transactionDate)}</p>

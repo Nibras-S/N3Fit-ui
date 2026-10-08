@@ -16,6 +16,7 @@ import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import CSVImportModal from '../components/ImportModal';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
+import { Avatar } from '../../../shared/components/ui/Avatar';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     FaUsers, FaMale, FaFemale, FaSearch, FaEdit, FaTrash, FaSync,
@@ -377,20 +378,8 @@ const MembersPage = () => {
             key: 'name', label: 'Name', sortable: true,
             render: (row) => (
                 <div className="flex items-center gap-3 group">
-                    {row.profileImage ? (
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm">
-                            <img
-                                src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
-                                alt={row.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                        </div>
-                    ) : (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
-                            {row.name?.charAt(0)}
-                        </div>
-                    )}
+                    <Avatar src={row.profileImage?.startsWith('http') ? row.profileImage : row.profileImage ? `${backendUrl}${row.profileImage}` : null}
+                        name={row.name} size="sm" variant="neutral" />
                     <span className="font-medium text-gray-900 dark:text-gray-200 group-hover:text-zinc-900 dark:group-hover:text-zinc-500 transition-colors">{row.name}</span>
                 </div>
             ),
@@ -464,20 +453,8 @@ const MembersPage = () => {
             <>
                 <div className="flex justify-between items-start mb-3 relative">
                     <div className="flex items-center gap-3 min-w-0">
-                        {row.profileImage ? (
-                            <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 dark:border-zinc-700 shadow-sm shrink-0">
-                                <img
-                                    src={row.profileImage.startsWith('http') ? row.profileImage : `${backendUrl}${row.profileImage}`}
-                                    alt={row.name}
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => { e.target.style.display = 'none'; }}
-                                />
-                            </div>
-                        ) : (
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${row.gender === 'Male' ? 'bg-zinc-100 dark:bg-zinc-700/50 text-zinc-900 dark:text-zinc-500' : 'bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400'}`}>
-                                {row.name?.charAt(0)}
-                            </div>
-                        )}
+                        <Avatar src={row.profileImage?.startsWith('http') ? row.profileImage : row.profileImage ? `${backendUrl}${row.profileImage}` : null}
+                            name={row.name} size="md" variant="neutral" />
                         <div className="min-w-0">
                             <div className="font-semibold text-gray-900 dark:text-white truncate">{row.name}</div>
                             {showPhone && row.phone && (

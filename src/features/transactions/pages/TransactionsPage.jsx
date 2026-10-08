@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import usePersistedFilters from '../../../shared/hooks/usePersistedFilters';
 import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 import { useTransactions } from '../hooks/useTransactionsQueries';
+import { Avatar } from '../../../shared/components/ui/Avatar';
 
 // Module-level empty array keeps the `data ?? EMPTY` fallback referentially
 // stable across renders so useMemo deps don't churn on every pending tick.
@@ -151,13 +152,8 @@ const TransactionsPage = () => {
             key: 'memberName', label: 'Member', sortable: true,
             render: (row) => (
                 <div className="flex items-center gap-2.5">
-                    {row.memberProfileImage ? (
-                        <img src={row.memberProfileImage} alt={row.memberName} className="w-8 h-8 rounded-full object-cover shrink-0" />
-                    ) : (
-                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center text-xs font-bold shrink-0">
-                            {row.memberName?.charAt(0)?.toUpperCase()}
-                        </div>
-                    )}
+                    <Avatar src={row.memberProfileImage} name={row.memberName}
+                        size="sm" variant="neutral" />
                     <span className="font-medium text-gray-800 dark:text-gray-200 text-sm">{row.memberName}</span>
                 </div>
             )
@@ -207,13 +203,8 @@ const TransactionsPage = () => {
         <>
             <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2.5">
-                    {row.memberProfileImage ? (
-                        <img src={row.memberProfileImage} alt={row.memberName} className="w-9 h-9 rounded-full object-cover shrink-0" />
-                    ) : (
-                        <div className="w-9 h-9 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white flex items-center justify-center text-sm font-bold shrink-0">
-                            {row.memberName?.charAt(0)?.toUpperCase()}
-                        </div>
-                    )}
+                    <Avatar src={row.memberProfileImage} name={row.memberName}
+                        size="md" variant="neutral" />
                     <div>
                         <p className="font-semibold text-gray-900 dark:text-white text-sm">{row.memberName}</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">{formatDate(row.transactionDate)} · {row.plan}</p>

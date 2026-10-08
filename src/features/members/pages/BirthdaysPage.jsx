@@ -6,6 +6,7 @@ import { formatDate } from '../../../shared/lib/formatters';
 import { formatPhoneForDisplay } from '../../../shared/lib/phone';
 import { FaBirthdayCake, FaSearch, FaSync } from 'react-icons/fa';
 import { CardSkeleton } from '../../../shared/components/ui/Skeleton';
+import { Avatar } from '../../../shared/components/ui/Avatar';
 
 const FILTER_OPTIONS = [
     { key: 'all', label: 'All' },
@@ -154,7 +155,6 @@ const BirthdaysPage = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filtered.map(member => {
                             const badge = getBadge(member.upcomingBirthdayDays);
-                            const initial = member.name?.charAt(0)?.toUpperCase() || '?';
 
                             return (
                                 <div
@@ -164,17 +164,8 @@ const BirthdaysPage = () => {
                                 >
                                     <div className="flex items-start gap-3">
                                         {/* Avatar */}
-                                        {member.profileImage ? (
-                                            <img
-                                                src={member.profileImage}
-                                                alt={member.name}
-                                                className="w-11 h-11 rounded-full object-cover shrink-0"
-                                            />
-                                        ) : (
-                                            <div className="w-11 h-11 rounded-full bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center shrink-0">
-                                                <span className="text-rose-600 dark:text-rose-400 font-bold text-sm">{initial}</span>
-                                            </div>
-                                        )}
+                                        <Avatar src={member.profileImage} name={member.name}
+                                            size="md" variant="neutral" />
 
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between gap-2">

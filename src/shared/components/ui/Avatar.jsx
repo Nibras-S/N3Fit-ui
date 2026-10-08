@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 /**
  * Avatar Component
@@ -12,6 +12,7 @@ import React from "react";
  *  - name      : user's full name — used for initials fallback and alt text
  *  - size      : size preset (default: "md")
  *  - online    : show green online indicator dot
+ *  - variant   : "color" | "neutral" fallback style
  *  - className : additional classes
  *
  * Example usage:
@@ -30,7 +31,7 @@ const sizes = {
 // Generate a stable background color based on the name
 function getColor(name = "") {
     const colors = [
-        "bg-zinc-1000", "bg-purple-500", "bg-pink-500", "bg-green-500",
+        "bg-blue-500", "bg-purple-500", "bg-pink-500", "bg-green-500",
         "bg-teal-500", "bg-orange-500", "bg-zinc-900", "bg-indigo-500",
         "bg-yellow-500", "bg-cyan-500",
     ];
@@ -47,26 +48,41 @@ function getInitials(name = "") {
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-export function Avatar({ src, name = "", size = "md", online = false, className = "" }) {
+export function Avatar({
+    src,
+    name = "",
+    size = "md",
+    online = false,
+    variant = "color",
+    className = "",
+}) {
     const s = sizes[size] ?? sizes.md;
     const initials = getInitials(name);
     const bgColor = getColor(name);
+    // Remember only the URL that failed. If a member uploads a replacement
+    // and `src` changes, the new image is attempted automatically.
+    const [failedSrc, setFailedSrc] = useState(null);
+    const showImage = Boolean(src && failedSrc !== src);
+    const displayInitials = variant === "neutral" ? initials.charAt(0) : initials;
+    const fallbackColor = variant === "neutral"
+        ? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white"
+        : `${bgColor} text-white`;
 
     return (
         <div className={`relative inline-flex shrink-0 ${className}`}>
-            {src ? (
+            {showImage ? (
                 <img
                     src={src}
                     alt={name || "Avatar"}
                     className={`${s.container} rounded-full object-cover ring-2 ring-white dark:ring-dark-card`}
-                    onError={(e) => { e.target.style.display = "none"; }}
+                    onError={() => setFailedSrc(src)}
                 />
             ) : (
                 <span
-                    className={`${s.container} ${bgColor} ${s.text} rounded-full flex items-center justify-center font-semibold text-white ring-2 ring-white dark:ring-dark-card`}
+                    className={`${s.container} ${fallbackColor} ${s.text} rounded-full flex items-center justify-center font-semibold ring-2 ring-white dark:ring-dark-card`}
                     aria-label={name || "Avatar"}
                 >
-                    {initials || "?"}
+                    {displayInitials || "?"}
                 </span>
             )}
 

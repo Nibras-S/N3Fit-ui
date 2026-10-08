@@ -13,6 +13,7 @@ import CSVImportModal from './ImportModal';
 import { getImageUrl } from '../../../shared/lib/imageUrl';
 import { FaFileImport } from 'react-icons/fa';
 import { useAuth } from '../../auth/context/AuthContext';
+import { Avatar } from '../../../shared/components/ui/Avatar';
 
 const AllMembers = () => {
     const { hasFeature } = useAuth();
@@ -122,20 +123,8 @@ const AllMembers = () => {
                     className="flex items-center gap-3 cursor-pointer hover:bg-gray-50 p-1 -m-1 rounded-lg transition-colors group"
                     onClick={() => navigate(`/members/${row._id}`)}
                 >
-                    {row.profileImage ? (
-                        <div className="w-8 h-8 rounded-full overflow-hidden border border-gray-100 shadow-sm">
-                            <img
-                                src={getImageUrl(row.profileImage)}
-                                alt={row.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                        </div>
-                    ) : (
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-zinc-900' : 'bg-pink-100 text-pink-600'}`}>
-                            {row.name?.charAt(0)}
-                        </div>
-                    )}
+                    <Avatar src={getImageUrl(row.profileImage)} name={row.name}
+                        size="sm" variant="neutral" />
                     <span className="font-medium text-gray-900 group-hover:text-zinc-900 transition-colors">{row.name}</span>
                 </div>
             )
@@ -181,20 +170,8 @@ const AllMembers = () => {
         <>
             <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-3">
-                    {row.profileImage ? (
-                        <div className="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm">
-                            <img
-                                src={getImageUrl(row.profileImage)}
-                                alt={row.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => { e.target.style.display = 'none'; }}
-                            />
-                        </div>
-                    ) : (
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${row.gender === 'Male' ? 'bg-zinc-100 text-zinc-900' : 'bg-pink-100 text-pink-600'}`}>
-                            {row.name?.charAt(0)}
-                        </div>
-                    )}
+                    <Avatar src={getImageUrl(row.profileImage)} name={row.name}
+                        size="md" variant="neutral" />
                     <div>
                         <div className="font-semibold text-gray-900">{row.name}</div>
                         <div className="text-sm text-gray-500">{row.phone}</div>
