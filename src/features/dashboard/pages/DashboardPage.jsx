@@ -14,23 +14,28 @@ import ReportBaselineBanner from '../../../shared/components/feedback/ReportBase
 import { Avatar } from '../../../shared/components/ui/Avatar';
 
 const Dashboard = () => {
-    const { user, hasFeature } = useAuth();
+    const { user, hasFeature, initialAuthChecked } = useAuth();
     const navigate = useNavigate();
     const [todayModalOpen, setTodayModalOpen] = useState(false);
     const [paymentTxn, setPaymentTxn] = useState(null);
+    // On reload the session hint has a role but no permissions yet. Wait for
+    // /auth/me before redirecting staff or issuing a protected stats request.
+    const permissionsReady = user?.role !== 'staff' || Array.isArray(user?.permissions) || initialAuthChecked;
+    const canViewDashboard = !!user && (user.role !== 'staff' || user.permissions?.includes('dashboard'));
+    const canManagePayments = user?.role === 'gymadmin' || user?.permissions?.includes('payments');
 
     // Socket-driven invalidation is centralized in app/RealtimeSync.jsx, which
     // flushes ['dashboard'] on member/transaction/expense events. No local
     // useGymSocket needed here — TQ picks it up automatically.
-    const statsQuery = useDashboardStats();
+    const statsQuery = useDashboardStats({ enabled: permissionsReady && canViewDashboard });
     const stats = statsQuery.data;
-    const loading = statsQuery.isPending;
+    const loading = !permissionsReady || statsQuery.isPending;
 
     useEffect(() => {
-        if (user && user.role === 'staff' && !user.permissions?.includes('dashboard')) {
-            navigate('/members');
+        if (permissionsReady && user?.role === 'staff' && !canViewDashboard) {
+            navigate('/members', { replace: true });
         }
-    }, [user, navigate]);
+    }, [permissionsReady, user, canViewDashboard, navigate]);
 
     const METHOD_COLORS = { Cash: '#10b981', UPI: '#6366f1', Card: '#8b5cf6', 'Bank Transfer': '#06b6d4' };
     const STATUS_COLORS = { Paid: '#10b981', Pending: '#f59e0b', Partial: '#f97316', Refunded: '#3f3f46' };
@@ -40,7 +45,7 @@ const Dashboard = () => {
         ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
         : '-';
 
-    if (loading) {
+    if (loading || !canViewDashboard) {
         return (
             <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
                 <div className="space-y-6 lg:pb-10">
@@ -55,6 +60,20 @@ const Dashboard = () => {
                         <div className="h-64 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800" />
                         <div className="h-64 bg-white dark:bg-zinc-900 opacity-60 animate-pulse rounded-2xl border border-gray-100 dark:border-zinc-800" />
                     </div>
+                </div>
+            </AppLayout>
+        );
+    }
+
+    if (statsQuery.isError) {
+        return (
+            <AppLayout title="Dashboard" description="Gym performance and revenue analytics" icon={FaChartPie} showGenderSwitch={false}>
+                <div role="alert" className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 text-center">
+                    <p className="font-semibold text-gray-900 dark:text-white">Unable to load dashboard data</p>
+                    <p className="mt-2 text-sm text-gray-500">Please try again. If this continues, contact your gym administrator.</p>
+                    <button onClick={() => statsQuery.refetch()} className="mt-4 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white dark:bg-white dark:text-zinc-900">
+                        Try again
+                    </button>
                 </div>
             </AppLayout>
         );
@@ -146,12 +165,12 @@ const Dashboard = () => {
                             <FaExchangeAlt className="text-zinc-900 text-sm" />
                             <h3 className="font-bold text-gray-900 dark:text-white">Recent Transactions</h3>
                         </div>
-                        <button
+                        {canManagePayments && <button
                             onClick={() => navigate('/transactions')}
                             className="text-xs text-zinc-900 hover:text-zinc-700 font-semibold transition-colors"
                         >
                             View All →
-                        </button>
+                        </button>}
                     </div>
 
                     {recentTransactions.length === 0 ? (
@@ -230,12 +249,12 @@ const Dashboard = () => {
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
                                             <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(p.amount)}</span>
-                                            <button
+                                            {canManagePayments && <button
                                                 onClick={() => setPaymentTxn(p)}
                                                 className="text-[10px] bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-1 rounded-lg font-semibold transition-colors"
                                             >
                                                 Collect
-                                            </button>
+                                            </button>}
                                         </div>
                                     </div>
                                 ))}
@@ -414,21 +433,21 @@ const Dashboard = () => {
                                 )}
                             </div>
 
-                            <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
+                            {canManagePayments && <div className="pt-2 border-t border-gray-100 dark:border-zinc-800">
                                 <button
                                     onClick={() => { setTodayModalOpen(false); navigate('/transactions'); }}
                                     className="w-full py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold text-sm transition-colors shadow-none"
                                 >
                                     View All Transactions →
                                 </button>
-                            </div>
+                            </div>}
                         </div>
                     </div>
                 </div>
             )}
 
             {/* ── Collect Payment Modal ─────────────────────────────────── */}
-            {paymentTxn && (
+            {canManagePayments && paymentTxn && (
                 <RecordPaymentModal
                     transactionId={paymentTxn._id}
                     totalAmount={paymentTxn.amount}
