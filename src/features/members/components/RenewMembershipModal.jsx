@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { FaRedo } from 'react-icons/fa';
 import { DatePicker } from '../../../shared/components/ui/DatePicker';
 import RecordPaymentModal from './RecordPaymentModal';
+import { refreshPaymentQueries } from '../../transactions/lib/paymentCache';
 import api from '../../../shared/services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../auth/context/AuthContext';
@@ -35,11 +36,7 @@ export default function RenewMembershipModal({ member, onClose, onRenewed }) {
     // membership history reflect the renewal without a manual refresh.
     // Invalidating ['members'] covers both the list and the member-detail tree.
     const refreshAfterRenewal = () => {
-        queryClient.invalidateQueries({ queryKey: ['members'] });
-        queryClient.invalidateQueries({ queryKey: ['transactions'] });
-        queryClient.invalidateQueries({ queryKey: ['memberships'] });
-        queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-        queryClient.invalidateQueries({ queryKey: ['reports'] });
+        return refreshPaymentQueries(queryClient);
     };
 
     // Plans for the picker.
@@ -80,7 +77,7 @@ export default function RenewMembershipModal({ member, onClose, onRenewed }) {
 
     const handleRenewalPaid = () => {
         setRenewalTxn(null);
-        refreshAfterRenewal();
+        // RecordPaymentModal has already refreshed the shared queries.
         toast.success('Membership renewed and payment recorded!');
         onRenewed?.();
         onClose?.();

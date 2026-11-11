@@ -10,6 +10,7 @@ import EditMemberModal from '../components/EditMemberModal';
 import RenewMembershipModal from '../components/RenewMembershipModal';
 import ConfirmModal from '../../../shared/components/feedback/ConfirmModal';
 import RecordPaymentModal from '../components/RecordPaymentModal';
+import { getCollectedAmount } from '../../../shared/lib/transactionAmounts';
 import EditEndDateModal from '../components/EditEndDateModal';
 import MembershipHistoryTab from '../components/MembershipHistoryTab';
 import { ProfileSkeleton } from '../../../shared/components/ui/Skeleton';
@@ -424,7 +425,7 @@ function MemberProfile() {
                             <FaMoneyBillWave /> Total Spent
                         </div>
                         <p className="text-3xl font-bold">
-                            ₹{transactions.reduce((sum, t) => sum + (t.paymentStatus === 'Paid' ? t.amount : 0), 0).toLocaleString('en-IN')}
+                            ₹{transactions.reduce((sum, t) => sum + getCollectedAmount(t), 0).toLocaleString('en-IN')}
                         </p>
                         <p className="text-xs opacity-75 mt-1">Lifetime Value</p>
                     </div>

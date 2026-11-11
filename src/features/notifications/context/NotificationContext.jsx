@@ -70,15 +70,6 @@ export const NotificationProvider = ({ children }) => {
     }, [api, notifications]);
 
     useEffect(() => {
-        // Disconnect the singleton from any previous session before re-connecting.
-        if (socketRef.current) {
-            socketRef.current.off('connect');
-            socketRef.current.off('new_notification');
-            socketRef.current.off('notification_read');
-            socketRef.current.disconnect();
-            socketRef.current = null;
-        }
-
         if (!user || user.role === 'superadmin') {
             setNotifications([]);
             setUnreadCount(0);
@@ -105,50 +96,47 @@ export const NotificationProvider = ({ children }) => {
             clearTimeout(handle);
         };
 
+        const onConnect = () => socket.emit('join_gym');
+        const onNotification = (notif) => {
+            setNotifications((prev) => {
+                if (prev.some((n) => n._id === notif._id)) return prev;
+                return [notif, ...prev];
+            });
+
+            if (notif.type === 'warning') setActiveWarning(notif);
+
+            toast.success('New notification received!', { icon: '🔔', duration: 4000 });
+        };
+
+        const onNotificationRead = ({ notificationId, userId }) => {
+            if (userId === (user.id || user._id)) {
+                setNotifications((prev) => prev.map((n) =>
+                    n._id === notificationId ? { ...n, isRead: true } : n,
+                ));
+            }
+        };
+
+        // Register before connecting so an immediate connection cannot miss
+        // the join handler. Clean up only the listeners owned by this provider.
+        socket.on('connect', onConnect);
+        socket.on('new_notification', onNotification);
+        socket.on('notification_read', onNotificationRead);
         const handle = schedule(() => {
             if (cancelled) return;
-
             fetchNotifications();
             checkWarning();
-
-            // Use the singleton socket — never call io() directly in feature code
-            socket.connect();
             socketRef.current = socket;
-
-            socket.on('connect', () => {
-                socket.emit('join_gym');
-            });
-
-            socket.on('new_notification', (notif) => {
-                setNotifications((prev) => {
-                    if (prev.some((n) => n._id === notif._id)) return prev;
-                    return [notif, ...prev];
-                });
-
-                if (notif.type === 'warning') setActiveWarning(notif);
-
-                toast.success('New notification received!', { icon: '🔔', duration: 4000 });
-            });
-
-            socket.on('notification_read', ({ notificationId, userId }) => {
-                if (userId === user._id) {
-                    setNotifications((prev) => prev.map((n) =>
-                        n._id === notificationId ? { ...n, isRead: true } : n,
-                    ));
-                }
-            });
+            socket.connect();
         });
 
         return () => {
             cancelled = true;
             cancel(handle);
-            if (socketRef.current) {
-                socketRef.current.off('connect');
-                socketRef.current.off('new_notification');
-                socketRef.current.off('notification_read');
-                socketRef.current.disconnect();
-                socketRef.current = null;
-            }
+            socket.off('connect', onConnect);
+            socket.off('new_notification', onNotification);
+            socket.off('notification_read', onNotificationRead);
+            socket.disconnect();
+            socketRef.current = null;
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
@@ -166,7 +154,7 @@ export const NotificationProvider = ({ children }) => {
         markAsRead,
         markAllAsRead,
         setActiveWarning,
-        socket: socketRef, // expose ref for useGymSocket hook
+        socket: socketRef, // retained for layout badge listeners
     }), [notifications, unreadCount, activeWarning, loading, fetchNotifications, markAsRead, markAllAsRead]);
 
     return (

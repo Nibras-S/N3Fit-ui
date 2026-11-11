@@ -56,9 +56,8 @@ const TransactionsPage = () => {
 
     const openPayModal = (tx) => setPayModal(tx);
     const closePayModal = () => setPayModal(null);
-    // Mutation lives in RecordPaymentModal (raw api.post). Backend emits
-    // `transaction:updated`, RealtimeSync invalidates ['transactions'] → TQ
-    // auto-refetches. No manual fetch call needed here.
+    // The shared payment mutation updates and refreshes all affected queries
+    // before calling onPaid, even when the socket is disconnected.
     const handlePaid = () => { closePayModal(); };
 
     const filteredTransactions = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import {
     FaCheckCircle, FaClock, FaExclamationTriangle,
@@ -7,7 +7,9 @@ import {
 } from 'react-icons/fa';
 import ImageViewer from '../../../shared/components/ui/ImageViewer';
 import { getImageUrl } from '../../../shared/lib/imageUrl';
-import api from '../../../shared/services/api';
+import { useMember, useMemberTransactions } from '../hooks/useMembersQueries';
+import { useTransaction } from '../../transactions/hooks/useTransactionsQueries';
+import { getCollectedAmount, getOutstandingAmount } from '../../../shared/lib/transactionAmounts';
 import { openWhatsApp } from '../../../shared/lib/phone';
 import { useAuth } from '../../auth/context/AuthContext';
 import RecordPaymentModal from '../components/RecordPaymentModal';
@@ -58,41 +60,16 @@ export default function MembershipCardPage() {
     // transactionId can be passed as a URL param to pre-select the right txn
     const txnIdFromUrl = searchParams.get('txn');
 
-    const [member, setMember] = useState(null);
-    const [transaction, setTransaction] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const memberQuery = useMember(memberId);
+    const transactionQuery = useTransaction(txnIdFromUrl);
+    const transactionsQuery = useMemberTransactions(txnIdFromUrl ? null : memberId);
+    const member = memberQuery.data;
+    const transaction = txnIdFromUrl ? transactionQuery.data : transactionsQuery.data?.[0];
+    const loading = memberQuery.isPending || (txnIdFromUrl ? transactionQuery.isPending : transactionsQuery.isPending);
     const [showPayModal, setShowPayModal] = useState(false);
     const [isImageOpen, setIsImageOpen] = useState(false);
 
-    useEffect(() => {
-        const load = async () => {
-            try {
-                const [memberRes, txnRes] = await Promise.all([
-                    api.get(`/contacts/${memberId}`),
-                    txnIdFromUrl
-                        ? api.get(`/transactions/${txnIdFromUrl}`)
-                        : api.get(`/transactions?memberId=${memberId}&sortBy=transactionDate&sortOrder=desc&limit=1`),
-                ]);
-
-                setMember(memberRes.data);
-
-                if (txnIdFromUrl) {
-                    setTransaction(txnRes.data);
-                } else {
-                    const list = txnRes.data?.data || txnRes.data;
-                    setTransaction(Array.isArray(list) ? list[0] : null);
-                }
-            } catch {
-                // api interceptor handles toast
-            } finally {
-                setLoading(false);
-            }
-        };
-        load();
-    }, [memberId, txnIdFromUrl]);
-
-    const handlePaid = (updatedTxn) => {
-        setTransaction(updatedTxn);
+    const handlePaid = () => {
         setShowPayModal(false);
     };
 
@@ -122,8 +99,8 @@ export default function MembershipCardPage() {
     const profileImg = getImageUrl(member.profileImage);
 
     const totalAmount = transaction?.amount || 0;
-    const paidSoFar = transaction?.paidAmount || 0;
-    const balanceDue = Math.max(0, totalAmount - paidSoFar);
+    const paidSoFar = getCollectedAmount(transaction);
+    const balanceDue = getOutstandingAmount(transaction);
     const isPendingOrPartial = status === 'Pending' || status === 'Partial';
 
     const gymName = user?.gym?.name || 'N3FitBook';
@@ -289,7 +266,7 @@ export default function MembershipCardPage() {
                                     const days = Number.isFinite(member.dews)
                                         ? Math.max(0, member.dews)
                                         : Math.max(0, Math.round((new Date(member.endDate).getTime() - todayIST) / 86400000));
-                                    const paidAmt = transaction?.paidAmount ?? 0;
+                                    const paidAmt = getCollectedAmount(transaction);
                                     const balance = Math.max(0, totalAmount - paidAmt);
                                     const paymentStatus = transaction?.paymentStatus || 'Pending';
                                     const lines = [

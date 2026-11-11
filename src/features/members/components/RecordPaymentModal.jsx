@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { FaTimes, FaPlus, FaTrash, FaCreditCard, FaExclamationTriangle } from 'react-icons/fa';
-import api from '../../../shared/services/api';
+import { useRecordPayment } from '../../transactions/hooks/useTransactionsQueries';
 import toast from 'react-hot-toast';
 
 const METHODS = ['Cash', 'UPI', 'Card', 'Bank Transfer'];
@@ -37,13 +37,16 @@ export default function RecordPaymentModal({
 
     const [splits, setSplits] = useState([{ paymentMethod: 'Cash', amount: '' }]);
     const [notes, setNotes] = useState('');
-    const [submitting, setSubmitting] = useState(false);
+    const paymentMutation = useRecordPayment();
+    const submitting = paymentMutation.isPending;
+    const submittingRef = useRef(false);
     const [showCancelWarn, setShowCancelWarn] = useState(false);
 
     // Cancel / ✕ both route through here so a renewal can confirm before the
     // staged-but-unpaid renewal is discarded.
     const requestClose = () => {
-        if (confirmCancel && !submitting) setShowCancelWarn(true);
+        if (submittingRef.current) return;
+        if (confirmCancel) setShowCancelWarn(true);
         else onClose();
     };
 
@@ -93,6 +96,7 @@ export default function RecordPaymentModal({
     // ── Submit ────────────────────────────────────────────────────────────────
 
     const handleSubmit = async () => {
+        if (submittingRef.current) return;
         if (splitTotal <= 0) return toast.error('Enter an amount to pay');
         if (isOver) return toast.error('Payment exceeds balance due');
 
@@ -102,19 +106,19 @@ export default function RecordPaymentModal({
 
         if (!payload.length) return toast.error('Enter an amount to pay');
 
-        setSubmitting(true);
+        submittingRef.current = true;
         try {
-            const res = await api.put(`/transactions/${transactionId}/pay`, {
+            const updated = await paymentMutation.mutateAsync({
+                transactionId,
                 splits: payload,
                 notes: notes.trim() || undefined,
             });
-            const updated = res.data;
             toast.success(isFull ? 'Payment recorded — Paid in full!' : 'Partial payment recorded');
             onPaid(updated);
         } catch {
             // axios interceptor already toasts the error
         } finally {
-            setSubmitting(false);
+            submittingRef.current = false;
         }
     };
 

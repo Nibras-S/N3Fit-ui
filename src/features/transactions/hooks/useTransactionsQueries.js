@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../../../shared/services/api';
+import { refreshPaymentQueries, updatePaymentCache } from '../lib/paymentCache';
 
 // Query keys for the transactions feature. Match the shape RealtimeSync
 // expects (['transactions'] prefix) so a `transaction:created` socket event
@@ -11,7 +12,31 @@ export const transactionKeys = {
     // gym and the UI filters client-side. Kept as a function so adding
     // server-side filters later is a one-line change.
     list: () => [...transactionKeys.lists(), {}],
+    detail: (id) => [...transactionKeys.all, 'detail', id],
 };
+
+export function useTransaction(id) {
+    return useQuery({
+        queryKey: transactionKeys.detail(id),
+        queryFn: async () => (await api.get(`/transactions/${id}`)).data,
+        enabled: Boolean(id),
+    });
+}
+
+export function useRecordPayment() {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ transactionId, ...payload }) => (
+            await api.put(`/transactions/${transactionId}/pay`, payload)
+        ).data,
+        // Never retry a financial write automatically.
+        retry: false,
+        onSuccess: async transaction => {
+            updatePaymentCache(queryClient, transaction);
+            await refreshPaymentQueries(queryClient);
+        },
+    });
+}
 
 // Paginated/filterable list. Today the server returns the full list and the
 // page filters client-side; the hook reflects that. When the backend grows

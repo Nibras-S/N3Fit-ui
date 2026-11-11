@@ -1,5 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query';
 import useGymSocket from '../shared/hooks/useGymSocket';
+import { refreshPaymentQueries } from '../features/transactions/lib/paymentCache';
 
 // App-level realtime invalidator. The backend already emits
 // `<resource>:<action>` events on every mutation (see emitToGym in
@@ -10,10 +11,18 @@ import useGymSocket from '../shared/hooks/useGymSocket';
 // incrementally without breaking cache coherence.
 //
 // Add a new section here when a new feature gets migrated to TanStack Query.
-// Must be rendered INSIDE both QueryClientProvider and NotificationProvider
-// (NotificationProvider owns the socket useGymSocket subscribes to).
+// Must be rendered inside QueryClientProvider and AuthProvider.
+// NotificationProvider connects the singleton that useGymSocket subscribes to.
 export default function RealtimeSync() {
     const queryClient = useQueryClient();
+
+    // Emitted after the authenticated gym room is joined on every connection.
+    // Refetch current state to recover events missed while disconnected.
+    useGymSocket(['gym:joined'], () => {
+        refreshPaymentQueries(queryClient);
+        queryClient.invalidateQueries({ queryKey: ['settings'] });
+        queryClient.invalidateQueries({ queryKey: ['expenses', 'list'] });
+    });
 
     useGymSocket(
         ['member:created', 'member:updated', 'member:deleted'],
@@ -36,12 +45,7 @@ export default function RealtimeSync() {
     useGymSocket(
         ['transaction:created', 'transaction:updated'],
         () => {
-            queryClient.invalidateQueries({ queryKey: ['transactions'] });
-            queryClient.invalidateQueries({ queryKey: ['dashboard'] });
-            queryClient.invalidateQueries({ queryKey: ['reports'] });
-            // Member profile page caches transactions under the member detail
-            // subtree; a recorded payment needs to flush that too.
-            queryClient.invalidateQueries({ queryKey: ['members', 'detail'] });
+            refreshPaymentQueries(queryClient);
         },
     );
 

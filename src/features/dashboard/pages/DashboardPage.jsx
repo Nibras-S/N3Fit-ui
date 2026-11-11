@@ -12,6 +12,7 @@ import RecordPaymentModal from '../../members/components/RecordPaymentModal';
 import { useDashboardStats } from '../hooks/useDashboardQueries';
 import ReportBaselineBanner from '../../../shared/components/feedback/ReportBaselineBanner';
 import { Avatar } from '../../../shared/components/ui/Avatar';
+import { getOutstandingAmount } from '../../../shared/lib/transactionAmounts';
 
 const Dashboard = () => {
     const { user, hasFeature, initialAuthChecked } = useAuth();
@@ -81,6 +82,7 @@ const Dashboard = () => {
 
     const dailyByMethod = stats?.income?.dailyByMethod || [];
     const dailyByStatus = stats?.income?.dailyByStatus || [];
+    const dailyDues = dailyByStatus.filter(row => ['Pending', 'Partial'].includes(row._id));
     const pendingPayments = stats?.pendingPayments || [];
 
     // simplePayments gyms don't track payment methods/dues — hide every money
@@ -147,10 +149,10 @@ const Dashboard = () => {
                                 <p className="text-[10px] uppercase font-bold text-gray-500 dark:text-gray-400 tracking-wider">Pending</p>
                             </div>
                             <p className="text-2xl font-black text-yellow-700 dark:text-yellow-400">
-                                {formatCurrency(dailyByStatus.find(s => s._id === 'Pending')?.total || 0)}
+                                {formatCurrency(dailyDues.reduce((sum, row) => sum + (row.outstanding ?? row.total ?? 0), 0))}
                             </p>
                             <p className="text-[10px] text-yellow-600/70 dark:text-yellow-400/70 font-medium">
-                                {dailyByStatus.find(s => s._id === 'Pending')?.count || 0} dues today
+                                {dailyDues.reduce((sum, row) => sum + (row.count || 0), 0)} dues today
                             </p>
                         </div>
                         </>)}
@@ -248,7 +250,7 @@ const Dashboard = () => {
                                             <p className="text-xs text-gray-400 dark:text-gray-400">{p.plan}</p>
                                         </div>
                                         <div className="flex items-center gap-2 shrink-0">
-                                            <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(p.amount)}</span>
+                                            <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">{formatCurrency(getOutstandingAmount(p))}</span>
                                             {canManagePayments && <button
                                                 onClick={() => setPaymentTxn(p)}
                                                 className="text-[10px] bg-zinc-900 hover:bg-zinc-800 text-white px-2 py-1 rounded-lg font-semibold transition-colors"
