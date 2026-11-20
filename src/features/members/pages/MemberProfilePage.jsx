@@ -299,7 +299,7 @@ function MemberProfile() {
                                                             )}
                                                             <button
                                                                 onClick={() => navigate(`/invoice/${txn._id}`)}
-                                                                className="text-zinc-700 hover:text-zinc-700 dark:hover:text-red-300 text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity"
+                                                                className="text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white text-sm font-medium transition-colors"
                                                                 title="View Invoice"
                                                             >
                                                                 Invoice
